@@ -1,6 +1,12 @@
+#folders
+./CaMa_in
+./CaMa_out
+
 #bin files
 *.bin
 *.one
+*.hlf
+*.qrt
 
 #text files
 *.txt
