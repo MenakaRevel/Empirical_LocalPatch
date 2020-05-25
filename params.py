@@ -16,15 +16,16 @@ def timestep():
      return 86400 # outer timestep in seconds
 
 def starttime():
-     return (1959,1,1) # start date: [year,month,date]
+     return [1958,1,1] # start date: [year,month,date]
 
 def endtime():
-     return (2014,1,1) # end date: [year,month,date]
+     return [1959,12,31] # end date: [year,month,date]
                       # *note: this date is not included
 
 def CaMa_dir():
      #return "/cluster/data6/menaka/CaMa-Flood_v395b_20191030"
      return "/cluster/data6/menaka/CaMa-Flood_v396_20191225"
+    # return "/cluster/data6/menaka/CaMa-Flood_v396a_20200514"
     # directory of CaMa-Flood
     # indicate the directory of ./map or ./src and other folders
 
@@ -32,6 +33,11 @@ def out_dir():
      return "/cluster/data6/menaka/Empiricl_LocalPatch"
     #return "/media/menaka/HDJA-UT/covariance"
 
+def map_name():
+    return "glb_06min"
+
+def input_name():
+    return "S14FD"
 
 def spinup_mode():
      return 0

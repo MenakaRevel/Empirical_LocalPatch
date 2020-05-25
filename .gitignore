@@ -11,6 +11,7 @@
 *.pyc
 
 #PBS oe files
+CaMa_sim.o*
 EmpLP.o*
 
 #figures
