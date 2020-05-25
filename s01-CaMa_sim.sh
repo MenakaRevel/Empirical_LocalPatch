@@ -16,14 +16,17 @@
 #==========================================================
 
 #*** PBS setting when needed
-#PBS -q E20
-#PBS -l select=1:ncpus=20:mem=10gb
+#PBS -q E40
+#PBS -l select=1:ncpus=40:mem=60gb
 #PBS -j oe
 #PBS -m ea
+#PBS -M menaka@rainbow.iis.u-tokyo.ac.jp
 #PBS -V
 #PBS -N CaMa_sim
 #========
 #edited by Menaka@IIS for Empirical Local Patch 2020/05/25
+#========
+cd $PBS_O_WORKDIR
 #================================================
 # input settings
 
@@ -33,7 +36,7 @@ sdate=`python -c "import params; print (params.starttime()[2])"`
 eyear=`python -c "import params; print (params.endtime()[0])"`
 emonth=`python -c "import params; print (params.endtime()[1])"`
 edate=`python -c "import params; print (params.endtime()[2])"`
-
+echo $syear $smonth
 CAMADIR=`python -c "import params; print (params.CaMa_dir())"`
 outdir=`python -c "import params; print (params.out_dir())"`
 cpunums=`python -c "import params; print (params.cpu_nums())"`
