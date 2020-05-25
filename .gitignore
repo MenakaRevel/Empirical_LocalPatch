@@ -1,0 +1,22 @@
+#bin files
+*.bin
+*.one
+
+#text files
+*.txt
+
+#fotran excutables
+
+#.pyc files
+*.pyc
+
+#PBS oe files
+EmpLP.o*
+
+#figures
+*.png
+*.jpg
+
+#temporary opened files
+*.swp
+*.swo
