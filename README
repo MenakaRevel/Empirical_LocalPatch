@@ -1,0 +1,10 @@
+Physically Based Adaptive empirical local patches for CaMa-Flood hydrodynaminc model
+======
+Local patached area derived using spatial auto-correlation
+=====
+1. s01-CaMa_sim.sh - run CaMa-Flood
+2. s02-conv_bin2nc.sh - convert binary files to netCDF4
+3. 
+Reference:
+1.  Revel, M., Ikeshima, D., Yamazaki, D., & Kanae, S.,A Physically Based Empirical Localization Method for Assimilating Synthetic SWOT Observations of a Continental-Scale River: A Case Study in the Congo Basin,Water, 11(4), 829. https://doi.org/10.3390/w11040829, 2019
+2. Revel, M., Yamazaki, D., & Kanae, S.,Model Based Observation Localization Weighting Function for Amazon Mainstream, Journal of Japan Society of Civil Engineers, Ser. B1 (Hydraulic Engineering), 74(5), I_157-I_162,https://doi.org/10.2208/jscejhe.74.5_I_157,2018 
