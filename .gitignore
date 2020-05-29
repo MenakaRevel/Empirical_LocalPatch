@@ -12,6 +12,13 @@
 *.txt
 
 #fotran excutables
+*/bin2nc
+*/trend_sfcelv
+*/ifft90_sfcelv
+*/standze_sfcelv
+*/sfit_sfcelv
+*/lpara_sfcelv
+*/lparaMS_sfcelv
 
 #.pyc files
 *.pyc
