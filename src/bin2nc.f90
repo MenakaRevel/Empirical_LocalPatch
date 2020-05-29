@@ -177,7 +177,7 @@ end do
 !===close netCDF4===
 call nccheck( nf90_close(ncid))
 
-print* , "***", trim(fname), "sucessfully created***"
+print* , "***", trim(varname)//trim(tag), "sucessfully created***"
 deallocate(d1lat,d1lon,dt)
 end program bin2nc
 !*********************************
