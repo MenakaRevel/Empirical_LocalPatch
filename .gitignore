@@ -25,6 +25,7 @@
 
 #PBS oe files
 CaMa_sim.o*
+bin2nc.o*
 EmpLP.o*
 
 #figures

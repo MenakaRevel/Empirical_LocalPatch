@@ -13,7 +13,7 @@ character(len=8)                      :: units
 real                                  :: gsize,west, north, east, south ! map boundries
 integer                               :: latpx,lonpx,nflp    ! pixel size, calculated
 real,allocatable                      :: globaltrue(:,:,:)
-integer*4                             :: i!,j,i_m,j_m,pixel
+integer*4                             :: i,j!,i_m,j_m,pixel
 integer                               :: days,ios,N!,countnum
 integer                               :: ncid,timeid,varid,latid,lonid
 integer                               :: ix,iy,nx,ny
@@ -61,24 +61,6 @@ read(11,*) south
 read(11,*) north
 close(11)
 !-------
-! read variable
-allocate(globaltrue(N,lonpx,latpx))
-i=1
-do year=syear,eyear
-    write(yyyy,'(i4.0)') year
-    write(*,*) yyyy !day,, days(day) 
-    days=dyear(year)
-    fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(inname)//"/"//trim(varname)//yyyy//".bin"
-    print *,fname
-    open(34,file=fname,form="unformatted",access="direct",recl=4*days*lonpx*latpx,status="old",iostat=ios)
-    if(ios==0)then
-        read(34,rec=1) globaltrue(i:i+days-1,:,:)
-    else
-        write(*,*) "no",trim(varname),trim(fname)
-    end if
-    close(34)
-    i=i+days
-end do
 !======
 ! write netCDF file
 !******
@@ -160,16 +142,37 @@ print*, "put variables"
 count=(/nx,ny,1/)
 start=(/1,1,1/)
 call nccheck( nf90_inq_varid(ncid,trim(varname),varid) )
-do i=1,N
-    start(4)=i
-    call nccheck( nf90_put_var(ncid,varid,globaltrue(i,1:nx,1:ny),start=start,count=count) )
+! read variable
+i=1
+do year=syear,eyear
+    write(yyyy,'(i4.0)') year
+    write(*,*) yyyy !day,, days(day) 
+    days=dyear(year)
+    allocate(globaltrue(days,lonpx,latpx))
+    fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(inname)//"/"//trim(varname)//yyyy//".bin"
+    print *,fname
+    open(34,file=fname,form="unformatted",access="direct",recl=4*days*lonpx*latpx,status="old",iostat=ios)
+    if(ios==0)then
+        read(34,rec=1) globaltrue(:,:,:)
+    else
+        write(*,*) "no",trim(varname),trim(fname)
+    end if
+    close(34)
+    do j=1,days
+        start(4)=j+i
+        call nccheck( nf90_put_var(ncid,varid,globaltrue(i,1:nx,1:ny),start=start,count=count) )
+    end do
+    deallocate(globaltrue)
+    i=i+days
 end do
+
+
 
 !===close netCDF4===
 call nccheck( nf90_close(ncid))
 
 print* , "***", trim(fname), "sucessfully created***"
-deallocate(globaltrue,d1lat,d1lon,dt)
+deallocate(d1lat,d1lon,dt)
 end program bin2nc
 !*********************************
 function dyear(year)
