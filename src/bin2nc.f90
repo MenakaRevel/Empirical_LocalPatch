@@ -3,7 +3,7 @@ program bin2nc
 use netcdf
 implicit none
 character(len=128)                    :: fname,buf,camadir,outdir
-character(len=32)                     :: varname,mapname,inname
+character(len=32)                     :: outname,varname,mapname,inname
 character(len=4)                      :: yyyy
 integer                               :: year,syear,eyear,dyear
 integer                               :: smonth,sday,shour,smin
@@ -32,13 +32,13 @@ call getarg(3,buf)
 read(buf,*) eyear ! end year
 
 call getarg(4,buf)
-read(buf,*) varname ! variable name [e.g. sfcelv,rivout,outflw]
+read(buf,'(A)') outname ! variable name [e.g. sfcelv,rivout,outflw]
 
 call getarg(5,buf)
-read(buf,*) mapname ! map name
+read(buf,"(A)") mapname ! map name
 
 call getarg(6,buf)
-read(buf,*) inname ! input runoff forcing name
+read(buf,'(A)') inname ! input runoff forcing name
 
 call getarg(7,buf)
 read(buf,"(A)") camadir
@@ -47,6 +47,8 @@ write(*,*) camadir
 call getarg(8,buf)
 read(buf,"(A)") outdir
 write(*,*) outdir
+!-
+varname=outname
 !==
 fname=trim(camadir)//"/map/"//trim(mapname)//"/params.txt"
 print *, fname
@@ -143,14 +145,15 @@ count=(/nx,ny,1/)
 start=(/1,1,1/)
 call nccheck( nf90_inq_varid(ncid,trim(varname),varid) )
 ! read variable
-i=1
+i=0
 do year=syear,eyear
     write(yyyy,'(i4.0)') year
     write(*,*) yyyy !day,, days(day) 
     days=dyear(year)
     allocate(globaltrue(days,lonpx,latpx))
+    varname=outname
     fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(inname)//"/"//trim(varname)//yyyy//".bin"
-    print *,fname
+    !print *,"L153",trim(varname),days!fname
     open(34,file=fname,form="unformatted",access="direct",recl=4*days*lonpx*latpx,status="old",iostat=ios)
     if(ios==0)then
         read(34,rec=1) globaltrue(:,:,:)
@@ -158,12 +161,15 @@ do year=syear,eyear
         write(*,*) "no",trim(varname),trim(fname)
     end if
     close(34)
+    !print*, "L161",trim(varname)
     do j=1,days
         start(4)=j+i
         call nccheck( nf90_put_var(ncid,varid,globaltrue(i,1:nx,1:ny),start=start,count=count) )
+        !print*,"L165", trim(varname),j
     end do
     deallocate(globaltrue)
     i=i+days
+    !print*,"L169",trim(varname)
 end do
 
 
