@@ -13,7 +13,7 @@
 
 #fotran excutables
 */bin2nc
-*/trend_sfcelv
+*/remove_trend
 */ifft90_sfcelv
 */standze_sfcelv
 */sfit_sfcelv
