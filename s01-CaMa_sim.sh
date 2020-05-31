@@ -33,10 +33,10 @@ cd $PBS_O_WORKDIR
 syear=`python -c "import params; print (params.starttime()[0])"`
 smonth=`python -c "import params; print (params.starttime()[1])"`
 sdate=`python -c "import params; print (params.starttime()[2])"`
-eyear=`python -c "import params; print (params.endtime()[0])"`
+eyear=1958 #`python -c "import params; print (params.endtime()[0])"`
 emonth=`python -c "import params; print (params.endtime()[1])"`
 edate=`python -c "import params; print (params.endtime()[2])"`
-echo $syear $smonth
+echo $syear" to "$eyear
 CAMADIR=`python -c "import params; print (params.CaMa_dir())"`
 outdir=`python -c "import params; print (params.out_dir())"`
 cpunums=`python -c "import params; print (params.cpu_nums())"`
@@ -63,7 +63,7 @@ export IFORTLIB="/opt/intel/lib:/opt/intel/mkl/lib"
 export DYLD_LIBRARY_PATH="${IFORTLIB}:${DYLD_LIBRARY_PATH}"
 
 #*** 0c. OpenMP thread number
-export OMP_NUM_THREADS=$cpunums       # OpenMP cpu num
+export OMP_NUM_THREADS=40 #$cpunums       # OpenMP cpu num
 
 #================================================
 # (1) Experiment setting
@@ -97,7 +97,7 @@ LDAMOUT=".FALSE."                           # .TRUE. to activate reservoir opera
 YSTA=$syear                                 # start year ( from YSTA / Jan  1st _ 00:00)
 YEND=$eyear                                  # end   year (until YEND / Dec 31st _ 24:00)
 SPINUP=0                                    # [0]: zero-storage start, [1]: from restart file
-NSP=0                                       # spinup repeat time
+NSP=1                                       # spinup repeat time
 
 
 #============================
