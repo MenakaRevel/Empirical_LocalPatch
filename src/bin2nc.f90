@@ -145,12 +145,12 @@ count=(/nx,ny,1/)
 start=(/1,1,1/)
 call nccheck( nf90_inq_varid(ncid,trim(varname),varid) )
 ! read variable
-i=0
+i=1
 do year=syear,eyear
     write(yyyy,'(i4.0)') year
     write(*,*) yyyy !day,, days(day) 
     days=dyear(year)
-    allocate(globaltrue(days,lonpx,latpx))
+    allocate(globaltrue(lonpx,latpx,days))
     varname=outname
     fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(inname)//"/"//trim(varname)//yyyy//".bin"
     !print *,"L153",trim(varname),days!fname
@@ -162,11 +162,14 @@ do year=syear,eyear
     end if
     close(34)
     !print*, "L161",trim(varname)
-    do j=1,days
-        start(4)=j+i
-        call nccheck( nf90_put_var(ncid,varid,globaltrue(i,1:nx,1:ny),start=start,count=count) )
-        !print*,"L165", trim(varname),j
-    end do
+    start(3)=i
+    count(3)=days
+    call nccheck( nf90_put_var(ncid,varid,globaltrue(1:nx,1:ny,1:days),start=start,count=count) )
+    !do j=1,days
+    !    start(3)=j+i
+    !    call nccheck( nf90_put_var(ncid,varid,globaltrue(1:nx,1:ny,i+j),start=start,count=count) )
+    !    !print*,"L165", trim(varname),j
+    !end do
     deallocate(globaltrue)
     i=i+days
     !print*,"L169",trim(varname)

@@ -3,7 +3,7 @@ program trend_sfcelv
 ! calcualte the trend line using y=a*x+b
 ! Menaka@IIS
 ! files read and write using netCDF4 format
-! 2020/0530
+! 2020/05/30
 ! Reference:
 ! Revel et al,. (2019), Revel et al,. (2019)
 !====================================================
@@ -77,7 +77,7 @@ close(11)
 allocate(nextX(lonpx,latpx),nextY(lonpx,latpx),ocean(lonpx,latpx))
 ! read next grid information
 ! read nextX and nextY
-fname=trim(adjustl(camadir))//"map/glb_15min/nextxy.bin"
+fname=trim(adjustl(camadir))//"/map/"//trim(mapname)//"/nextxy.bin"
 open(34,file=fname,form="unformatted",access="direct",recl=4*latpx*lonpx,status="old",iostat=ios)
 if(ios==0)then
     read(34,rec=1) nextX
@@ -179,12 +179,13 @@ call nccheck( nf90_put_var(ncidout,varid,dt) )
 !---------------------------------
 ! read netCDF file
 fname=trim(outdir)//"/CaMa_out/"//trim(inname)//"/"//trim(varname)//trim(tag)//".nc"
+print*, "open ",trim(fname)
 call nccheck( nf90_open(fname, nf90_nowrite, ncidin) )
 call nccheck( nf90_inq_varid(ncidin, trim(varname),varidin) )
 allocate(globaltrue(N),rmdtrnd(N),xt(N))
 xt = (/(real(i), i=1,N,1)/)
 
-
+print*,N
 ! parallel calculation
 
 !$omp parallel default(private) shared(ocean,rivwth,globaltrue,xt,N)
@@ -201,10 +202,12 @@ do ix = 1,nx ! pixels along longtitude direction
         else
             ! get variable subset
             call nccheck( nf90_get_var(ncidin,varidin,globaltrue,start=start,count=count) )
+            !write(*,*) globaltrue
             !--trend line as y = a + bx
             call trend_para(globaltrue,N,a,b)
             !---
             rmdtrnd(:) = globaltrue - (a + b*(xt))
+            print*,ix,iy,a,b
         end if
         !--write variable--
         call nccheck( nf90_put_var(ncidout,varidout,rmdtrnd,start=start,count=count) )
