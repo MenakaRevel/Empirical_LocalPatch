@@ -31,6 +31,7 @@ integer,allocatable                   :: dt(:)
 real,allocatable                      :: d1lat(:), d1lon(:)
 integer,dimension(3)                  :: start,count
 real,parameter                        :: rmis=1.0e20
+integer                               :: MPI_COMM_WORLD,MPI_INFO_NULL
 !====================================================
 call getarg(1,buf)
 read(buf,*) N ! length of time series
@@ -107,10 +108,10 @@ write(tag,'(i4.0,a,i4.0)')syear,"-",eyear
 fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(inname)//"/rmdtrnd"//trim(tag)//".nc"
 print*, "create",fname
 call nccheck( nf90_create(fname, NF90_NETCDF4, ncidout) )
-!call nccheck( nf90_create(fname, IOR(NF90_NETCDF4,NF90_MPIIO), ncidout, comm = MPI_COMM_WORLD, info = MPI_INFO_NULL) )
+!call nccheck( nf90_create_par(fname, IOR(NF90_NETCDF4,NF90_MPIIO), MPI_COMM_WORLD, MPI_INFO_NULL, ncidout) )
 !=== set dimension ===
 print*, "set dimension"
-call nccheck( nf90_def_dim(ncidout, 'time', NF90_UNLIMITED, timeid) )
+call nccheck( nf90_def_dim(ncidout, 'time', N, timeid) )
 call nccheck( nf90_def_dim(ncidout, 'lat', ny, latid) )
 call nccheck( nf90_def_dim(ncidout, 'lon', nx, lonid) )
 !=== define variables ===
@@ -185,8 +186,11 @@ call nccheck( nf90_put_var(ncidout,varid,dt) )
 fname=trim(outdir)//"/CaMa_out/"//trim(inname)//"/"//trim(varname)//trim(tag)//".nc"
 print*, "open ",trim(fname)
 call nccheck( nf90_open(fname, nf90_nowrite, ncidin) )
-!call nccheck( nf90_open(fname, IOR(nf90_nowrite,NF90_MPIIO), ncidin, comm = MPI_COMM_WORLD, info = MPI_INFO_NULL) )
+!call nccheck( nf90_open_par(fname, IOR(NF90_NETCDF4,NF90_MPIIO), MPI_COMM_WORLD, MPI_INFO_NULL, ncidin) )
 call nccheck( nf90_inq_varid(ncidin, trim(varname),varidin) )
+!===set collective I/O globally===
+!call nccheck( nf90_var_par_access(ncidin, nf90_global, nf90_collective) )
+!------------
 allocate(globaltrue(N),rmdtrnd(N),xt(N))
 xt = (/(real(i), i=1,N,1)/)
 
@@ -201,12 +205,10 @@ do ix = 1,nx ! pixels along longtitude direction
         start=(/ix,iy,1/)
         count=(/1,1,N/)
         !remove ocean
-        if (ocean(ix,iy) /= 0) then
-            globaltrue = 1e20
-            rmdtrnd    = 1e20
-        else
+        if (ocean(ix,iy) == 0) then
             ! get variable subset
             call nccheck( nf90_get_var(ncidin,varidin,globaltrue,start=start,count=count) )
+            !globaltrue = 100
             !write(*,*) globaltrue
             !--trend line as y = a + bx
             call trend_para(globaltrue,N,a,b)

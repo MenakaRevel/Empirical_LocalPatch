@@ -20,7 +20,6 @@ cd $PBS_O_WORKDIR
 export OMP_NUM_THREADS=20
 
 # input settings
-
 syear=`python -c "import params; print (params.starttime()[0])"`
 smonth=`python -c "import params; print (params.starttime()[1])"`
 sdate=`python -c "import params; print (params.starttime()[2])"`

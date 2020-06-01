@@ -77,7 +77,7 @@ print*, "create",fname
 call nccheck( nf90_create(fname, NF90_NETCDF4, ncid) )
 !=== set dimension ===
 print*, "set dimension"
-call nccheck( nf90_def_dim(ncid, 'time', NF90_UNLIMITED, timeid) )
+call nccheck( nf90_def_dim(ncid, 'time', N, timeid) )
 call nccheck( nf90_def_dim(ncid, 'lat', ny, latid) )
 call nccheck( nf90_def_dim(ncid, 'lon', nx, lonid) )
 !=== define variables ===

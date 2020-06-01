@@ -17,14 +17,16 @@
 #========
 cd $PBS_O_WORKDIR
 #================================================
-# input settings
+# OpenMP Thread number
+export OMP_NUM_THREADS=20
 
+# input settings
 syear=`python -c "import params; print (params.starttime()[0])"`
 smonth=`python -c "import params; print (params.starttime()[1])"`
 sdate=`python -c "import params; print (params.starttime()[2])"`
-eyear=2010 #`python -c "import params; print (params.endtime()[0])"`
-emonth=12 #`python -c "import params; print (params.endtime()[1])"`
-edate=31 #`python -c "import params; print (params.endtime()[2])"`
+eyear=1958 #`python -c "import params; print (params.endtime()[0])"`
+emonth=`python -c "import params; print (params.endtime()[1])"`
+edate=`python -c "import params; print (params.endtime()[2])"`
 echo $syear" to "$eyear
 CAMADIR=`python -c "import params; print (params.CaMa_dir())"`
 outdir=`python -c "import params; print (params.out_dir())"`
