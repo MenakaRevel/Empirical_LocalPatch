@@ -14,6 +14,7 @@
 #fotran excutables
 */bin2nc
 */remove_trend
+*/remove_season
 */ifft90_sfcelv
 */standze_sfcelv
 */sfit_sfcelv
