@@ -1,11 +1,11 @@
-program trend_sfcelv
+program remove_trend
 !===================================================
 ! calcualte the trend line using y=a*x+b
 ! Menaka@IIS
 ! files read and write using netCDF4 format
 ! 2020/05/30
 ! Reference:
-! Revel et al,. (2019), Revel et al,. (2019)
+! Revel et al,. (2018), Revel et al,. (2019)
 !====================================================
 !$ use omp_lib
 use netcdf
@@ -107,6 +107,7 @@ write(tag,'(i4.0,a,i4.0)')syear,"-",eyear
 fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(inname)//"/rmdtrnd"//trim(tag)//".nc"
 print*, "create",fname
 call nccheck( nf90_create(fname, NF90_NETCDF4, ncidout) )
+!call nccheck( nf90_create(fname, IOR(NF90_NETCDF4,NF90_MPIIO), ncidout, comm = MPI_COMM_WORLD, info = MPI_INFO_NULL) )
 !=== set dimension ===
 print*, "set dimension"
 call nccheck( nf90_def_dim(ncidout, 'time', NF90_UNLIMITED, timeid) )
@@ -141,6 +142,9 @@ print*, "put attribute"
 call nccheck( nf90_put_att(ncidout, varidout, 'long_name', trim(longname(varname))) )
 call nccheck( nf90_put_att(ncidout, varidout, 'units',     trim(units(varname))) )
 call nccheck( nf90_put_att(ncidout, varidout, '_fillvalue',rmis) )
+
+!===set collective I/O globally===
+!call nccheck( nf90_var_par_access(ncidout, nf90_global, nf90_collective) )
 
 !===end header===
 print*, "end def"
@@ -181,6 +185,7 @@ call nccheck( nf90_put_var(ncidout,varid,dt) )
 fname=trim(outdir)//"/CaMa_out/"//trim(inname)//"/"//trim(varname)//trim(tag)//".nc"
 print*, "open ",trim(fname)
 call nccheck( nf90_open(fname, nf90_nowrite, ncidin) )
+!call nccheck( nf90_open(fname, IOR(nf90_nowrite,NF90_MPIIO), ncidin, comm = MPI_COMM_WORLD, info = MPI_INFO_NULL) )
 call nccheck( nf90_inq_varid(ncidin, trim(varname),varidin) )
 allocate(globaltrue(N),rmdtrnd(N),xt(N))
 xt = (/(real(i), i=1,N,1)/)
@@ -188,7 +193,7 @@ xt = (/(real(i), i=1,N,1)/)
 print*,N
 ! parallel calculation
 
-!$omp parallel default(private) shared(ocean,rivwth,globaltrue,xt,N)
+!$omp parallel default(private) shared(ocean,N,iy,ncidin,varidin,ncidout,varidout)
 !$omp do
 !$write(*,*) omp_get_num_threads()
 do ix = 1,nx ! pixels along longtitude direction
@@ -198,7 +203,7 @@ do ix = 1,nx ! pixels along longtitude direction
         !remove ocean
         if (ocean(ix,iy) /= 0) then
             globaltrue = 1e20
-            rmdtrnd(:) = 1e20
+            rmdtrnd    = 1e20
         else
             ! get variable subset
             call nccheck( nf90_get_var(ncidin,varidin,globaltrue,start=start,count=count) )
@@ -206,11 +211,13 @@ do ix = 1,nx ! pixels along longtitude direction
             !--trend line as y = a + bx
             call trend_para(globaltrue,N,a,b)
             !---
-            rmdtrnd(:) = globaltrue - (a + b*(xt))
+            rmdtrnd = globaltrue - (a + b*(xt))
             print*,ix,iy,a,b
+            !--write variable--
+            call nccheck( nf90_put_var(ncidout,varidout,rmdtrnd,start=start,count=count) )
         end if
-        !--write variable--
-        call nccheck( nf90_put_var(ncidout,varidout,rmdtrnd,start=start,count=count) )
+!        !--write variable--
+!        call nccheck( nf90_put_var(ncidout,varidout,rmdtrnd,start=start,count=count) )
     end do
 end do
 !$write(*,*) omp_get_num_threads() 
@@ -222,7 +229,7 @@ call nccheck( nf90_close(ncidin ) )
 call nccheck( nf90_close(ncidout) )
 !---
 deallocate(nextX,nextY,ocean,globaltrue,xt,rmdtrnd)
-end program trend_sfcelv
+end program remove_trend
 !************************
 subroutine trend_para(y,N,a,b)
 implicit none
