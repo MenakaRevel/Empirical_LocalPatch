@@ -17,10 +17,10 @@ TARGETS=\
 bin2nc \
 remove_trend \
 remove_season \
-standze_sfcelv \
-sfit_sfcelv \
-lpara_sfcelv \
-lparaMS_sfcelv
+standardize \
+semivariance \
+lpara\
+lparaMS
 
 # Suffix
 .SUFFIXES : .f90
