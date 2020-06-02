@@ -27,6 +27,13 @@
 #PBS oe files
 CaMa_sim.o*
 bin2nc.o*
+rm_trd.o*
+rm_sen.o*
+stndz.o*
+semivar.o*
+weight.o*
+lpara.o*
+lparaMS.o*
 EmpLP.o*
 
 #figures
