@@ -226,7 +226,7 @@ do ix = 1,nx ! pixels along longtitude direction
             !remove frequency other than multiple of p days
             !covarite of 6
             !frequency of 90 and 180 also kept
-            write(*,*)"NN",NN,shape(data)
+            write(*,*)ix,iy,NN,shape(data)
             call iff_p(data,NN,P)
             call REALFT(data,NN,-1)
             !call FOUR1(data1,NN/2,-1)
