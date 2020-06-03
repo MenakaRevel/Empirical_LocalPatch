@@ -23,7 +23,6 @@ integer                               :: latpx,lonpx,nflp    ! pixel size, calcu
 real,allocatable                      :: globaltrue(:),rmdsesn(:),data1(:)
 integer,allocatable                   :: nextX(:,:),nextY(:,:),ocean(:,:)
 integer                               :: i,ios,N,NN
-real,allocatable                      :: xt(:)
 integer                               :: timeid,varid,latid,lonid
 integer                               :: ncidin,ncidout,varidin,varidout
 integer                               :: ix,iy,nx,ny
@@ -31,17 +30,6 @@ integer,allocatable                   :: dt(:)
 real,allocatable                      :: d1lat(:), d1lon(:)
 integer,dimension(3)                  :: start,count
 real,parameter                        :: rmis=1.0e20,coeff=0.1,P=365.0
-!real,allocatable                      :: storage(:,:),globaltrue(:,:,:),td(:,:),wse(:,:),data11(:)!,anomaly(:,:,:)!,data111(:)
-!integer,allocatable                   :: ocean(:,:),days(:)
-!real                                  :: assimN,assimS,assimW,assimE!,lat,lon
-!integer*4                             :: lon_cent,lat_cent!,patch_size,patch_side,patch_nums
-!!integer*4                             :: i!,j,i_m,j_m,pixel
-!integer                               :: day,ios,N,NN!,countnum
-!!real,allocatable                      :: xf(:),xt(:) 
-!integer*4,dimension(lonpx,latpx)      :: nextX,nextY
-!!real                                  :: a,b
-!real,parameter                        :: coeff=0.1,P=365.0
-!real                                  :: P 
 !==========================================================
 call getarg(1,buf)
 read(buf,*) N ! length of time series
@@ -195,8 +183,7 @@ fname=trim(outdir)//"/CaMa_out/"//trim(inname)//"/"//trim(varname)//trim(tag)//"
 print*, "open ",trim(fname)
 call nccheck( nf90_open(fname, nf90_nowrite, ncidin) )
 call nccheck( nf90_inq_varid(ncidin, trim(varname),varidin) )
-allocate(globaltrue(N),rmdsesn(N),xt(N))
-xt = (/(real(i), i=1,N,1)/)
+allocate(globaltrue(N),rmdsesn(N))
 !--
 print*,N
 !--
@@ -246,12 +233,7 @@ call nccheck( nf90_close(ncidin ) )
 call nccheck( nf90_close(ncidout) )
 !---
 print*, "deallocate"
-!deallocate(nextX,nextY,ocean,d1lat,d1lon,dt,globaltrue,xt,data1,rmdsesn)
-deallocate(nextX,nextY,ocean)
-deallocate(d1lat,d1lon)
-deallocate(dt)
-deallocate(globaltrue,rmdsesn,xt)
-deallocate(data1)
+deallocate(nextX,nextY,ocean,d1lat,d1lon,dt,globaltrue,data1,rmdsesn)
 print*,"end program"
 end program remove_season
 !**********************************
