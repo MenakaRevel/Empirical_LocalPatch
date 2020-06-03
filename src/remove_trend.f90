@@ -205,21 +205,20 @@ do ix = 1,nx ! pixels along longtitude direction
         start=(/ix,iy,1/)
         count=(/1,1,N/)
         !remove ocean
-        if (ocean(ix,iy) == 0) then
-            ! get variable subset
-            call nccheck( nf90_get_var(ncidin,varidin,globaltrue,start=start,count=count) )
-            !globaltrue = 100
-            !write(*,*) globaltrue
-            !--trend line as y = a + bx
-            call trend_para(globaltrue,N,a,b)
-            !---
-            rmdtrnd = globaltrue - (a + b*(xt))
-            print*,ix,iy,a,b
-            !--write variable--
-            call nccheck( nf90_put_var(ncidout,varidout,rmdtrnd,start=start,count=count) )
+        if (ocean(ix,iy) /= 0) then
+            cycle
         end if
-!        !--write variable--
-!        call nccheck( nf90_put_var(ncidout,varidout,rmdtrnd,start=start,count=count) )
+        ! get variable subset
+        call nccheck( nf90_get_var(ncidin,varidin,globaltrue,start=start,count=count) )
+        !globaltrue = 100
+        !write(*,*) globaltrue
+        !--trend line as y = a + bx
+        call trend_para(globaltrue,N,a,b)
+        !---
+        rmdtrnd = globaltrue - (a + b*(xt))
+        print*,ix,iy,a,b
+        !--write variable--
+        call nccheck( nf90_put_var(ncidout,varidout,rmdtrnd,start=start,count=count) )
     end do
 end do
 !$write(*,*) omp_get_num_threads() 

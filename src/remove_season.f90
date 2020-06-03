@@ -211,29 +211,30 @@ data=0.0
 !$omp parallel default(private) shared(ocean,rivwth,globaltrue,N,NN) 
 !$omp do
 !$write(*,*) omp_get_num_threads()
-do ix = 1,nx ! pixels along longtitude direction
-    do iy = 1,ny ! pixel along latitude direction
+do ix = 1,100 !nx ! pixels along longtitude direction
+    do iy = 1,100 !ny ! pixel along latitude direction
         start=(/ix,iy,1/)
         count=(/1,1,N/)
         !remove ocean
-        if (ocean(ix,iy) == 0) then
-            ! get variable subset
-            call nccheck( nf90_get_var(ncidin,varidin,globaltrue,start=start,count=count) )
-            ! zero padding
-            data=0.0
-            data(1:N)=globaltrue(:)
-            call REALFT(data,NN,+1)
-            !remove frequency other than multiple of p days
-            !covarite of 6
-            !frequency of 90 and 180 also kept
-            write(*,*)ix,iy,NN,shape(data)
-            call iff_p(data,NN,P)
-            call REALFT(data,NN,-1)
-            !call FOUR1(data1,NN/2,-1)
-            rmdsesn(:)=globaltrue(:)-(2.0/real(NN)) *data(1:N) 
-            !--write variable--
-            call nccheck( nf90_put_var(ncidout,varidout,rmdsesn,start=start,count=count) )
+        if (ocean(ix,iy) /= 0) then
+            cycle
         end if
+        ! get variable subset
+        call nccheck( nf90_get_var(ncidin,varidin,globaltrue,start=start,count=count) )
+        ! zero padding
+        data=0.0
+        data(1:N)=globaltrue(:)
+        call REALFT(data,NN,+1)
+        !remove frequency other than multiple of p days
+        !covarite of 6
+        !frequency of 90 and 180 also kept
+        write(*,*)ix,iy,NN,shape(data)
+        call iff_p(data,NN,P)
+        call REALFT(data,NN,-1)
+        !call FOUR1(data1,NN/2,-1)
+        rmdsesn(:)=globaltrue(:)-(2.0/real(NN)) *data(1:N) 
+        !--write variable--
+        call nccheck( nf90_put_var(ncidout,varidout,rmdsesn,start=start,count=count) )
     end do
 end do
 !$omp end do
