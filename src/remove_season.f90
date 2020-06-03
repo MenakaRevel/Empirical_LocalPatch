@@ -20,7 +20,7 @@ character(len=8)                      :: units
 !-map variables
 real                                  :: gsize,west, north, east, south ! map boundries
 integer                               :: latpx,lonpx,nflp    ! pixel size, calculated
-real,allocatable                      :: globaltrue(:),rmdsesn(:),data(:)
+real,allocatable                      :: globaltrue(:),rmdsesn(:),data1(:)
 integer,allocatable                   :: nextX(:,:),nextY(:,:),ocean(:,:)
 integer                               :: i,ios,N,NN
 real,allocatable                      :: xt(:)
@@ -31,7 +31,7 @@ integer,allocatable                   :: dt(:)
 real,allocatable                      :: d1lat(:), d1lon(:)
 integer,dimension(3)                  :: start,count
 real,parameter                        :: rmis=1.0e20,coeff=0.1,P=365.0
-!real,allocatable                      :: storage(:,:),globaltrue(:,:,:),td(:,:),wse(:,:),data1(:)!,anomaly(:,:,:)!,data11(:)
+!real,allocatable                      :: storage(:,:),globaltrue(:,:,:),td(:,:),wse(:,:),data11(:)!,anomaly(:,:,:)!,data111(:)
 !integer,allocatable                   :: ocean(:,:),days(:)
 !real                                  :: assimN,assimS,assimW,assimE!,lat,lon
 !integer*4                             :: lon_cent,lat_cent!,patch_size,patch_side,patch_nums
@@ -85,7 +85,7 @@ read(11,*) north
 close(11)
 !-------
 !======
-NN=2**((log(real(N))/log(2.0))+1)
+NN=2**(int(log(real(N))/log(2.0))+1)
 !
 write(*,*) N, NN
 !
@@ -200,11 +200,11 @@ xt = (/(real(i), i=1,N,1)/)
 !--
 print*,N
 !--
-allocate(data(NN))!,anomaly(lonpx,latpx,N))
+allocate(data1(NN))!,anomaly(lonpx,latpx,N))
 !allocate(xt(N),xf(N),data1(NN),data11(NN),anomaly(lonpx,latpx,N))
 !xt = (/(real(i), i=1,N,1)/)
 ! zero padding
-data=0.0
+data1=0.0
 !data11=0.0
 
 ! parallel calculation
@@ -222,17 +222,17 @@ do ix = 1,nx ! pixels along longtitude direction
         ! get variable subset
         call nccheck( nf90_get_var(ncidin,varidin,globaltrue,start=start,count=count) )
         ! zero padding
-        data=0.0
-        data(1:N)=globaltrue(:)
-        call REALFT(data,NN,+1)
+        data1=0.0
+        data1(1:N)=globaltrue(:)
+        call REALFT(data1,NN,+1)
         !remove frequency other than multiple of p days
         !covarite of 6
         !frequency of 90 and 180 also kept
-        write(*,*)ix,iy,NN,shape(data)
-        call iff_p(data,NN,P)
-        call REALFT(data,NN,-1)
-        !call FOUR1(data1,NN/2,-1)
-        rmdsesn(:)=globaltrue(:)-(2.0/real(NN)) *data(1:N) 
+        write(*,*)ix,iy,NN,shape(data1)
+        call iff_p(data1,NN,P)
+        call REALFT(data1,NN,-1)
+        !call FOUR1(data11,NN/2,-1)
+        rmdsesn(:)=globaltrue(:)-(2.0/real(NN)) *data1(1:N) 
         !--write variable--
         call nccheck( nf90_put_var(ncidout,varidout,rmdsesn,start=start,count=count) )
     end do
@@ -240,11 +240,19 @@ end do
 !$omp end do
 !$omp end parallel
 !----
+print*, "save netCDF"
 !====close netcdf=====
 call nccheck( nf90_close(ncidin ) )
 call nccheck( nf90_close(ncidout) )
 !---
-deallocate(nextX,nextY,ocean,globaltrue,xt,data,rmdsesn)
+print*, "deallocate"
+!deallocate(nextX,nextY,ocean,d1lat,d1lon,dt,globaltrue,xt,data1,rmdsesn)
+deallocate(nextX,nextY,ocean)
+deallocate(d1lat,d1lon)
+deallocate(dt)
+deallocate(globaltrue,rmdsesn,xt)
+deallocate(data1)
+print*,"end program"
 end program remove_season
 !**********************************
   SUBROUTINE REALFT (DATA, N, ISIGN)
