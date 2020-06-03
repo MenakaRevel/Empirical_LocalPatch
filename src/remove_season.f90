@@ -92,7 +92,7 @@ write(*,*) N, NN
 allocate(nextX(lonpx,latpx),nextY(lonpx,latpx),ocean(lonpx,latpx))
 ! read next grid information
 ! read nextX and nextY
-fname=trim(adjustl(camadir))//"map/glb_15min/nextxy.bin"
+fname=trim(adjustl(camadir))//"/map/"//trim(mapname)//"/nextxy.bin"
 open(34,file=fname,form="unformatted",access="direct",recl=4*latpx*lonpx,status="old",iostat=ios)
 if(ios==0)then
     read(34,rec=1) nextX
@@ -211,8 +211,8 @@ data=0.0
 !$omp parallel default(private) shared(ocean,rivwth,globaltrue,N,NN) 
 !$omp do
 !$write(*,*) omp_get_num_threads()
-do ix = 1,100 !nx ! pixels along longtitude direction
-    do iy = 1,100 !ny ! pixel along latitude direction
+do ix = 1,nx ! pixels along longtitude direction
+    do iy = 1,ny ! pixel along latitude direction
         start=(/ix,iy,1/)
         count=(/1,1,N/)
         !remove ocean
