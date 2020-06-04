@@ -23,7 +23,6 @@ integer                               :: latpx,lonpx,nflp    ! pixel size, calcu
 real,allocatable                      :: globaltrue(:),rmdtrnd(:)
 integer,allocatable                   :: nextX(:,:),nextY(:,:),ocean(:,:)
 integer                               :: i,ios,N
-real,allocatable                      :: xt(:)
 real                                  :: a,b
 integer                               :: timeid,varid,latid,lonid 
 integer                               :: ncidin,ncidout,varidin,varidout
