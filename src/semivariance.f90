@@ -229,7 +229,7 @@ do ix = 1,nx !
             call river_dn(ix,iy,patch_nums,lonpx,latpx,nextX,nextY,nextdst,xt,yt,rlen,k) 
             write(*,*)"-------------",k,"downstream pixels"
             write(u,'(a2, i5.5)') "dn",0
-            fname=trim(adjustl(outdir))//"semivar/"//trim(lon)//trim(lat)//"/"//trim(u)//".svg"
+            fname=trim(adjustl(outdir))//"/semivar/"//trim(lon)//trim(lat)//"/"//trim(u)//".svg"
             write(*,*)fname
             open(34,file=fname,form="formatted",status='replace',iostat=ios)
             if (ios /= 0) then
