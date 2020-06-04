@@ -76,6 +76,7 @@ read(11,*) north
 close(11)
 !-------
 !======
+print*,"allocate"
 allocate(nextX(lonpx,latpx),nextY(lonpx,latpx),ocean(lonpx,latpx),rivseq(lonpx,latpx),nextdst(lonpx,latpx))
 ! read next grid information
 ! read nextX and nextY
@@ -128,16 +129,18 @@ write(79,'(a4,4x,a4,4x,a3,4x,a3)')"lon","lat","up","dn"
 !!$write(*,*) omp_get_num_threads()
 nx=lonpx
 ny=latpx-30.0/dble(gsize) ! writed only up -60S latitude
-
+print*,nx,ny
 ! find all the upstream , rivseq=1
-allocate(xlist(100000),ylist(100000))
+allocate(xlist(1000000),ylist(1000000))
 xlist=-9999
 ylist=-9999
 seqnum=0
 i=0
+!print*,"rivseq"
 do ix = 1,nx !
     do iy = 1,ny
         if (rivseq(ix,iy) == 1) then
+            !print*,ix,iy
             xlist(i)=ix
             ylist(i)=iy
             i=i+1
