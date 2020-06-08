@@ -19,10 +19,10 @@ cd $PBS_O_WORKDIR
 export OMP_NUM_THREADS=20
 
 # input settings
-syear=`python -c "import params; print (params.starttime()[0])"`
+
 smonth=`python -c "import params; print (params.starttime()[1])"`
 sdate=`python -c "import params; print (params.starttime()[2])"`
-eyear=1958 #`python -c "import params; print (params.endtime()[0])"`
+eyear=`python -c "import params; print (params.endtime()[0])"`
 emonth=`python -c "import params; print (params.endtime()[1])"`
 edate=`python -c "import params; print (params.endtime()[2])"`
 echo $syear" to "$eyear
@@ -33,5 +33,8 @@ mapname=`python -c "import params; print (params.map_name())"`
 inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 threshold=`python -c "import params; print (params.threshold())"`
+varname="weightage"
+# make dir local patch
+mkdir "local_patchMS"
 #=================================================
-./src/lpara $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold
+./src/lparaMS $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold

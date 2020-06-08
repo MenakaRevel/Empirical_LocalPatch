@@ -34,7 +34,8 @@ def out_dir():
     #return "/media/menaka/HDJA-UT/covariance"
 
 def map_name():
-    return "glb_06min"
+    return "amz_06min" #Amazon river 6 min
+    #return "glb_06min" # global 6 min
 
 def input_name():
     return "S14FD"

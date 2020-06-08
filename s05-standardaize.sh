@@ -22,7 +22,7 @@ export OMP_NUM_THREADS=20
 syear=`python -c "import params; print (params.starttime()[0])"`
 smonth=`python -c "import params; print (params.starttime()[1])"`
 sdate=`python -c "import params; print (params.starttime()[2])"`
-eyear=1958 #`python -c "import params; print (params.endtime()[0])"`
+eyear=`python -c "import params; print (params.endtime()[0])"`
 emonth=`python -c "import params; print (params.endtime()[1])"`
 edate=`python -c "import params; print (params.endtime()[2])"`
 echo $syear" to "$eyear

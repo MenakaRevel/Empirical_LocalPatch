@@ -139,8 +139,11 @@ close(34)
 countp=0
 targetp=0
 !===
+! for global map do not write below 60S
+south=max(south,-60.0)
 nx=lonpx
-ny=latpx-30.0/dble(gsize) ! only uo to -60S latitutde
+!ny=latpx-30.0/dble(gsize) ! writed only up -60S latitude
+ny=(noth-south)/dble(gsize)
 !--
 ! do parallel
 !$omp parallel default(none)&
@@ -160,11 +163,11 @@ do ix = 1,nx ! pixels along longtitude direction
         ! open emperical weightage
         write(llon,'(i4.4)') ix
         write(llat,'(i4.4)') iy
-        fname=trim(adjustl(outdir))//"weightage/"//trim(llon)//trim(llat)//".bin"
+        fname=trim(adjustl(outdir))//"/weightage/"//trim(llon)//trim(llat)//".bin"
         fn = 34
         call read_wgt(fname,lonpx,latpx,weightage)
         ! read gausssian weight
-        fname=trim(adjustl(outdir))//"gaussian_weight/"//trim(llon)//trim(llat)//".bin"
+        fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(llon)//trim(llat)//".bin"
         fn = 34
         call read_wgt(fname,lonpx,latpx,gauss_weight)
         countnum=1
