@@ -60,10 +60,12 @@ integer,allocatable                   :: targetp(:,:),countp(:,:)
 real                                  :: lag_dist,conflag
 integer                               :: ix,iy,nx,ny
 integer                               :: patch_size,patch_side,countnum,patch_nums
-integer(kind=4)                       :: i_m,j_m
+integer(kind=4)                       :: i_m,j_m,iix,iiy,k
+integer,allocatable                   :: xlist(:),ylist(:)
 integer(kind=4)                       :: target_pixel,fn
 character(len=8)                      :: llon,llat
 real                                  :: threshold
+integer                               :: info
 !for writing
 integer,allocatable                   :: upx(:,:),upy(:,:),lps(:,:) ! upstrea x,y and length
 !====================================================
@@ -202,7 +204,7 @@ targetp=0
 south=max(south,-60.0)
 nx=lonpx
 !ny=latpx-30.0/dble(gsize) ! writed only up -60S latitude
-ny=(noth-south)/dble(gsize)
+ny=(north-south)/dble(gsize)
 !--
 allocate(upx(lonpx,latpx),upy(lonpx,latpx),lps(lonpx,latpx))
 !===========
@@ -237,14 +239,14 @@ do ix = 1,nx !int((assimW+180)*4+1),int((assimE+180)*4+1),1
         call read_wgt(fname,lonpx,latpx,gauss_weight)
         ! get the mainstream pixels
         ! most upstream pixels and number of downstream pixels
-        ix=0
-        iy=0
+        iix=0
+        iiy=0
         k=0
-        call patch_pixels(ix,iy,lonpx,latpx,threshold,weightage,nextX,nextY,nextdst,uparea,rivseq,ix,iy,k)
-        upx(ix,iy)=ix
-        upy(ix,iy)=iy
+        call patch_pixels(ix,iy,lonpx,latpx,threshold,weightage,nextX,nextY,nextdst,uparea,rivseq,iix,iiy,k)
+        upx(ix,iy)=iix
+        upy(ix,iy)=iiy
         lps(ix,iy)=k
-        write(*,*)"===",ix,iy,"===",ix,iy,k
+        write(*,*)"===",ix,iy,"===",iix,iiy,k
         allocate(xlist(k),ylist(k))
         call downstream_pixels(ix,iy,k,lonpx,latpx,weightage,nextX,nextY,xlist,ylist,info)
         if (info /= 0) then

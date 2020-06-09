@@ -73,7 +73,7 @@ close(11)
 south=max(south,-60.0)
 nx=lonpx
 !ny=latpx-30.0/dble(gsize) ! writed only up -60S latitude
-ny=(noth-south)/dble(gsize)
+ny=(north-south)/dble(gsize)
 write(tag,'(i4.0,a,i4.0)')syear,"-",eyear
 fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(inname)//"/"//trim(varname)//trim(tag)//".nc"
 print*, "create",fname

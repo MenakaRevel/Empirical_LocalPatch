@@ -131,7 +131,7 @@ write(79,'(a4,4x,a4,4x,a3,4x,a3)')"lon","lat","up","dn"
 south=max(south,-60.0)
 nx=lonpx
 !ny=latpx-30.0/dble(gsize) ! writed only up -60S latitude
-ny=(noth-south)/dble(gsize)
+ny=(north-south)/dble(gsize)
 print*,nx,ny
 ! find all the upstream , rivseq=1
 allocate(xlist(1000000),ylist(1000000))
