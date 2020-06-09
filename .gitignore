@@ -15,26 +15,25 @@
 */bin2nc
 */remove_trend
 */remove_season
-*/ifft90_sfcelv
-*/standze_sfcelv
-*/sfit_sfcelv
-*/lpara_sfcelv
-*/lparaMS_sfcelv
+*/standardize
+*/semivariance
+*/lpara
+*/lparaMS
 
 #.pyc files
 *.pyc
 
 #PBS oe files
-CaMa_sim.o*
-bin2nc.o*
-rm_trd.o*
-rm_sen.o*
-stndz.o*
-semivar.o*
-weight.o*
-lpara.o*
-lparaMS.o*
-EmpLP.o*
+*/CaMa_sim.o*
+*/bin2nc.o*
+*/rm_trd.o*
+*/rm_sen.o*
+*/stndz.o*
+*/semivar.o*
+*/weight.o*
+*/lpara.o*
+*/lparaMS.o*
+*/EmpLP.o*
 
 #figures
 *.png
