@@ -63,12 +63,12 @@ oname="%s/semivar"%(out_dir)
 if not os.path.exists(oname):
     print oname
     mk_dir(oname)
-    #---
-    for i in np.arange(1,nx+1):
-        for j in np.arange(1,ny+1):
-            if nextx[j-1,i-1]==-9999:
-                continue
-            oname="%s/semivar/%04d%04d"%(out_dir,i,j)
-            if not os.path.exists(oname):
-                print oname
-                mk_dir(oname)
+#---
+for i in np.arange(1,nx+1):
+    for j in np.arange(1,ny+1):
+        if nextx[j-1,i-1]==-9999:
+            continue
+        oname="%s/semivar/%04d%04d"%(out_dir,i,j)
+        if not os.path.exists(oname):
+            print oname
+            mk_dir(oname)

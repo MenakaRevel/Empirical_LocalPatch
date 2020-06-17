@@ -18,7 +18,7 @@ integer                               :: syear,eyear
 !-map variables
 real                                  :: gsize,west, north, east, south ! map boundries
 integer                               :: latpx,lonpx,nflp    ! pixel size, calculated
-real,allocatable                      :: globaltrue(:),offset(:)
+real,allocatable                      :: globalarray(:,:,:),globaltrue(:),offset(:)
 real,allocatable                      :: nextdst(:,:)
 integer,allocatable                   :: rivseq(:,:),nextX(:,:),nextY(:,:),ocean(:,:)
 integer                               :: i,j,ios,N
@@ -119,7 +119,7 @@ patch_nums=100000
 allocate(xt(patch_nums),yt(patch_nums),xf(patch_nums))
 allocate(ux(patch_nums),uy(patch_nums),rlen(patch_nums))
 
-fname=trim(adjustl(outdir))//"semivar/lonlat_list.txt"
+fname=trim(adjustl(outdir))//"/semivar/lonlat_list.txt"
 open(79,file=fname,form="formatted",status='replace',iostat=ios)
 write(79,'(a4,4x,a4,4x,a3,4x,a3)')"lon","lat","up","dn"
 
@@ -138,7 +138,7 @@ allocate(xlist(1000000),ylist(1000000))
 xlist=-9999
 ylist=-9999
 seqnum=0
-i=0
+i=1
 !print*,"rivseq"
 do ix = 1,nx !
     do iy = 1,ny
@@ -155,6 +155,9 @@ write(*,*) "seqnum",seqnum
 write(*,*) "start calculation"
 !---------------------
 write(tag,'(i4.0,a,i4.0)')syear,"-",eyear
+! allocate varibles
+!=====================
+allocate(globalarray(nx,ny,N),globaltrue(N),offset(N))
 !===============
 !*********************************
 !============READING==============
@@ -165,11 +168,19 @@ write(tag,'(i4.0,a,i4.0)')syear,"-",eyear
 ! read netCDF file
 fname=trim(outdir)//"/CaMa_out/"//trim(inname)//"/"//trim(varname)//trim(tag)//".nc"
 print*, "open ",trim(fname)
-call nccheck( nf90_open(fname, nf90_nowrite, ncidin) )
+call nccheck( nf90_open(trim(fname), nf90_nowrite, ncidin) )
 !call nccheck( nf90_open_par(fname, IOR(NF90_NETCDF4,NF90_MPIIO), MPI_COMM_WORLD, MPI_INFO_NULL, ncidin) )
-call nccheck( nf90_inq_varid(ncidin, trim(varname),varidin) )
-!=====================
-allocate(globaltrue(N),offset(N))
+print*, "inqure variable id", " ", trim(varname)
+!call nccheck( nf90_inq_varid(ncidin, trim(varname),varidin) )
+call nccheck( nf90_inq_varid(ncidin, "standardize",varidin) )
+!===read the traget pixel==
+start=(/1,1,1/)
+count=(/nx,ny,N/)
+print*, "read variable"
+! get variable
+call nccheck( nf90_get_var(ncidin,varidin,globalarray,start=start,count=count) )
+!====close netcdf=====
+call nccheck( nf90_close(ncidin ) )
 ! parallel calculation
 
 !$omp parallel default(private) shared(ocean,rivwth,globaltrue,nextX,nextY,outdir,patch_size,nextdst,N,lon_cent)
@@ -182,11 +193,13 @@ do ix = 1,nx !
             countnum=1
             write(lon,'(i4.4)')ix
             write(lat,'(i4.4)')iy
-            !===read the traget pixel==
-            start=(/ix,iy,1/)
-            count=(/1,1,N/)
-            ! get variable subset
-            call nccheck( nf90_get_var(ncidin,varidin,globaltrue,start=start,count=count) )
+            !!!===read the traget pixel==
+            !!start=(/ix,iy,1/)
+            !!count=(/1,1,N/)
+            !!! get variable subset
+            !!call nccheck( nf90_get_var(ncidin,varidin,globaltrue,start=start,count=count) )
+            !===========
+            globaltrue=globalarray(ix,iy,N)
             !===========
             write(*,*)"================================="
             write(*,*) lon,lat!,results
@@ -213,11 +226,14 @@ do ix = 1,nx !
                 call river_up(ux(i),uy(i),ix,iy,patch_nums,lonpx,latpx,nextX,nextY,nextdst,xt,yt,rlen,k)
                 write(*,*)"-------------",k,"upstreams pixels"!,xt,yt
                 do j=1,k
-                    !===offset pixel===
-                    start=(/xt(j),yt(j),1/)
-                    count=(/1,1,N/)
-                    ! get variable subset
-                    call nccheck( nf90_get_var(ncidin,varidin,offset,start=start,count=count) )
+                    !!!!===offset pixel===
+                    !!!start=(/xt(j),yt(j),1/)
+                    !!!count=(/1,1,N/)
+                    !!!! get variable subset
+                    !!!call nccheck( nf90_get_var(ncidin,varidin,offset,start=start,count=count) )
+                    !===========
+                    offset=globalarray(xt(j),yt(j),N)
+                    !===========
                     ! calculate experimental semivariance
                     call semi_var(globaltrue,offset,N,semivar,std)
                     write(34,21)xt(j),yt(j),rlen(j),semivar,std
@@ -241,10 +257,14 @@ do ix = 1,nx !
             write(34,22)"lon","lat","dis","gamma","sig"
             write(*,*) "downstream pixel:" ,xt(k),yt(k)
             do j=1,k
-                start=(/xt(j),yt(j),1/)
-                count=(/1,1,N/)
-                ! get variable subset
-                call nccheck( nf90_get_var(ncidin,varidin,offset,start=start,count=count) )
+                !!!start=(/xt(j),yt(j),1/)
+                !!!count=(/1,1,N/)
+                !!!! get variable subset
+                !!!call nccheck( nf90_get_var(ncidin,varidin,offset,start=start,count=count) )
+                !===========
+                offset=globalarray(xt(j),yt(j),N)
+                !===========
+
                 ! calculate experimantal semivariance
                 call semi_var(globaltrue,offset,N,semivar,std)
                 write(34,21)xt(j),yt(j),rlen(j),semivar,std
@@ -264,13 +284,13 @@ end do
 !$omp end do
 !$omp end parallel
 !====close netcdf=====
-call nccheck( nf90_close(ncidin ) )
+!call nccheck( nf90_close(ncidin ) )
 
 !---
-deallocate(nextX,nextY,ocean,rivseq,nextdst,globaltrue,offset)
+deallocate(nextX,nextY,ocean,rivseq,nextdst)
+deallocate(globalarray,globaltrue,offset)
 deallocate(xt,yt,xf,ux,uy,rlen)
 deallocate(xlist,ylist)
-close(35)
 close(79)
 end program semivariance
 !*****************************************************************
@@ -463,7 +483,7 @@ rlen(1)=0.0
 k=2
 ix=x
 iy=y
-do while (ix/=tx .or. iy/=ty) 
+do while (ix>0 .or. iy>0) 
   iix=ix
   iiy=iy
   !write(*,*)iix,iiy
@@ -506,7 +526,7 @@ integer,dimension(patch)            :: ux,uy
 integer                             :: ix,iy,k,un,ud
 !--
 un=1
-do k=0, seqnum
+do k=1, seqnum
     ix=xlist(k)
     iy=ylist(k)
     !-- find up or down of x,y

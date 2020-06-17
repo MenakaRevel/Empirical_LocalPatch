@@ -135,17 +135,18 @@ mk_dir(pathname)
 pathname1=out_dir+"/gaussian_weight"
 mk_dir(pathname1)
 #----
-fname=pm.out_dir()+"/semivar/lonlat_list.txt"
+fname=out_dir+"/semivar/lonlat_list.txt"
 f=open(fname,"r")
 lines=f.readlines()
 f.close()
 #---
 # threshold for defining the local patch boundries
 #threshold=0.6
-threshold=sys.argv[4]
+threshold=float(sys.argv[5])
 # samllest patch size along the river (upstream/downstream)
 #baseline=6
 baseline=11 # Revel_etal,. (2019) proves 21 x 21 patch works well in upstreams 
+#print lines[0]
 #for line in lines[1::]:
 def mk_wgt(line):
     #print line
@@ -175,7 +176,7 @@ def mk_wgt(line):
         lgamma=[]
         lstd=[]
         #--
-        fname="%s/semivar/%04d%04d/dn%05d.svg"%(pm.out_dir(),lon,lat,0)
+        fname="%s/semivar/%04d%04d/dn%05d.svg"%(out_dir,lon,lat,0)
         try:
             f=open(fname,"r")
             lines=f.readlines()
@@ -266,7 +267,7 @@ def mk_wgt(line):
             lgamma=[]
             lstd=[]
             #--
-            fname="%s/semivar/%04d%04d/up%05d.svg"%(pm.out_dir(),lon,lat,iup)
+            fname="%s/semivar/%04d%04d/up%05d.svg"%(out_dir,lon,lat,iup)
             try:
                 f=open(fname,"r")
                 lines=f.readlines()

@@ -7,8 +7,6 @@ FC  = ifort
 FFLAGS = -O3 -assume byterecl -heap-arrays -nogen-interfaces -mcmodel=large -fPIC -shared-intel -g -traceback -lpthread -mkl -parallel
 #FFLAGS = -O3 -assume byterecl -heap-arrays -nogen-interfaces -mcmodel=large -fPIC -shared-intel -g -traceback -lpthread -mkl -qopenmp
 
-CFLAGS = -DUseCDF
-
 ## with netCDF
 INC = -I/opt/intel/include -I/opt/local/include -I/opt/local/netcdf-fortran-4.4.5/include
 LIB = -L/opt/intel/lib -L/opt/intel/mkl/lib -L/opt/local/lib -L/opt/local/netcdf-fortran-4.4.5/lib -lnetcdff
@@ -25,7 +23,7 @@ lparaMS
 # Suffix
 .SUFFIXES : .f90
 .f90:
-	$(FC) ${FFLAGS} ${CFLAGS} ${INC} ${LIB} $^ -o $@
+	$(FC) ${FFLAGS} ${INC} ${LIB} $^ -o $@
 
 # commands
 all: $(TARGETS)

@@ -62,7 +62,7 @@ def patch_end():
     return 2013,12,31
 
 def threshold():
-    return 0.9000000
+    return 0.6000000
 
 def para_nums():
     return 6
