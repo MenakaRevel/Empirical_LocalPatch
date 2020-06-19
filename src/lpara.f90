@@ -159,14 +159,17 @@ do ix = 1,nx ! pixels along longtitude direction
         if (ocean(ix,iy)==1) then
             cycle
         end if
-        write(*,*)"===",lat,lon,"==="!$,omp_get_num_threads(),omp_get_thread_num(),"==="
+        write(*,*)"===",lat,lon,"===",ix,iy,rivwth(ix,iy)!$,omp_get_num_threads(),omp_get_thread_num(),"==="
         ! open emperical weightage
         write(llon,'(i4.4)') ix
         write(llat,'(i4.4)') iy
+        ! read weightage
         fname=trim(adjustl(outdir))//"/weightage/"//trim(llon)//trim(llat)//".bin"
+        print*, "read weightage",fname
         fn = 34
         call read_wgt(fname,lonpx,latpx,weightage)
         ! read gausssian weight
+        print*, "read gausssian weight"
         fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(llon)//trim(llat)//".bin"
         fn = 34
         call read_wgt(fname,lonpx,latpx,gauss_weight)
@@ -180,11 +183,21 @@ do ix = 1,nx ! pixels along longtitude direction
             do i=iy-patch_size,iy+patch_size
                 i_m = i
                 j_m = j
-                call ixy2iixy(i,j,lonpx,latpx,i_m,j_m)
-                ! weitage >= 0.2 is considered
+                if (mapname(1:3)=="glb") then
+                    !print*, "global map"
+                    call ixy2iixy(i,j,lonpx,latpx,i_m,j_m)
+                else
+                    !print*, "regional map"
+                    i_m=min(i_m,lonpx)
+                    i_m=max(i_m,1)
+                    j_m=min(j_m,latpx)
+                    j_m=max(j_m,1)
+                end if
+                ! weitage >= threshold is considered
                 if (weightage(i_m,j_m) < threshold) then
                     cycle
                 end if
+                print*, i_m,j_m,weightage(i_m,j_m),threshold
                 !write(*,*)i_m,j_m
                 ! ocean removed
                 if (ocean(i_m,j_m)==1) then
@@ -198,7 +211,7 @@ do ix = 1,nx ! pixels along longtitude direction
                 ! calculate lag distance
                 call lag_distance(i_m,j_m,ix,iy,lonpx,latpx,nextX,nextY,nextdst,lag_dist)
                 !---
-                !write(*,*) lag_dist
+                write(*,*) lag_dist,i,j,i_m,j_m,ix,iy
                 !---
                 ! only river pixels which connects to target pixel is considered
                 if (lag_dist == -9999.0) then
@@ -212,8 +225,11 @@ do ix = 1,nx ! pixels along longtitude direction
                     !continue
                 end if
                 !---
+                print*, i_m,j_m
                 write(fn,21)i_m,j_m,gauss_weight(i_m,j_m)
+                write(*,21)i_m,j_m,gauss_weight(i_m,j_m)
                 ! find the target pixel
+                target_pixel=1
                 if (i_m==ix .and. j_m==iy) then
                   target_pixel=countnum
                 end if

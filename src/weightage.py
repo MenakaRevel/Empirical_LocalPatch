@@ -160,8 +160,8 @@ def mk_wgt(line):
     if up + dn == 0:
         return 0
     #--
-    wgt=np.zeros([720,1440],np.float32)
-    Gwt=np.zeros([720,1440],np.float32)
+    wgt=np.zeros([ny,nx],np.float32)
+    Gwt=np.zeros([ny,nx],np.float32)
     #--
     # put 1 in self pixel (target pixel should be 1)
     wgt[lat-1,lon-1]=1.0
