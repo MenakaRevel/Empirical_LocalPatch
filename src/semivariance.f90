@@ -562,8 +562,8 @@ do i=1,n
   v=v+(((h(i)-t(i))**2.0)/2.0)**2.0
 end do
 semivar=p/(2.0*real(n))
-std=sqrt((v/real(n-1))-((semivar**2.0)*(real(n)/real(n-1))))
-return 
+std=sqrt((v/(real(n-1)+1.0e-20))-((semivar**2.0)*(real(n)/(real(n-1)+1.0e-20))))
+return
 end subroutine semi_var
 !******************************
 subroutine nccheck(status)

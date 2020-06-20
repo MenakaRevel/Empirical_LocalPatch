@@ -165,11 +165,11 @@ do ix = 1,nx ! pixels along longtitude direction
         write(llat,'(i4.4)') iy
         ! read weightage
         fname=trim(adjustl(outdir))//"/weightage/"//trim(llon)//trim(llat)//".bin"
-        print*, "read weightage",fname
+        !print*, "read weightage",fname
         fn = 34
         call read_wgt(fname,lonpx,latpx,weightage)
         ! read gausssian weight
-        print*, "read gausssian weight"
+        !print*, "read gausssian weight"
         fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(llon)//trim(llat)//".bin"
         fn = 34
         call read_wgt(fname,lonpx,latpx,gauss_weight)
@@ -197,7 +197,7 @@ do ix = 1,nx ! pixels along longtitude direction
                 if (weightage(i_m,j_m) < threshold) then
                     cycle
                 end if
-                print*, i_m,j_m,weightage(i_m,j_m),threshold
+                !print*, i_m,j_m,weightage(i_m,j_m),threshold
                 !write(*,*)i_m,j_m
                 ! ocean removed
                 if (ocean(i_m,j_m)==1) then
@@ -211,7 +211,7 @@ do ix = 1,nx ! pixels along longtitude direction
                 ! calculate lag distance
                 call lag_distance(i_m,j_m,ix,iy,lonpx,latpx,nextX,nextY,nextdst,lag_dist)
                 !---
-                write(*,*) lag_dist,i,j,i_m,j_m,ix,iy
+                !write(*,*) lag_dist,i,j,i_m,j_m,ix,iy
                 !---
                 ! only river pixels which connects to target pixel is considered
                 if (lag_dist == -9999.0) then
@@ -225,9 +225,9 @@ do ix = 1,nx ! pixels along longtitude direction
                     !continue
                 end if
                 !---
-                print*, i_m,j_m
+                !print*, i_m,j_m
                 write(fn,21)i_m,j_m,gauss_weight(i_m,j_m)
-                write(*,21)i_m,j_m,gauss_weight(i_m,j_m)
+                !write(*,21)i_m,j_m,gauss_weight(i_m,j_m)
                 ! find the target pixel
                 target_pixel=1
                 if (i_m==ix .and. j_m==iy) then
@@ -293,7 +293,11 @@ if (ud==-1) then
     iiy=iy 
     ix=nextX(iix,iiy)
     iy=nextY(iix,iiy)
-    if (ix==-9 .or. iy==-9) then
+    if (ix==-9 .or. iy==-9) then ! river mouth to the sea
+      ud=+1
+      exit
+    end if
+    if (ix==-10 .or. iy==-10) then ! inland termination
       ud=+1
       exit
     end if
@@ -301,7 +305,8 @@ if (ud==-1) then
       ud=+1
       exit
     end if
-    !-- half of the present grid
+    !-- distance to the next grid
+    !print*, nextdst(ix,iy)
     rl=anint((nextdst(ix,iy)/1000.0)*100)/100.0
     length=length+rl!/2.0
   end do
@@ -319,8 +324,12 @@ if (ud==+1) then
     ix=nextX(iix,iiy)
     iy=nextY(iix,iiy)
     !---
-    if (ix==-9 .or. iy==-9) then
+    if (ix==-9 .or. iy==-9) then ! river mouth to the sea
       ud=-9999
+      exit
+    end if
+    if (ix==-10 .or. iy==-10) then ! inland termination
+      ud=+1
       exit
     end if
     if (ix==-9999 .or. iy==-9999) then
@@ -374,7 +383,11 @@ if (ud==-1) then
     iiy=iy 
     ix=nextX(iix,iiy)
     iy=nextY(iix,iiy)
-    if (ix==-9 .or. iy==-9) then
+    if (ix==-9 .or. iy==-9) then ! river mouth
+      ud=+1
+      exit
+    end if
+    if (ix==-10 .or. iy==-10) then ! inland termination
       ud=+1
       exit
     end if
@@ -402,15 +415,15 @@ if (ud==+1) then
     ix=nextX(iix,iiy)
     iy=nextY(iix,iiy)
     !---
-    if (ix==-9 .or. iy==-9) then
-      ud=-9999
+    if (ix==-9 .or. iy==-9) then ! river mouth
+      ud=+1
       exit
     end if
-    if (ix==-9999 .or. iy==-9999) then
-      ud=-9999
+    if (ix==-10 .or. iy==-10) then ! inland termination
+      ud=+1
       exit
     end if
-    !--compare the weightage and thersold
+    !the weightage and thersold
     if (weightage(ix,iy) < thersold) then
       conflag=0.0
     end if 
