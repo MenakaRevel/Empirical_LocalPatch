@@ -1,6 +1,13 @@
 #folders
 */CaMa_in
 */CaMa_out
+*/semivar
+*/weight
+*/gaussian_weight
+*/local_patch
+*/local_patchMS
+*/img
+*/dat
 
 #bin files
 *.bin
