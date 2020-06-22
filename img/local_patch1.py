@@ -24,80 +24,81 @@ from mpl_toolkits.basemap import Basemap
 from multiprocessing import Pool
 from multiprocessing import Process
 #---
+os.system("cp ../params.py params.py")
 import LMA_semivari as LMA
 import params as pm
 import read_grdc as grdc
 import slice_region as sl
 import river_boundry as rbd
 #-----------------------------
-def latlon_river(rivername,ix,iy):
-     global lllat, urlat, lllon, urlon
-     lonlat = pm.CaMa_dir()+"/map/glb_15min/lonlat.bin"
-     lonlat = np.fromfile(lonlat,np.float32).reshape(2,720,1440)
-     llon=lonlat[0,iy-1,ix-1]
-     llat=lonlat[1,iy-1,ix-1]
-     adj=20.0
-     lllat, urlat, lllon, urlon = max(llat-adj,-90.),min(llat+adj,90.),max(llon-adj,-180.),min(llon+adj,180.)
-     if rivername=="LENA":
-         lllat = 50.
-         urlat = 80.
-         lllon = 100.
-         urlon = 145.
-     if rivername=="NIGER":
-         lllat = 0.
-         urlat = 25.
-         lllon = -10.
-         urlon = 15.
-     if rivername=="AMAZONAS":
-         lllat = -20.
-         urlat = 10.
-         lllon = -80.
-         urlon = -45.
-     if rivername=="MEKONG":
-         lllat = 10.
-         urlat = 35.
-         lllon = 90.
-         urlon = 120.
-     if rivername=="MISSISSIPPI":
-         lllat = 20.
-         urlat = 50.
-         lllon = -115.
-         urlon = -75.
-     if rivername=="OB":
-         lllat = 40.
-         urlat = 70.
-         lllon = 55.
-         urlon = 95.
-     if rivername=="CONGO":
-         lllat = -15.
-         urlat = 10.
-         lllon = 10.
-         urlon = 35.
-     if rivername=="INDUS":
-         lllat = 20.
-         urlat = 40.
-         lllon = 60.
-         urlon = 80.
-     if rivername=="VOLGA":
-         lllat = 40.
-         urlat = 65.
-         lllon = 30.
-         urlon = 70.
-     if rivername=="NILE":
-         lllat = -5.
-         urlat = 30.
-         lllon = 20.
-         urlon = 40.
-     if rivername=="YUKON":
-         lllat = 55.
-         urlat = 75.
-         lllon = -165.
-         urlon = -130.
-     #if rivername not in ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS","INDUS"]:
+def latlon_river(rivername,ix,iy,mapname="glb_06min",nYY=1800,nXX=3600):
+    global lllat, urlat, lllon, urlon
+    lonlat = pm.CaMa_dir()+"/map/glb_"+mapname[-5::]+"/lonlat.bin"
+    lonlat = np.fromfile(lonlat,np.float32).reshape(2,nYY,nXX)
+    llon=lonlat[0,iy-1,ix-1]
+    llat=lonlat[1,iy-1,ix-1]
+    adj=20.0
+    lllat, urlat, lllon, urlon = max(llat-adj,-90.),min(llat+adj,90.),max(llon-adj,-180.),min(llon+adj,180.)
+    if rivername=="LENA":
+        lllat = 50.
+        urlat = 80.
+        lllon = 100.
+        urlon = 145.
+    if rivername=="NIGER":
+        lllat = 0.
+        urlat = 25.
+        lllon = -10.
+        urlon = 15.
+    if rivername=="AMAZONAS" or rivername=="AMAZON":
+        lllat = -20.
+        urlat = 10.
+        lllon = -80.
+        urlon = -45.
+    if rivername=="MEKONG":
+        lllat = 10.
+        urlat = 35.
+        lllon = 90.
+        urlon = 120.
+    if rivername=="MISSISSIPPI":
+        lllat = 20.
+        urlat = 50.
+        lllon = -115.
+        urlon = -75.
+    if rivername=="OB":
+        lllat = 40.
+        urlat = 70.
+        lllon = 55.
+        urlon = 95.
+    if rivername=="CONGO":
+        lllat = -15.
+        urlat = 10.
+        lllon = 10.
+        urlon = 35.
+    if rivername=="INDUS":
+        lllat = 20.
+        urlat = 40.
+        lllon = 60.
+        urlon = 80.
+    if rivername=="VOLGA":
+        lllat = 40.
+        urlat = 65.
+        lllon = 30.
+        urlon = 70.
+    if rivername=="NILE":
+        lllat = -5.
+        urlat = 30.
+        lllon = 20.
+        urlon = 40.
+    if rivername=="YUKON":
+        lllat = 55.
+        urlat = 75.
+        lllon = -165.
+        urlon = -130.
+    #if rivername not in ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS","INDUS"]:
     #    adj=20.
     #    lllat, urlat, lllon, urlon = max(llat-adj,-90.),min(llat+adj,90.),max(llon-adj,-180.),min(llon+adj,180.)
 
-     return lllat, urlat, lllon, urlon
+    return lllat, urlat, lllon, urlon
 #----
 def riveridname(rivername):
     river=rivername[0]+rivername[1::].lower()
@@ -129,38 +130,58 @@ def mk_dir(sdir):
     os.makedirs(sdir)
   except:
     pass
-#-- 
+#--
+fname=pm.CaMa_dir()+"/map/"+pm.map_name()+"/params.txt"
+f=open(fname,"r")
+lines=f.readlines()
+f.close()
+#-- map params --
+nx     = int(filter(None, re.split(" ",lines[0]))[0])
+ny     = int(filter(None, re.split(" ",lines[1]))[0])
+gsize  = float(filter(None, re.split(" ",lines[3]))[0])
+west   = float(filter(None, re.split(" ",lines[4]))[0])
+east   = float(filter(None, re.split(" ",lines[5]))[0])
+south  = float(filter(None, re.split(" ",lines[6]))[0])
+north  = float(filter(None, re.split(" ",lines[7]))[0])
+# regional map dimesion realtive to global map
+offsetX= int((west+180.0)/gsize)
+offsetY= int((90.0-north)/gsize)
+# global dimension
+glbname="glb_"+pm.map_name()[-5::]
+nXX    = int((180.0+180.0)/gsize)
+nYY    = int((90.0+90.0)/gsize)
+print glbname
 #--------------
-nextxy = pm.CaMa_dir()+"/map/glb_15min/nextxy.bin"
-rivwth = pm.CaMa_dir()+"/map/glb_15min/rivwth.bin"
-rivhgt = pm.CaMa_dir()+"/map/glb_15min/rivhgt.bin"
-rivlen = pm.CaMa_dir()+"/map/glb_15min/rivlen.bin"
-elevtn = pm.CaMa_dir()+"/map/glb_15min/elevtn.bin"
-uparea = pm.CaMa_dir()+"/map/glb_15min/uparea.bin"
-lonlat = pm.CaMa_dir()+"/map/glb_15min/lonlat.bin"
-nextxy = np.fromfile(nextxy,np.int32).reshape(2,720,1440)
-rivwth = np.fromfile(rivwth,np.float32).reshape(720,1440)
-rivhgt = np.fromfile(rivhgt,np.float32).reshape(720,1440)
-rivlen = np.fromfile(rivlen,np.float32).reshape(720,1440)
-elevtn = np.fromfile(elevtn,np.float32).reshape(720,1440)
-uparea = np.fromfile(uparea,np.float32).reshape(720,1440)
-lonlat = np.fromfile(lonlat,np.float32).reshape(2,720,1440)
+nextxy = pm.CaMa_dir()+"/map/"+pm.map_name()+"/nextxy.bin"
+rivwth = pm.CaMa_dir()+"/map/"+pm.map_name()+"/rivwth.bin"
+rivhgt = pm.CaMa_dir()+"/map/"+pm.map_name()+"/rivhgt.bin"
+rivlen = pm.CaMa_dir()+"/map/"+pm.map_name()+"/rivlen.bin"
+elevtn = pm.CaMa_dir()+"/map/"+pm.map_name()+"/elevtn.bin"
+uparea = pm.CaMa_dir()+"/map/"+pm.map_name()+"/uparea.bin"
+lonlat = pm.CaMa_dir()+"/map/"+pm.map_name()+"/lonlat.bin"
+nextxy = np.fromfile(nextxy,np.int32).reshape(2,ny,nx)
+rivwth = np.fromfile(rivwth,np.float32).reshape(ny,nx)
+rivhgt = np.fromfile(rivhgt,np.float32).reshape(ny,nx)
+rivlen = np.fromfile(rivlen,np.float32).reshape(ny,nx)
+elevtn = np.fromfile(elevtn,np.float32).reshape(ny,nx)
+uparea = np.fromfile(uparea,np.float32).reshape(ny,nx)
+lonlat = np.fromfile(lonlat,np.float32).reshape(2,ny,nx)
 #----
-rivnum = "rivnum.bin"
-rivnum = np.fromfile(rivnum,np.int32).reshape(720,1440)
+rivnum = pm.out_dir()+"/dat/rivnum_"+pm.map_name()[-5::]+".bin"
+rivnum = np.fromfile(rivnum,np.int32).reshape(nYY,nXX)
 #----
 nextx  = nextxy[0]#ma.masked_where(rivwth<=500.0,nextxy[0]).filled(0)
 nexty  = nextxy[1]#ma.masked_where(rivwth<=500.0,nextxy[1]).filled(0) 
 #--------------
 #fname = "./congo_nextxy.bin"
-#c_nextx= np.fromfile(fname,np.int32).reshape([2,720,1440])[0]
-fname = pm.CaMa_dir()+"/map/glb_15min/outclm.bin"
-trueforo = np.fromfile(fname,np.float32).reshape([2,720,1440])
-dis=(trueforo[0]>500.)*1
-dis=dis*((nextx>0)*1)
+#c_nextx= np.fromfile(fname,np.int32).reshape([2,nyYYnXX])[0]
+#fname = pm.CaMa_dir()+"/map/glb_15min/outclm.bin"
+#trueforo = np.fromfile(fname,np.float32).reshape([2,nYY,nXX])
+#dis=(trueforo[0]>500.)*1
+#dis=dis*((nextx>0)*1)
 #--major rivers and Ids
 rivid={}
-fname="river30_id.txt"
+fname=pm.out_dir()+"/dat/river30_id.txt"
 f = open(fname,"r")
 lines = f.readlines()
 f.close()
@@ -176,23 +197,33 @@ pname=[]
 xlist=[]
 ylist=[]
 river=[]
+staid=[]
 #--
 #rivernames  = ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS"]#,"INDUS"]# ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS","INDUS"] ["AMAZONAS"]#"CONGO"]#
-rivernames = grdc.grdc_river_name()
+#rivernames = grdc.grdc_river_name()
+rivernames = ["AMAZON"]
 for rivername in rivernames:
 #for rivername in ["AMAZONAS"]:#"LENA","NIGER","INDUS","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS"]:
 #  oname = "../assim_out/img/sfcelv/%s"%(rivername)
 #  mk_dir(oname)
-     station_loc,x_list,y_list = grdc.get_grdc_loc(rivername,"b")
-     for station in station_loc:
-         gid=grdc.get_id(station)
-         if gid== -9999:
-             continue 
-         ix, iy = grdc.get_loc_v394(gid)
-         river.append([rivername])
-         pname.append([station])
-         xlist.append([ix])
-         ylist.append([iy])
+    grdc_id,station_loc,x_list,y_list = grdc.get_grdc_loc_v396(rivername)
+    print rivername, grdc_id,station_loc
+    river.append([rivername]*len(station_loc))
+    staid.append(grdc_id)
+    pname.append(station_loc)
+    xlist.append(x_list)
+    ylist.append(y_list)
+###
+###    station_loc,x_list,y_list = grdc.get_grdc_loc(rivername,"b")
+###    for station in station_loc:
+###        gid=grdc.get_id(station)
+###        if gid== -9999:
+###            continue 
+###        ix, iy = grdc.get_loc_v394(gid)
+###        river.append([rivername])
+###        pname.append([station])
+###        xlist.append([ix-offsetX])
+###        ylist.append([iy-offsetY])
 #  print rivername, station_loc,x_list,y_list
 #  river.append([rivername]*len(station_loc))
 #  pname.append(station_loc)
@@ -273,10 +304,10 @@ alpha1=1
 width=0.5
 #---
 #---
-local_patch="local_patch_0.50"
-local_patch1="local_patch_one_0.50"
+local_patch="local_patch"#"_%3.2f"%(pm.threshold())
+local_patch1="local_patch_one_%3.2f"%(pm.threshold())
 #pathname="../img/local_patch_one_0.90"
-pathname="../img/%s"%(local_patch1)
+pathname="../figures/%s"%(local_patch1)
 mk_dir(pathname)
 pnum=len(pname)
 #--
@@ -287,10 +318,10 @@ for point in np.arange(pnum):
   iy=ylist[point]+1
   #--
   if not riveridname(river[point]) in rivid.keys():
-      continue
-
+    continue
+  #----
   fname=pm.out_dir()+"/weightage/%04d%04d.bin"%(ix,iy)
-  wgt=np.fromfile(fname,np.float32).reshape([720,1440])
+  wgt=np.fromfile(fname,np.float32).reshape([ny,nx])
   #--
   rivername=river[point]
   c_nextx=(rivnum==rivid[riveridname(rivername)])*1.0
@@ -309,8 +340,8 @@ for point in np.arange(pnum):
   #print rivername
   #lllat,urlat,lllon,urlon=rbd.latlon_river(rivername)
   ax1 = fig.add_subplot(G[0,0])
-  data=sl.slice(wgt,lllat,urlat,lllon,urlon,0.25)
-  data_Q=sl.slice(dis,lllat,urlat,lllon,urlon,0.25)
+  #data=sl.slice(wgt,lllat,urlat,lllon,urlon,gsize)
+  #data_Q=sl.slice(dis,lllat,urlat,lllon,urlon,gsize)
   #data=ma.masked_greater_equal(data,0.8).filled(1.0)
   M  = Basemap(resolution="c", llcrnrlat=lllat, llcrnrlon=lllon, urcrnrlat=urlat, urcrnrlon=urlon,ax=ax1) 
 #  M.drawcoastlines(color="k",linewidth=0.5, zorder=100)
@@ -323,9 +354,9 @@ for point in np.arange(pnum):
 #  im=M.imshow(ma.masked_less_equal(data,0.6),interpolation="nearest",cmap=cmap,origin="upper",zorder=101,norm=norm)
   #-----------
   #--
-  box="%f %f %f %f"%(lllon,urlon,urlat,lllat) 
+  box="%f %f %f %f"%(lllon,urlon,urlat,lllat)
   #  os.system("./bin/txt_vector "+str(lllon)+str(urlon)+str(urlat)+str(lllat)+" > tmp.txt")
-  os.system("./bin/txt_vector "+box+" "+pm.CaMa_dir()+" > tmp.txt") 
+  os.system("./bin/txt_vector "+box+" "+pm.CaMa_dir()+" "+glbname+" > tmp.txt")
   for LEVEL in range(1,10+1):
     os.system("./bin/print_rivvec tmp.txt 1 "+str(LEVEL)+" > tmp2.txt")
     width=float(LEVEL)*w
@@ -333,24 +364,24 @@ for point in np.arange(pnum):
     # open tmp2.txt
     f = open("tmp2.txt","r")
     lines = f.readlines()
-    f.close() 
-    #--- 
+    f.close()
+    #----------------
     for line in lines:
-      line    = filter(None, re.split(" ",line))
-      lon1 = float(line[0])
-      lat1 = float(line[1])
-      lon2 = float(line[3]) 
-      lat2 = float(line[4])
-  
-      iix = int((lon1 + 180.)*4.0) 
-      iiy = int((-lat1 + 90.)*4.0)
-  
-      if c_nextx[iiy,iix] <= 0:
-        continue
-      #print lon1,lat1,width
-      x1,y1=M(lon1,lat1)
-      x2,y2=M(lon2,lat2)
-      M.plot([x1,x2],[y1,y2],color="#C0C0C0",linewidth=width,zorder=101,alpha=alpha)
+        line = filter(None, re.split(" ",line))
+        lon1 = float(line[0])
+        lat1 = float(line[1])
+        lon2 = float(line[3])
+        lat2 = float(line[4])
+        #----
+        iix  = int((lon1 + 180.)*(1.0/gsize))
+        iiy  = int((-lat1 + 90.)*(1.0/gsize))
+        #----
+        if c_nextx[iiy,iix] <= 0:
+          continue
+        #print lon1,lat1,width
+        x1,y1=M(lon1,lat1)
+        x2,y2=M(lon2,lat2)
+        M.plot([x1,x2],[y1,y2],color="#C0C0C0",linewidth=width,zorder=101,alpha=alpha)
   #--
   fname=pm.out_dir()+"/"+local_patch+"/patch%04d%04d.txt"%(ix,iy)
   f=open(fname,"r")
@@ -359,60 +390,20 @@ for point in np.arange(pnum):
   #--
   f=open("tmp.txt","w")
   for line in lines:#[:1]:
-    line = filter(None, re.split(" ",line))  
-    #print line 
+    line = filter(None, re.split(" ",line))
+    #print line
     iix = int(line[0])
-    iiy = int(line[1])   
+    iiy = int(line[1])
     jjx = nextx[iiy-1,iix-1]
     jjy = nexty[iiy-1,iix-1]
     #-----
     lon1 = lonlat[0,iiy-1,iix-1]
     lat1 = lonlat[1,iiy-1,iix-1]
-    lon2 = lonlat[0,jjy-1,jjx-1] 
+    lon2 = lonlat[0,jjy-1,jjx-1]
     lat2 = lonlat[1,jjy-1,jjx-1]
-#    # remove seperate areas 
-#    if lon1 > 25.0 and lat1 > -10.0 and lon1 < 30.0 and lat1 < -5.0:
-#      print "1. removed:", lon1, lat1
-#      continue
-#    #--
-#    if lon1 > 16.0 and lat1 > -1.0 and lon1 < 16.5 and lat1 < 0.25:
-#      print "2. removed:", lon1, lat1
-#      continue  
-#        #--
-#    if lon1 > 17.5 and lat1 > -4.0 and lon1 < 19.5 and lat1 < -2.0:
-#      print "3. removed:", lon1, lat1
-#      continue    
-#    #--
-#    if lon1 > 17.0 and lat1 > 2.0 and lon1 < 18.5 and lat1 < 2.5:
-#      print "4. removed:", lon1, lat1
-#      continue 
-    #--
-  #  # remove seperate areas
-  #  if point == 5 or point == 4 or point == 1: 
-  #    if lon1 > 25.0 and lat1 > -10.0 and lon1 < 30.0 and lat1 < -6.0:
-  #      print "1. removed:", lon1, lat1
-  #      continue
-  #  #--
-  #  if point == 5:
-  #    if lon1 > 17.5 and lat1 > -4.0 and lon1 < 20.0 and lat1 < -2.0:
-  #      print "3. removed:", lon1, lat1
-  #      continue
-  #  #--
-  #  if point == 4:
-  #    if lon1 > 16.0 and lat1 > -0.5 and lon1 < 16.5 and lat1 < 0.5:
-  #      print "2. removed:", lon1, lat1
-  #      continue  
-  #        #--
-  #    if lon1 > 17.5 and lat1 > -4.0 and lon1 < 19.5 and lat1 < -2.0:
-  #      print "3. removed:", lon1, lat1
-  #      continue    
-  #    #--
-  #    if lon1 > 17.0 and lat1 > 2.0 and lon1 < 18.5 and lat1 < 2.5:
-  #      print "4. removed:", lon1, lat1
-  #      continue 
     #--
     line1="%12.5f %12.5f %12.5f %12.5f %12.1f\n"%(lon1, lat1, lon2, lat2, uparea[iiy-1,iix-1]/1000.**2)
-    f.write(line1) 
+    f.write(line1)
   f.close()
   for LEVEL in range(1,10+1):
     os.system("./bin/print_rivvec tmp.txt 1 "+str(LEVEL)+" > tmp2.txt")
@@ -424,21 +415,21 @@ for point in np.arange(pnum):
     f.close() 
     #--- 
     for line in lines:
-      line    = filter(None, re.split(" ",line))
-      lon1 = float(line[0])
-      lat1 = float(line[1])
-      lon2 = float(line[3]) 
-      lat2 = float(line[4])
-  
-      iix = int((lon1 + 180.)*4.0) 
-      iiy = int((-lat1 + 90.)*4.0)
-  
-      if c_nextx[iiy,iix] <= 0:
-        continue
-      #print lon1,lat1,lon2,lat2,width
-      x1,y1=M(lon1,lat1)
-      x2,y2=M(lon2,lat2)
-      M.plot([x1,x2],[y1,y2],color="dodgerblue",linewidth=width,zorder=102,alpha=alpha)
+        line = filter(None, re.split(" ",line))
+        lon1 = float(line[0])
+        lat1 = float(line[1])
+        lon2 = float(line[3])
+        lat2 = float(line[4])
+        #----
+        iix = int((lon1 + 180.)*(1.0/gsize))
+        iiy = int((-lat1 + 90.)*(1.0/gsize))
+        #----
+        if c_nextx[iiy,iix] <= 0:
+          continue
+        #print lon1,lat1,lon2,lat2,width
+        x1,y1=M(lon1,lat1)
+        x2,y2=M(lon2,lat2)
+        M.plot([x1,x2],[y1,y2],color="dodgerblue",linewidth=width,zorder=102,alpha=alpha)
   # target pixel 
   lon = -180.0 + (ix-1)*0.25
   lat = 90.0 - (iy-1)*0.25
@@ -448,10 +439,12 @@ for point in np.arange(pnum):
 #  stitle= "%s)"%(string.ascii_lowercase[point])
 #  ax1.set_title(stitle,fontsize=9,loc="left")
   #--
-  pathname="../img/"+local_patch1+"/"+rivername
+  pathname="../figures/"+local_patch1+"/"+rivername
   #pathname=pathname+"/"+rivername
   mk_dir(pathname)
   figname=pathname+"/"+pname[point]+".png"
   print (figname)
   plt.savefig(figname)
   #plt.show()
+# remove tmp
+os.system("rm -r tmp*")
