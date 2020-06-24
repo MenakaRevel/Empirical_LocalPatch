@@ -27,6 +27,10 @@
 */lpara
 */lparaMS
 
+# fortran at img/bin
+*/txt_vector
+*/print_rivvec
+
 #.pyc files
 *.pyc
 

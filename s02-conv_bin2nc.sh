@@ -34,7 +34,13 @@ cpunums=`python -c "import params; print (params.cpu_nums())"`
 mapname=`python -c "import params; print (params.map_name())"`
 inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
+
+# water surface elevation
 varname="sfcelv"
-#echo $N
+#=================================================
+./src/bin2nc $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
+
+# discharge
+varname="outflw"
 #=================================================
 ./src/bin2nc $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
