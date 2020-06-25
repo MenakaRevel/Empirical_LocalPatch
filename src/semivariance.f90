@@ -232,7 +232,7 @@ do ix = 1,nx !
                     !!!! get variable subset
                     !!!call nccheck( nf90_get_var(ncidin,varidin,offset,start=start,count=count) )
                     !===========
-                    offset=globalarray(xt(j),yt(j),N)
+                    offset=globalarray(xt(j),yt(j),:)
                     !===========
                     ! calculate experimental semivariance
                     call semi_var(globaltrue,offset,N,semivar,std)
@@ -262,9 +262,8 @@ do ix = 1,nx !
                 !!!! get variable subset
                 !!!call nccheck( nf90_get_var(ncidin,varidin,offset,start=start,count=count) )
                 !===========
-                offset=globalarray(xt(j),yt(j),N)
+                offset=globalarray(xt(j),yt(j),:)
                 !===========
-
                 ! calculate experimantal semivariance
                 call semi_var(globaltrue,offset,N,semivar,std)
                 write(34,21)xt(j),yt(j),rlen(j),semivar,std
@@ -562,7 +561,7 @@ do i=1,n
   v=v+(((h(i)-t(i))**2.0)/2.0)**2.0
 end do
 semivar=p/(2.0*real(n))
-std=sqrt((v/(real(n-1)+1.0e-20))-((semivar**2.0)*(real(n)/(real(n-1)+1.0e-20))))
+std=sqrt(abs((v/(real(n-1)+1.0e-20))-((semivar**2.0)*(real(n)/(real(n-1)+1.0e-20)))))
 return
 end subroutine semi_var
 !******************************
