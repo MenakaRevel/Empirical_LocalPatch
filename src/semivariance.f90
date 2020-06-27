@@ -183,7 +183,7 @@ call nccheck( nf90_get_var(ncidin,varidin,globalarray,start=start,count=count) )
 call nccheck( nf90_close(ncidin ) )
 ! parallel calculation
 
-!$omp parallel default(private) shared(ocean,rivwth,globaltrue,nextX,nextY,outdir,patch_size,nextdst,N,lon_cent)
+!$omp parallel default(private) shared(ocean,rivwth,globalarray,nextX,nextY,outdir,patch_nums,nextdst,N,ix)
 !!!default(shared) private(lat_cent,xt,xf,i,j,i_m,j_m,rlen,pixel, cov,corr,countnum)
 !$omp do
 do ix = 1,nx !
@@ -199,7 +199,7 @@ do ix = 1,nx !
             !!! get variable subset
             !!call nccheck( nf90_get_var(ncidin,varidin,globaltrue,start=start,count=count) )
             !===========
-            globaltrue=globalarray(ix,iy,N)
+            globaltrue=globalarray(ix,iy,:)
             !===========
             write(*,*)"================================="
             write(*,*) lon,lat!,results
