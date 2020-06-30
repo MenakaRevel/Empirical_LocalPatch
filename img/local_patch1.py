@@ -431,8 +431,8 @@ for point in np.arange(pnum):
         x2,y2=M(lon2,lat2)
         M.plot([x1,x2],[y1,y2],color="dodgerblue",linewidth=width,zorder=102,alpha=alpha)
   # target pixel 
-  lon = -180.0 + (ix-1)*0.25
-  lat = 90.0 - (iy-1)*0.25
+  lon = west  + (ix-1)*gsize
+  lat = north - (iy-1)*gsize
   plt.scatter(lon,lat,s=100,marker="o",color="red",zorder=105)
   #plt.annotate(annotate_string,xy=(lon,lat),xycoords="data",horizontalalignment="left",verticalalignment="top",fontsize=12,zorder=106)
   #--title--

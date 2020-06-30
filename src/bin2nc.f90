@@ -73,7 +73,9 @@ close(11)
 south=max(south,-60.0)
 nx=lonpx
 !ny=latpx-30.0/dble(gsize) ! writed only up -60S latitude
-ny=(north-south)/dble(gsize)
+ny=(north-south)/gsize !dble(gsize)
+!print*, north,south,gsize
+!print*, nx,ny
 write(tag,'(i4.0,a,i4.0)')syear,"-",eyear
 fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(inname)//"/"//trim(varname)//trim(tag)//".nc"
 print*, "create",fname
@@ -107,7 +109,7 @@ call nccheck( nf90_put_att(ncid, varid, 'units',ctime) )
 !===
 print*, "variable"
 call nccheck( nf90_def_var(ncid, trim(varname), nf90_float, &
-         (/lonid,latid,timeid/), varid) )
+         &(/lonid,latid,timeid/), varid) )
 print*, "put attribute"
 call nccheck( nf90_put_att(ncid, varid, 'long_name', trim(longname(varname))) )
 call nccheck( nf90_put_att(ncid, varid, 'units',     trim(units(varname))) )
@@ -177,9 +179,6 @@ do year=syear,eyear
     i=i+days
     !print*,"L169",trim(varname)
 end do
-
-
-
 !===close netCDF4===
 call nccheck( nf90_close(ncid))
 
