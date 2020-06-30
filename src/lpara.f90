@@ -143,7 +143,7 @@ targetp=0
 south=max(south,-60.0)
 nx=lonpx
 !ny=latpx-30.0/dble(gsize) ! writed only up -60S latitude
-ny=(north-south)/dble(gsize)
+ny=(north-south)/gsize !dble(gsize)
 !--
 ! do parallel
 !$omp parallel default(none)&
