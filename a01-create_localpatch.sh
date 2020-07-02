@@ -7,18 +7,18 @@
 # 2020/05/29
 #====================
 #*** PBS setting when needed
-#PBS -q E20
-#PBS -l select=1:ncpus=20:mem=100gb
+#PBS -q E40
+#PBS -l select=1:ncpus=40:mem=100gb
 #PBS -j oe
 #PBS -m ea
 #PBS -M menaka@rainbow.iis.u-tokyo.ac.jp
 #PBS -V
-#PBS -N bin2nc
+#PBS -N EmpLP
 #========
 cd $PBS_O_WORKDIR
 #================================================
 # OpenMP Thread number
-export OMP_NUM_THREADS=20
+export OMP_NUM_THREADS=40
 
 # input settings
 syear=`python -c "import params; print (params.starttime()[0])"`
@@ -35,7 +35,8 @@ mapname=`python -c "import params; print (params.map_name())"`
 inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 #*************************
-# runs 01-CaMa_sim.sh before following steps to get the simulated variables
+# runs s01-CaMa_sim.sh before following steps to get the simulated variables
+# ./s01-CaMa_sim.sh
 #*************************
 #=========================
 # convert binary to netCDF
