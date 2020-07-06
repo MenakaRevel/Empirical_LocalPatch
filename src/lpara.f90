@@ -188,10 +188,13 @@ do ix = 1,nx ! pixels along longtitude direction
                     call ixy2iixy(i,j,lonpx,latpx,i_m,j_m)
                 else
                     !print*, "regional map"
-                    i_m=min(i_m,lonpx)
-                    i_m=max(i_m,1)
-                    j_m=min(j_m,latpx)
-                    j_m=max(j_m,1)
+                    if (i_m < 1 .or. i_m > lonpx .or. j_m < 1 .or. j_m > latpx) then
+                        cycle
+                    end if
+                    !i_m=min(i_m,lonpx)
+                    !i_m=max(i_m,1)
+                    !j_m=min(j_m,latpx)
+                    !j_m=max(j_m,1)
                 end if
                 ! weitage >= threshold is considered
                 if (weightage(i_m,j_m) < threshold) then
