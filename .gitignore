@@ -6,7 +6,6 @@
 */gaussian_weight
 */local_patch
 */local_patchMS
-*/img
 */dat
 
 #bin files
@@ -29,7 +28,9 @@
 
 # fortran at img/bin
 */txt_vector
+*/txt_vector.o
 */print_rivvec
+*/print_rivvec.o
 
 #.pyc files
 *.pyc
