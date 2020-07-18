@@ -179,6 +179,7 @@ do ix = 1,nx ! pixels along longtitude direction
         fname=trim(adjustl(outdir))//"/local_patch/patch"//trim(llon)//trim(llat)//".txt"
         open(fn,file=fname,status='replace')
         ! patch size should be >=1000
+        target_pixel=-9999
         do j=iy-patch_size,iy+patch_size
             do i=iy-patch_size,iy+patch_size
                 i_m = i
@@ -232,7 +233,6 @@ do ix = 1,nx ! pixels along longtitude direction
                 write(fn,21)i_m,j_m,gauss_weight(i_m,j_m)
                 !write(*,21)i_m,j_m,gauss_weight(i_m,j_m)
                 ! find the target pixel
-                target_pixel=1
                 if (i_m==ix .and. j_m==iy) then
                   target_pixel=countnum
                 end if
