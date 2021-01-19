@@ -258,9 +258,9 @@ integer                        :: year,dyear
 ! normal : 365
 ! leap   : 366
 dyear=365
-if (mod(dble(year),4.0) == 0) then
-    dyear=366
-endif
+if (mod(dble(year),4.0)   == 0) dyear=366
+if (mod(dble(year),100.0) == 0) dyear=365
+if (mod(dble(year),400.0) == 0) dyear=366
 return
 end function dyear
 !*********************************
