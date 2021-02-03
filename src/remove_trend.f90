@@ -109,7 +109,7 @@ nx=lonpx
 ny=(north-south)/gsize !dble(gsize)
 write(tag,'(i4.0,a,i4.0)')syear,"-",eyear
 ! edited the file name as /CaMa_out/{mapname}_{inputname}/{var}{syear}-{eyear}.nc
-fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(mapname)//"_"//trim(inname)//"/"//trim(varname)//trim(tag)//".nc"
+fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(mapname)//"_"//trim(inname)//"/rmdtrnd"//trim(tag)//".nc"
 print*, "create",fname
 call nccheck( nf90_create(fname, NF90_NETCDF4, ncidout) )
 !call nccheck( nf90_create_par(fname, IOR(NF90_NETCDF4,NF90_MPIIO), MPI_COMM_WORLD, MPI_INFO_NULL, ncidout) )
@@ -144,7 +144,7 @@ print*, "variable"
 call nccheck( nf90_def_var(ncidout, "rmdtrnd", nf90_float, &
          (/lonid,latid,timeid/), varidout) )
 print*, "put attribute"
-call nccheck( nf90_put_att(ncidout, varidout, 'long_name', trim(longname(varname))) )
+call nccheck( nf90_put_att(ncidout, varidout, 'long_name', 'trend removed water surface elevation') ) !trim(longname(varname))
 call nccheck( nf90_put_att(ncidout, varidout, 'units',     trim(units(varname))) )
 call nccheck( nf90_put_att(ncidout, varidout, '_fillvalue',rmis) )
 
@@ -187,7 +187,7 @@ call nccheck( nf90_put_var(ncidout,varid,dt) )
 !  varidin
 !---------------------------------
 ! read netCDF file
-fname=trim(outdir)//"/CaMa_out/"//trim(inname)//"/"//trim(varname)//trim(tag)//".nc"
+fname=trim(outdir)//"/CaMa_out/"//trim(mapname)//"_"//trim(inname)//"/"//trim(varname)//trim(tag)//".nc"
 print*, "open ",trim(fname)
 call nccheck( nf90_open(fname, nf90_nowrite, ncidin) )
 !call nccheck( nf90_open_par(fname, IOR(NF90_NETCDF4,NF90_MPIIO), MPI_COMM_WORLD, MPI_INFO_NULL, ncidin) )

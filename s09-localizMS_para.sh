@@ -36,6 +36,7 @@ threshold=`python -c "import params; print (params.threshold())"`
 
 # make dir local patch
 mkdir "local_patchMS/${mapname}_${inputname}"
+
 #=================================================
 varname="weightage"
 ./src/lparaMS $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold

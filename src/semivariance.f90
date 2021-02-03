@@ -119,7 +119,7 @@ patch_nums=100000
 allocate(xt(patch_nums),yt(patch_nums),xf(patch_nums))
 allocate(ux(patch_nums),uy(patch_nums),rlen(patch_nums))
 
-fname=trim(adjustl(outdir))//"/semivar/"//trim(mapname)"_"trim(inname)//"/lonlat_list.txt"
+fname=trim(adjustl(outdir))//"/semivar/"//trim(mapname)//"_"//trim(inname)//"/lonlat_list.txt"
 open(79,file=fname,form="formatted",status='replace',iostat=ios)
 write(79,'(a4,4x,a4,4x,a3,4x,a3)')"lon","lat","up","dn"
 
@@ -166,7 +166,7 @@ allocate(globalarray(nx,ny,N),globaltrue(N),offset(N))
 !  varidin
 !---------------------------------
 ! read netCDF file
-fname=trim(outdir)//"/CaMa_out/"//trim(mapname)"_"trim(inname)"/"//trim(varname)//trim(tag)//".nc"
+fname=trim(outdir)//"/CaMa_out/"//trim(mapname)//"_"//trim(inname)//"/"//trim(varname)//trim(tag)//".nc"
 print*, "open ",trim(fname)
 call nccheck( nf90_open(trim(fname), nf90_nowrite, ncidin) )
 !call nccheck( nf90_open_par(fname, IOR(NF90_NETCDF4,NF90_MPIIO), MPI_COMM_WORLD, MPI_INFO_NULL, ncidin) )
@@ -212,7 +212,7 @@ do ix = 1,nx !
             do i=1,un
                 !===wiriting file===
                 write(u,'(a2, i5.5)') "up",i
-                fname=trim(adjustl(outdir))//"/semivar/"//trim(lon)//trim(lat)//"/"//trim(u)//".svg"
+                fname=trim(adjustl(outdir))//"/semivar/"//trim(mapname)//"_"//trim(inname)//"/"//trim(lon)//trim(lat)//"/"//trim(u)//".svg"
                 write(*,*)fname
                 open(34,file=fname,form="formatted",status='replace',iostat=ios)
                 if (ios /= 0) then
@@ -248,7 +248,7 @@ do ix = 1,nx !
             call river_dn(ix,iy,patch_nums,lonpx,latpx,nextX,nextY,nextdst,xt,yt,rlen,k) 
             write(*,*)"-------------",k,"downstream pixels"
             write(u,'(a2, i5.5)') "dn",0
-            fname=trim(adjustl(outdir))//"/semivar/"//trim(lon)//trim(lat)//"/"//trim(u)//".svg"
+            fname=trim(adjustl(outdir))//"/semivar/"//trim(mapname)//"_"//trim(inname)//"/"//trim(lon)//trim(lat)//"/"//trim(u)//".svg"
             write(*,*)fname
             open(34,file=fname,form="formatted",status='replace',iostat=ios)
             if (ios /= 0) then

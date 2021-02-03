@@ -256,7 +256,7 @@ do ix = 1,nx !int((assimW+180)*4+1),int((assimE+180)*4+1),1
         end if
         ! file to save
         fn=72
-        fname=trim(adjustl(outdir))//"/local_patchMS/patch"//trim(llon)//trim(llat)//".txt"
+        fname=trim(adjustl(outdir))//"/local_patchMS/"//trim(mapname)//"_"//trim(inname)//"/patch"//trim(llon)//trim(llat)//".txt"
         open(fn,file=fname,status='replace')
         !write(fn,22)"lon","lat","","forcast","assim"
         do i=1,k

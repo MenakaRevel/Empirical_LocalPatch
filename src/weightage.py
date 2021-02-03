@@ -144,11 +144,11 @@ print pathname1
 pathname2=out_dir+"/gaussian_weight"
 mk_dir(pathname2)
 print pathname2
-pathname3=out_dir+"/gaussian_weight"+mapname+"_"+inname
+pathname3=out_dir+"/gaussian_weight/"+mapname+"_"+inname
 mk_dir(pathname3)
 print pathname3
 #==============================================
-fname=out_dir+"/semivar/lonlat_list.txt"
+fname=out_dir+"/semivar/"+mapname+"_"+inname+"/lonlat_list.txt"
 f=open(fname,"r")
 lines=f.readlines()
 f.close()

@@ -14,6 +14,7 @@
 #  distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
 # See the License for the specific language governing permissions and limitations under the License.
 #==========================================================
+# (0) Basic Setting (for workstation)
 
 #*** PBS setting when needed
 #PBS -q E40
@@ -47,14 +48,11 @@ pwd
 echo ${CAMADIR}
 
 #================================================
-# (0) Basic Setting (for workstation)
 
 #*** 0a. Set CaMa-Flood base directory
 BASE=$CAMADIR                         #   CaMa-Flood directory
 OUTBASE=$outdir						            #   base for output => CaMa_out
 INBASE=$outdir                        #   base for input => CaMa_in
-
-# BASE="/home/yamadai/work/CaMa_v395/cmf_v395_pkg"  # setting for PBS in cluster
 
 echo $BASE
 
@@ -71,7 +69,7 @@ export OMP_NUM_THREADS=40 #$cpunums       # OpenMP cpu num
 
 #============================
 #*** 1a. Experiment directory setting
-EXP=$mapname_$inputname                              # experiment name (output directory name)
+EXP=$mapname_$inputname                     # experiment name (output directory name)
 RDIR=${OUTBASE}/CaMa_out/${EXP}             # directory to run CaMa-Flood
 EXE="MAIN_cmf"                              # Execute file name
 PROG=${BASE}/src/${EXE}                     # location of Fortran main program
