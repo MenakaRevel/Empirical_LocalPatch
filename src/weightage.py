@@ -16,9 +16,9 @@ import math
 from numpy import ma
 from multiprocessing import Pool
 from multiprocessing import Process
-#---
+#==============================================
 import LMA_semivari as LMA
-#---
+#==============================================
 def slink(src,dst):
   try:
     os.symlink(src,dst)
@@ -28,13 +28,13 @@ def slink(src,dst):
       os.symlink(src,dst)
     else:
       raise
-#----
+#==============================================
 def mk_dir(sdir):
   try:
     os.makedirs(sdir)
   except:
     pass
-#------------------------
+#==============================================
 def gaussian(i, p):
     p=abs(p)
     #yfit=[]
@@ -45,14 +45,14 @@ def gaussian(i, p):
     else:
       yfit=0.
     return yfit
-#---------------------------
+#==============================================
 def Gauss_w(x,s=500.):
   yfit=[]
   for i in x:
     i=abs(i)
     yfit.append((math.exp((-i**2.0)/(2*s**2.0))))
   return np.array(yfit)
-#------------
+#==============================================
 def mk_svg1(sv,lag,model="gaussian"):
   # up = 0 is downsream
   # up > 0 is upstream number
@@ -75,7 +75,7 @@ def mk_svg1(sv,lag,model="gaussian"):
         print "except:",str(e)
         a=lag[0] 
   return a
-#--
+#==============================================
 def mk_svg(sv,lag,model="gaussian"):
   # up = 0 is downsream
   # up > 0 is upstream number
@@ -98,21 +98,24 @@ def mk_svg(sv,lag,model="gaussian"):
         print "except:",str(e)
         c,a=sv[-1],lag[-1] 
   return c,a 
-#----------------
+#==============================================
+# read inputs
 CaMa_dir=sys.argv[1]
 mapname=sys.argv[2]
-out_dir=sys.argv[3]
-para=int(sys.argv[4])
-#----
+inname=sys.argv[3]
+out_dir=sys.argv[4]
+para=int(sys.argv[5])
+threshold=float(sys.argv[6])
+#==============================================
 fname=CaMa_dir+"/map/"+mapname+"/params.txt"
 f=open(fname,"r")
 lines=f.readlines()
 f.close()
-#----
+#==============================================
 nx     = int(filter(None, re.split(" ",lines[0]))[0])
 ny     = int(filter(None, re.split(" ",lines[1]))[0])
 gsize  = float(filter(None, re.split(" ",lines[3]))[0])
-#--------------
+#==============================================
 nextxy = CaMa_dir+"/map/"+mapname+"/nextxy.bin"
 rivwth = CaMa_dir+"/map/"+mapname+"/rivwth.bin"
 rivhgt = CaMa_dir+"/map/"+mapname+"/rivhgt.bin"
@@ -123,31 +126,41 @@ rivwth = np.fromfile(rivwth,np.float32).reshape(ny,nx)
 rivhgt = np.fromfile(rivhgt,np.float32).reshape(ny,nx)
 rivlen = np.fromfile(rivlen,np.float32).reshape(ny,nx)
 elevtn = np.fromfile(elevtn,np.float32).reshape(ny,nx)
-#----
+#==============================================
 nextx  = nextxy[0]
 nexty  = nextxy[1]
-#***********
+#==============================================
 print out_dir
+#==============================================
 # spatial dependancy weight
-pathname=out_dir+"/weightage"
-mk_dir(pathname)
-# gaussian weight for data assimilatioi
-pathname1=out_dir+"/gaussian_weight"
+pathname0=out_dir+"/weightage"
+mk_dir(pathname0)
+print pathname0
+pathname1=out_dir+"/weightage/"+mapname+"_"+inname
 mk_dir(pathname1)
-#----
+print pathname1
+#==============================================
+# gaussian weight for data assimilatioi
+pathname2=out_dir+"/gaussian_weight"
+mk_dir(pathname2)
+print pathname2
+pathname3=out_dir+"/gaussian_weight"+mapname+"_"+inname
+mk_dir(pathname3)
+print pathname3
+#==============================================
 fname=out_dir+"/semivar/lonlat_list.txt"
 f=open(fname,"r")
 lines=f.readlines()
 f.close()
-#---
+#==============================================
 # threshold for defining the local patch boundries
 #threshold=0.6
-threshold=float(sys.argv[5])
 # samllest patch size along the river (upstream/downstream)
 #baseline=6
 baseline=11 # Revel_etal,. (2019) proves 21 x 21 patch works well in upstreams 
 #print lines[0]
 #for line in lines[1::]:
+#==============================================
 def mk_wgt(line):
     #print line
     line  = filter(None, re.split(" ",line))
@@ -176,7 +189,7 @@ def mk_wgt(line):
         lgamma=[]
         lstd=[]
         #--
-        fname="%s/semivar/%04d%04d/dn%05d.svg"%(out_dir,lon,lat,0)
+        fname="%s/semivar/%s_%s/%04d%04d/dn%05d.svg"%(out_dir,mapname,inname,lon,lat,0)
         try:
             f=open(fname,"r")
             lines=f.readlines()
@@ -267,7 +280,7 @@ def mk_wgt(line):
             lgamma=[]
             lstd=[]
             #--
-            fname="%s/semivar/%04d%04d/up%05d.svg"%(out_dir,lon,lat,iup)
+            fname="%s/semivar/%s_%s/%04d%04d/dn%05d.svg"%(out_dir,mapname,inname,lon,lat,iup)
             try:
                 f=open(fname,"r")
                 lines=f.readlines()
@@ -334,11 +347,11 @@ def mk_wgt(line):
                     # Gaussian Weight 
                     Gwt[y,x]=max(math.exp(-ldis[i]**2/(2.0*sigma1**2)),Gwt[y,x])
     #-----
-    oname=pathname+"/%04d%04d.bin"%(lon,lat)
+    oname=pathname1+"/%04d%04d.bin"%(lon,lat)
     wgt.tofile(oname)
     print oname
     #-----
-    oname=pathname1+"/%04d%04d.bin"%(lon,lat)
+    oname=pathname3+"/%04d%04d.bin"%(lon,lat)
     Gwt.tofile(oname)
     print oname
     return 0

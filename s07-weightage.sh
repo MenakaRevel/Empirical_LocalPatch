@@ -33,5 +33,6 @@ mapname=`python -c "import params; print (params.map_name())"`
 inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 threshold=`python -c "import params; print (params.threshold())"`
+
 #=================================================
-python src/weightage.py $CAMADIR $mapname $outdir $cpunums $threshold
+python src/weightage.py $CAMADIR $mapname $inputname $outdir $cpunums $threshold

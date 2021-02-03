@@ -51,7 +51,7 @@ echo ${CAMADIR}
 
 #*** 0a. Set CaMa-Flood base directory
 BASE=$CAMADIR                         #   CaMa-Flood directory
-OUTBASE=$outdir						  #   base for output => CaMa_out
+OUTBASE=$outdir						            #   base for output => CaMa_out
 INBASE=$outdir                        #   base for input => CaMa_in
 
 # BASE="/home/yamadai/work/CaMa_v395/cmf_v395_pkg"  # setting for PBS in cluster
@@ -63,7 +63,7 @@ export IFORTLIB="/opt/intel/lib:/opt/intel/mkl/lib"
 export DYLD_LIBRARY_PATH="${IFORTLIB}:${DYLD_LIBRARY_PATH}"
 
 #*** 0c. OpenMP thread number
-export OMP_NUM_THREADS=20 #$cpunums       # OpenMP cpu num
+export OMP_NUM_THREADS=40 #$cpunums       # OpenMP cpu num
 
 #================================================
 # (1) Experiment setting
@@ -71,7 +71,7 @@ export OMP_NUM_THREADS=20 #$cpunums       # OpenMP cpu num
 
 #============================
 #*** 1a. Experiment directory setting
-EXP=$inputname                              # experiment name (output directory name)
+EXP=$mapname_$inputname                              # experiment name (output directory name)
 RDIR=${OUTBASE}/CaMa_out/${EXP}             # directory to run CaMa-Flood
 EXE="MAIN_cmf"                              # Execute file name
 PROG=${BASE}/src/${EXE}                     # location of Fortran main program

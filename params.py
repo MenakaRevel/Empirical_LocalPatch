@@ -5,7 +5,7 @@ import numpy as np
 # Creating Empirical Local Patch
 # By Menaka Revel@IIS,U-Tokyo
 # 2020/05/25
-# Revel et al,. (2019,2020)
+# Revel et al,. (2019,2021)
 ########################
 #
 # parameters list
@@ -34,7 +34,8 @@ def out_dir():
     #return "/media/menaka/HDJA-UT/covariance"
 
 def map_name():
-    return "amz_06min" #Amazon river 6 min
+    #return "amz_06min" #Amazon river 6 min
+    return "congo_06min" #Congo river 6min
     #return "glb_06min" # global 6 min
 
 def input_name():

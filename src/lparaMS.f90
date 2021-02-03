@@ -119,7 +119,7 @@ patch_side=patch_size*2+1
 patch_nums=patch_side**2
 
 
-fname=trim(adjustl(outdir))//"local_patch/lonlat.txt"
+fname=trim(adjustl(outdir))//"local_patchMS/"//trim(mapname)//"_"//trim(inname)//"/lonlat.txt"
 open(78,file=fname,status='replace')
 
 21 format(i4.4,2x,i4.4,2x,f10.7)
@@ -230,11 +230,11 @@ do ix = 1,nx !int((assimW+180)*4+1),int((assimE+180)*4+1),1
         ! open emperical weightage
         write(llon,'(i4.4)') ix
         write(llat,'(i4.4)') iy
-        fname=trim(adjustl(outdir))//"/weightage/"//trim(llon)//trim(llat)//".bin"
+        fname=trim(adjustl(outdir))//"/weightage/"//trim(mapname)//"_"//trim(inname)//"/"//trim(llon)//trim(llat)//".bin"
         fn = 34
         call read_wgt(fname,lonpx,latpx,weightage)
         ! read gausssian weight
-        fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(llon)//trim(llat)//".bin"
+        fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"/"//trim(llon)//trim(llat)//".bin"
         fn = 34
         call read_wgt(fname,lonpx,latpx,gauss_weight)
         ! get the mainstream pixels
@@ -287,7 +287,7 @@ end do
 !$omp end do
 !$omp end parallel
 !---
-fname=trim(adjustl(outdir))//"/local_patchMS/countnum.bin"
+fname=trim(adjustl(outdir))//"/local_patchMS/"//trim(mapname)//"_"//trim(inname)//"/countnum.bin"
 open(84,file=fname,form="unformatted",access="direct",recl=4*latpx*lonpx,status="replace",iostat=ios)
 if(ios==0)then
     write(84,rec=1) countp
@@ -298,7 +298,7 @@ end if
 close(84)
 !--
 !---
-fname=trim(adjustl(outdir))//"/local_patchMS/lpara_patch.bin"
+fname=trim(adjustl(outdir))//"/local_patchMS/"//trim(mapname)//"_"//trim(inname)//"/lpara_patch.bin"
 open(85,file=fname,form="unformatted",access="direct",recl=4*latpx*lonpx,status="replace",iostat=ios)
 if(ios==0)then
     write(85,rec=1) upx

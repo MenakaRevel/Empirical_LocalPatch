@@ -108,7 +108,8 @@ nx=lonpx
 !ny=latpx-30.0/dble(gsize) ! writed only up -60S latitude
 ny=(north-south)/gsize !dble(gsize)
 write(tag,'(i4.0,a,i4.0)')syear,"-",eyear
-fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(inname)//"/rmdsesn"//trim(tag)//".nc"
+! edited the file name as /CaMa_out/{mapname}_{inputname}/{var}{syear}-{eyear}.nc
+fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(mapname)//"_"//trim(inname)//"/"//trim(varname)//trim(tag)//".nc"
 print*, "create",fname
 call nccheck( nf90_create(fname, NF90_NETCDF4, ncidout) )
 !=== set dimension ===

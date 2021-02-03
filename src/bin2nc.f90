@@ -77,7 +77,8 @@ ny=(north-south)/gsize !dble(gsize)
 !print*, north,south,gsize
 !print*, nx,ny
 write(tag,'(i4.0,a,i4.0)')syear,"-",eyear
-fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(inname)//"/"//trim(varname)//trim(tag)//".nc"
+! edited the file name as /CaMa_out/{mapname}_{inputname}/{var}{syear}-{eyear}.nc
+fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(mapname)//"_"//trim(inname)//"/"//trim(varname)//trim(tag)//".nc"
 print*, "create",fname
 call nccheck( nf90_create(fname, NF90_NETCDF4, ncid) )
 !=== set dimension ===

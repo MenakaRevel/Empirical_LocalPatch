@@ -33,8 +33,10 @@ mapname=`python -c "import params; print (params.map_name())"`
 inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 threshold=`python -c "import params; print (params.threshold())"`
-varname="weightage"
+
 # make dir local patch
-mkdir "local_patch"
+mkdir -p "local_patch/${mapname}_${inputname}"
+
 #=================================================
+varname="weightage"
 ./src/lpara $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold

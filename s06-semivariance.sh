@@ -32,8 +32,11 @@ cpunums=`python -c "import params; print (params.cpu_nums())"`
 mapname=`python -c "import params; print (params.map_name())"`
 inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
+
 varname="standardized"
-#===make directories for semivar
-`python src/make_semivari.py $CAMADIR $mapname $outdir`
+#=================================================
+# make directories for semivar
+`python src/make_semivari.py $CAMADIR $mapname $inputname $outdir`
+
 #=================================================
 ./src/semivariance $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir

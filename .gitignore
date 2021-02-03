@@ -54,3 +54,14 @@
 #temporary opened files
 *.swp
 *.swo
+
+#unecessary files
+*/src/corr_area.f90
+*/src/corr_sfcelv.f90
+*/src/create_subbasin.f90
+*/src/lg.f90
+*/src/log_rivout.f90
+*/src/mean_rivout.f90
+*/src/mean_sfcelv.f90
+*/src/mean_slope.f90
+*/src/open_sfcelv.f90
