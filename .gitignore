@@ -1,14 +1,14 @@
 #folders
-*/CaMa_in
-*/CaMa_out
-*/semivar
-*/weight
-*/gaussian_weight
-*/local_patch
-*/local_patchMS
-*/dat
+CaMa_in/
+CaMa_out/
+semivar/
+weight/
+gaussian_weight/
+local_patch/
+local_patchMS/
+dat/
 
-#bin files
+#binary files
 *.bin
 *.one
 *.hlf
@@ -36,16 +36,16 @@
 *.pyc
 
 #PBS oe files
-*/CaMa_sim.o*
-*/bin2nc.o*
-*/rm_trd.o*
-*/rm_sen.o*
-*/stndz.o*
-*/semivar.o*
-*/weight.o*
-*/lpara.o*
-*/lparaMS.o*
-*/EmpLP.o*
+CaMa_sim.o*
+bin2nc.o*
+rm_trd.o*
+rm_sen.o*
+stadz.o*
+semivar.o*
+weight.o*
+lpara.o*
+lparaMS.o*
+EmpLP.o*
 
 #figures
 *.png
@@ -56,12 +56,12 @@
 *.swo
 
 #unecessary files
-*/src/corr_area.f90
-*/src/corr_sfcelv.f90
-*/src/create_subbasin.f90
-*/src/lg.f90
-*/src/log_rivout.f90
-*/src/mean_rivout.f90
-*/src/mean_sfcelv.f90
-*/src/mean_slope.f90
-*/src/open_sfcelv.f90
+*src/corr_area.f90
+*src/corr_sfcelv.f90
+*src/create_subbasin.f90
+*src/lg.f90
+*src/log_rivout.f90
+*src/mean_rivout.f90
+*src/mean_sfcelv.f90
+*src/mean_slope.f90
+*src/open_sfcelv.f90
