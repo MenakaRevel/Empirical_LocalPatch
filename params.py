@@ -34,8 +34,8 @@ def out_dir():
     #return "/media/menaka/HDJA-UT/covariance"
 
 def map_name():
-    #return "amz_06min" #Amazon river 6 min
-    return "congo_06min" #Congo river 6min
+    return "amz_06min" #Amazon river 6 min
+    # return "congo_06min" #Congo river 6min
     #return "glb_06min" # global 6 min
 
 def input_name():
@@ -63,7 +63,8 @@ def patch_end():
     return 2013,12,31
 
 def threshold():
-    return 0.6000000
+    # return 0.6000000
+    return 0.4000000
 
 def para_nums():
     return 6

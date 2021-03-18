@@ -26,6 +26,7 @@ integer(kind=4)                       :: i_m,j_m
 integer(kind=4)                       :: target_pixel,fn
 character(len=8)                      :: llon,llat
 real                                  :: threshold
+character(len=2)                      :: thrname
 !====================================================
 call getarg(1,buf)
 read(buf,*) N ! length of time series
@@ -76,8 +77,11 @@ patch_size=1000
 patch_side=patch_size*2+1
 patch_nums=patch_side**2
 
+print*, threshold*100
+write(thrname,'(i2.0)') int(threshold*100)
+print*, thrname
 
-fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"/lonlat.txt"
+fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/lonlat.txt"
 open(78,file=fname,status='replace')
 
 21 format(i4.4,2x,i4.4,2x,f10.7)
@@ -176,7 +180,7 @@ do ix = 1,nx ! pixels along longtitude direction
         countnum=1
         ! file to save
         fn=72
-        fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"/patch"//trim(llon)//trim(llat)//".txt"
+        fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/patch"//trim(llon)//trim(llat)//".txt"
         open(fn,file=fname,status='replace')
         ! patch size should be >=1000
         target_pixel=-9999
@@ -253,7 +257,7 @@ end do
 !$omp end do
 !$omp end parallel
 !---
-fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"/countnum.bin"
+fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/countnum.bin"
 open(84,file=fname,form="unformatted",access="direct",recl=4*latpx*lonpx,status="replace",iostat=ios)
 if(ios==0)then
     write(84,rec=1) countp

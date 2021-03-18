@@ -68,6 +68,7 @@ real                                  :: threshold
 integer                               :: info
 !for writing
 integer,allocatable                   :: upx(:,:),upy(:,:),lps(:,:) ! upstrea x,y and length
+character(len=2)                      :: thrname
 !====================================================
 call getarg(1,buf)
 read(buf,*) N ! length of time series
@@ -118,8 +119,11 @@ patch_size=1000
 patch_side=patch_size*2+1
 patch_nums=patch_side**2
 
+print*, threshold*100
+write(thrname,'(i2.0)') int(threshold*100)
+print*, thrname
 
-fname=trim(adjustl(outdir))//"local_patchMS/"//trim(mapname)//"_"//trim(inname)//"/lonlat.txt"
+fname=trim(adjustl(outdir))//"local_patchMS/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/lonlat.txt"
 open(78,file=fname,status='replace')
 
 21 format(i4.4,2x,i4.4,2x,f10.7)
@@ -234,7 +238,7 @@ do ix = 1,nx !int((assimW+180)*4+1),int((assimE+180)*4+1),1
         fn = 34
         call read_wgt(fname,lonpx,latpx,weightage)
         ! read gausssian weight
-        fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"/"//trim(llon)//trim(llat)//".bin"
+        fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/"//trim(llon)//trim(llat)//".bin"
         fn = 34
         call read_wgt(fname,lonpx,latpx,gauss_weight)
         ! get the mainstream pixels
@@ -298,7 +302,7 @@ end if
 close(84)
 !--
 !---
-fname=trim(adjustl(outdir))//"/local_patchMS/"//trim(mapname)//"_"//trim(inname)//"/lpara_patch.bin"
+fname=trim(adjustl(outdir))//"/local_patchMS/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/lpara_patch.bin"
 open(85,file=fname,form="unformatted",access="direct",recl=4*latpx*lonpx,status="replace",iostat=ios)
 if(ios==0)then
     write(85,rec=1) upx
