@@ -17,8 +17,8 @@
 # (0) Basic Setting (for workstation)
 
 #*** PBS setting when needed
-#PBS -q E40
-#PBS -l select=1:ncpus=40:mem=60gb
+#PBS -q F10
+#PBS -l select=1:ncpus=10:mem=60gb
 #PBS -j oe
 #PBS -m ea
 #PBS -M menaka@rainbow.iis.u-tokyo.ac.jp
@@ -61,7 +61,7 @@ export IFORTLIB="/opt/intel/lib:/opt/intel/mkl/lib"
 export DYLD_LIBRARY_PATH="${IFORTLIB}:${DYLD_LIBRARY_PATH}"
 
 #*** 0c. OpenMP thread number
-export OMP_NUM_THREADS=40 #$cpunums       # OpenMP cpu num
+export OMP_NUM_THREADS=10 #$cpunums       # OpenMP cpu num
 
 #================================================
 # (1) Experiment setting
@@ -69,7 +69,7 @@ export OMP_NUM_THREADS=40 #$cpunums       # OpenMP cpu num
 
 #============================
 #*** 1a. Experiment directory setting
-EXP=$mapname_$inputname                     # experiment name (output directory name)
+EXP=${mapname}_${inputname}                 # experiment name (output directory name)
 RDIR=${OUTBASE}/CaMa_out/${EXP}             # directory to run CaMa-Flood
 EXE="MAIN_cmf"                              # Execute file name
 PROG=${BASE}/src/${EXE}                     # location of Fortran main program
@@ -102,12 +102,9 @@ NSP=1                                       # spinup repeat time
 #*** 1d. spinup setting
 
 #* input restart file
-LRESTART=".FALSE." # see (3) set each year   # TRUE. to use restart initial condition
-CRESTSTO="" # see (3) set each year        # input restart FIle
-#CRESTSTO=$INBASE/CaMa_in/restart/$in_year/restart$in_year$in_month$in_date".bin" 
-echo $CRESTSTO
-LSTOONLY=".FALSE."                           # .TRUE. for storage only restart (for assimilation)
-
+LRESTART="" # see (3) set each year         # TRUE. to use restart initial condition
+CRESTSTO="" # see (3) set each year         # input restart FIle
+LSTOONLY=".FALSE."                          # .TRUE. for storage only restart (for assimilation)
 
 #* output restart file
 CRESTDIR="./"                               # output restart file directory
@@ -283,7 +280,9 @@ do
   else
     LRESTART=".TRUE."
     CRESTSTO="${CVNREST}${CYR}010100.bin"    ## from restart file
-#    CRESTSTO="${CVNREST}${CYR}010100.nc"    ## from restart file
+    if [ ${LRESTCDF} = ".TRUE." ]; then
+      CRESTSTO="${CVNREST}${CYR}010100.nc"    ## from restart file
+    fi
   fi
 
   #*** 3b. update start-end year

@@ -158,7 +158,7 @@ do year=syear,eyear
     days=dyear(year)
     allocate(globaltrue(lonpx,latpx,days))
     varname=outname
-    fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(inname)//"/"//trim(varname)//yyyy//".bin"
+    fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(mapname)//"_"//trim(inname)//"/"//trim(varname)//yyyy//".bin"
     !print *,"L153",trim(varname),days!fname
     open(34,file=fname,form="unformatted",access="direct",recl=4*days*lonpx*latpx,status="old",iostat=ios)
     if(ios==0)then

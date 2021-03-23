@@ -105,17 +105,19 @@ def grdc_id():
 #slink("/hydro/covariance/CaMa_simulation/params.py", "params.py")
 #slink("../CaMa_simulation/params.py", "params.py")
 #slink("../read_grdc.py","read_grdc.py")
+slink("../params.py","params.py")
 import params as pm
 import read_grdc as grdc
 #--
 mk_dir(pm.out_dir()+"/figures")
-mk_dir(pm.out_dir()"/figures/disgraph")
+mk_dir(pm.out_dir()+"/figures/"+pm.map_name()+"_"+pm.input_name()+"/disgraph")
 #--read outflow netCDF4--
 tag="%04d-%04d"%(pm.starttime()[0],pm.endtime()[0])
-fname=pm.out_dir()+"/CaMa_out/"+pm.input_name()+"/outflw"+tag+".nc"
+fname=pm.out_dir()+"/CaMa_out/"+pm.map_name()+"_"+pm.input_name()+"/outflw"+tag+".nc"
+print (fname)
 nc=xr.open_dataset(fname)
 
-print pm.patch_start()
+print (pm.patch_start())
 syear=pm.starttime()[0]
 smonth=pm.starttime()[1]
 sdate=pm.starttime()[2]
@@ -141,15 +143,15 @@ ylist=[]
 river=[]
 staid=[]
 #--
-#rivernames  = ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS","INDUS"]
+rivernames  = ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZON","INDUS"]
 #rivernames = ["AMAZON"]
-rivernames = grdc.grdc_river_name()
+# rivernames = grdc.grdc_river_name()
 for rivername in rivernames:
-    path = pm.out_dir()+"/figures/disgraph/%s"%(rivername)
-    print path
-    mk_dir(path)
+    # path = pm.out_dir()+"/figures/"+pm.map_name()+"_"+pm.input_name()+"/disgraph/%s"%(rivername)
+    # print path
+    # mk_dir(path)
     grdc_id,station_loc,x_list,y_list = grdc.get_grdc_loc_v396(rivername)
-    print rivername, grdc_id,station_loc
+    print (rivername, grdc_id,station_loc)
     river.append([rivername]*len(station_loc))
     staid.append(grdc_id)
     pname.append(station_loc)
@@ -280,7 +282,7 @@ def make_fig(point):
     ax.ticklabel_format(style="sci",axis="y",scilimits=(0,0))
 
     plt.tight_layout(pad=0.2,w_pad=0.05,h_pad=0.05)
-    plt.savefig(pm.out_dir()+"/figures/disgraph/"+river[point]+"/"+pname[point]+"_disgraph_GRDC.png",dpi=500)
+    plt.savefig(pm.out_dir()+"/figures/"+pm.map_name()+"_"+pm.input_name()+"/disgraph/"+river[point]+"-"+pname[point]+"_disgraph_GRDC.png",dpi=500)
     #plt.show()
     return 0
 

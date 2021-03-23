@@ -88,24 +88,25 @@ def detrend(x,y,n):
 #--
 #slink("/hydro/covariance/CaMa_simulation/params.py", "params.py")
 #slink("/hydro/SWOTDA/img_code/read_grdc.py","read_grdc.py")
+slink("../params.py","params.py")
 import params as pm
 import read_grdc as grdc
 #--
 mk_dir(pm.out_dir()+"/figures")
-mk_dir(pm.out_dir()+"/figures/timeseries")
+mk_dir(pm.out_dir()+"/figures/"+pm.map_name()+"_"+pm.input_name()+"/timeseries")
 #--read outflow netCDF4--
 tag="%04d-%04d"%(pm.starttime()[0],pm.endtime()[0])
 # sfcelv
-fname=pm.out_dir()+"/CaMa_out/"+pm.input_name()+"/sfcelv"+tag+".nc"
+fname=pm.out_dir()+"/CaMa_out/"+pm.map_name()+"_"+pm.input_name()+"/sfcelv"+tag+".nc"
 nc_sfcelv=xr.open_dataset(fname)
 # removed trend line
-fname=pm.out_dir()+"/CaMa_out/"+pm.input_name()+"/rmdtrnd"+tag+".nc"
+fname=pm.out_dir()+"/CaMa_out/"+pm.map_name()+"_"+pm.input_name()+"/rmdtrnd"+tag+".nc"
 nc_rmdtrend=xr.open_dataset(fname)
 # removed seasonality
-fname=pm.out_dir()+"/CaMa_out/"+pm.input_name()+"/rmdsesn"+tag+".nc"
+fname=pm.out_dir()+"/CaMa_out/"+pm.map_name()+"_"+pm.input_name()+"/rmdsesn"+tag+".nc"
 nc_rmdseson=xr.open_dataset(fname)
 # standardized
-fname=pm.out_dir()+"/CaMa_out/"+pm.input_name()+"/standardized"+tag+".nc"
+fname=pm.out_dir()+"/CaMa_out/"+pm.map_name()+"_"+pm.input_name()+"/standardized"+tag+".nc"
 nc_standz=xr.open_dataset(fname)
 
 #--
@@ -135,11 +136,11 @@ ylist=[]
 river=[]
 staid=[]
 #--
-#rivernames  = ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS","INDUS"]
-rivernames = ["AMAZON"]#"MEKONG"]
+rivernames  = ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS","INDUS"]
+# rivernames = ["AMAZON"]#"MEKONG"]
 #rivernames = grdc.grdc_river_name()
 for rivername in rivernames:
-  path = pm.out_dir()+"/figures/timeseries/%s"%(rivername)
+  path = pm.out_dir()+"/figures/"+pm.map_name()+"_"+pm.input_name()+"/timeseries/%s"%(rivername)
   print path
   mk_dir(path)
   grdc_id,station_loc,x_list,y_list = grdc.get_grdc_loc_v396(rivername)
@@ -343,8 +344,8 @@ def make_fig(point):
     ax4.set_xticklabels(days,fontsize=8) 
     #------------------
     #xff1.tofile("../img/fft_sfcelv/"+river[point]+"/"+pname[point]+"_fft_freq.bin")
-    plt.savefig(pm.out_dir()+"/figures/timeseries/"+river[point]+"/"+pname[point]+"_sfcelv.png",dpi=500)
-    print "/figures/timeseries/"+river[point]+"/"+pname[point]+"_sfcelv.png"
+    plt.savefig(pm.out_dir()+"/figures/"+pm.map_name()+"_"+pm.input_name()+"/timeseries/"+river[point]+"-"+pname[point]+"_sfcelv.png",dpi=500)
+    print "/figures/"+pm.input_name()+"/timeseries/"+river[point]+"/"+pname[point]+"_sfcelv.png"
     #plt.show()
     return 0
 

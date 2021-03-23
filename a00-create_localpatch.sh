@@ -34,22 +34,23 @@ cpunums=`python -c "import params; print (params.cpu_nums())"`
 mapname=`python -c "import params; print (params.map_name())"`
 inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
+
 #*************************
 # runs s01-CaMa_sim.sh before following steps to get the simulated variables
 # ./s01-CaMa_sim.sh
 #*************************
-#=========================
-# convert binary to netCDF
-#=========================
-# water surface elevation
-varname="sfcelv"
-#=================================================
-#./src/bin2nc $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
+# # #=========================
+# # # convert binary to netCDF
+# # #=========================
+# # # water surface elevation
+# # varname="sfcelv"
+# # #=================================================
+# # ./src/bin2nc $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
 
-# discharge
-varname="outflw"
-#=================================================
-#./src/bin2nc $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
+# # # discharge
+# # varname="outflw"
+# # #=================================================
+# # ./src/bin2nc $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
 
 #=========================
 # remove trend lines
@@ -77,7 +78,7 @@ varname="rmdsesn"
 #=========================
 varname="standardized"
 #===make directories for semivar
-python src/make_semivari.py $CAMADIR $mapname $outdir
+`python src/make_semivari.py $CAMADIR $mapname $outdir`
 #=================================================
 ./src/semivariance $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
 
@@ -85,6 +86,7 @@ python src/make_semivari.py $CAMADIR $mapname $outdir
 # calculate spatial auto-correlation weightage
 #=========================
 threshold=`python -c "import params; print (params.threshold())"`
+threshname=$(echo $threshold 100 | awk '{printf "%2d\n",$1*$2}')
 #=================================================
 python src/weightage.py $CAMADIR $mapname $outdir $cpunums $threshold
 
@@ -92,17 +94,20 @@ python src/weightage.py $CAMADIR $mapname $outdir $cpunums $threshold
 # write local patch to text files
 #=========================
 varname="weightage"
+
 # make dir local patch
-mkdir "local_patch"
+mkdir -p "local_patch/${mapname}_${inputname}_${threshname}"
+
 #=================================================
 ./src/lpara $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold
 
-#=========================
-# write local patch [main strem] to text files
-#=========================
-varname="weightage"
-# make dir local patch
-mkdir "local_patchMS"
-#=================================================
-#./src/lparaMS $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold
+# # #=========================
+# # # write local patch [main stream] to text files
+# # #=========================
+# # varname="weightage"
+
+# # # make dir local patch
+# # mkdir -p "local_patchMS/${mapname}_${inputname}_${threshname}"
+# # #=================================================
+# # #./src/lparaMS $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold
 

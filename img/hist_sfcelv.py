@@ -55,7 +55,7 @@ import read_grdc as grdc
 #--
 #--
 mk_dir(pm.out_dir()+"/figures")
-mk_dir(pm.out_dir()+"/figures/hist_sfcelv")
+mk_dir(pm.out_dir()+"/figures/"+pm.map_name()+"_"+pm.input_name()+"/hist_sfcelv")
 #--read outflow netCDF4--
 tag="%04d-%04d"%(pm.starttime()[0],pm.endtime()[0])
 # sfcelv
@@ -104,7 +104,7 @@ rivernames=["AMAZON"]#
 #rivernames = ["MEKONG"]
 #rivernames = grdc.grdc_river_name()
 for rivername in rivernames:
-    path = pm.out_dir()+"/figures/hist_sfcelv/%s"%(rivername)
+    path = pm.out_dir()+"/figures/"+pm.map_name()+"_"+pm.input_name()+"/hist_sfcelv/%s"%(rivername)
     print path
     mk_dir(path)
     grdc_id,station_loc,x_list,y_list = grdc.get_grdc_loc_v396(rivername)
@@ -336,7 +336,7 @@ def make_fig(point):
     
     #ax.text(0.02,0.9,Nash,ha="left",va="center",transform=ax.transAxes,fontsize=8) 
     #plt.legend(loc=1)
-    plt.savefig(pm.out_dir()+"/figures/hist_sfcelv/"+river[point]+"/"+pname[point]+"_hist_sfcelv.png",dpi=500)
+    plt.savefig(pm.out_dir()+"/figures/"+pm.map_name()+"_"+pm.input_name()+"/hist_sfcelv/"+river[point]+"/"+pname[point]+"_hist_sfcelv.png",dpi=500)
     #plt.show()
     return 0
 
@@ -384,7 +384,7 @@ def stanz_fig(point):
     #ax3.set_xlim(xmin=0,xmax=la+1)
     #ax3.set_ylim(ymin=0)#,xmax=ed+1)
     ax3.tick_params('y', colors='k')
-    plt.savefig(pm.out_dir()+"/figures/hist_sfcelv/"+river[point]+"/"+pname[point]+"_hist_standz.png",pad_inches=0.02,dpi=800)
+    plt.savefig(pm.out_dir()+"/figures/"+pm.map_name()+"_"+pm.input_name()+"/hist_sfcelv/"+river[point]+"/"+pname[point]+"_hist_standz.png",pad_inches=0.02,dpi=800)
     return 0
 
 #p=Pool(10)
