@@ -5,7 +5,7 @@
 # 2020/06/01
 #====================
 #*** PBS setting when needed
-#PBS -q E20
+#PBS -q F20
 #PBS -l select=1:ncpus=20:mem=40gb
 #PBS -j oe
 #PBS -m ea

@@ -280,7 +280,7 @@ def mk_wgt(line):
             lgamma=[]
             lstd=[]
             #--
-            fname="%s/semivar/%s_%s/%04d%04d/dn%05d.svg"%(out_dir,mapname,inname,lon,lat,iup)
+            fname="%s/semivar/%s_%s/%04d%04d/up%05d.svg"%(out_dir,mapname,inname,lon,lat,iup)
             try:
                 f=open(fname,"r")
                 lines=f.readlines()
