@@ -5,8 +5,8 @@
 # 2020/06/01
 #====================
 #*** PBS setting when needed
-#PBS -q F20
-#PBS -l select=1:ncpus=20:mem=40gb
+#PBS -q F10
+#PBS -l select=1:ncpus=10:mem=40gb
 #PBS -j oe
 #PBS -m ea
 #PBS -M menaka@rainbow.iis.u-tokyo.ac.jp
@@ -16,7 +16,7 @@
 cd $PBS_O_WORKDIR
 #================================================
 # OpenMP Thread number
-export OMP_NUM_THREADS=20
+export OMP_NUM_THREADS=10
 
 # input settings
 syear=`python -c "import params; print (params.starttime()[0])"`
@@ -36,12 +36,13 @@ inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 threshold=`python -c "import params; print (params.threshold())"`
 # threshold=0.80
+patch=100
 
 threshname=$(echo $threshold 100 | awk '{printf "%2d\n",$1*$2}')
 
 # make dir local patch
-mkdir -p "local_patch/${mapname}_${inputname}_${threshname}"
+mkdir -p "./local_patch/${mapname}_${inputname}_${threshname}"
 
 #=================================================
 varname="weightage"
-./src/lpara $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold
+./src/lpara $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold $patch

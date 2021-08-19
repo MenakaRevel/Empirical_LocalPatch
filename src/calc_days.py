@@ -1,6 +1,6 @@
 #!/opt/local/bin/python
 # -*- coding: utf-8 -*-
-import numpy as np
+# import numpy as np
 import datetime
 import sys
 import os
@@ -17,4 +17,4 @@ last_dt=datetime.date(eyear,emon,eday)
 last=(last_dt-start_dt).days + 1
 #**********
 N = int(last)
-print N
+print (N)

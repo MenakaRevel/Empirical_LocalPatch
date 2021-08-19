@@ -5,7 +5,7 @@
 # 2020/06/01
 #====================
 #*** PBS setting when needed
-#PBS -q E20
+#PBS -q F20
 #PBS -l select=1:ncpus=20:mem=40gb
 #PBS -j oe
 #PBS -m ea
@@ -13,13 +13,14 @@
 #PBS -V
 #PBS -N lparaMS
 #========
-cd $PBS_O_WORKDIR
+# cd $PBS_O_WORKDIR
+cd "/cluster/data6/menaka/Empirical_LocalPatch"
 #================================================
 # OpenMP Thread number
 export OMP_NUM_THREADS=20
 
 # input settings
-
+syear=`python -c "import params; print (params.starttime()[0])"`
 smonth=`python -c "import params; print (params.starttime()[1])"`
 sdate=`python -c "import params; print (params.starttime()[2])"`
 eyear=`python -c "import params; print (params.endtime()[0])"`
@@ -31,14 +32,16 @@ outdir=`python -c "import params; print (params.out_dir())"`
 cpunums=`python -c "import params; print (params.cpu_nums())"`
 mapname=`python -c "import params; print (params.map_name())"`
 inputname=`python -c "import params; print (params.input_name())"`
+echo $syear $smonth $sdate $eyear $emonth $edate
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 threshold=`python -c "import params; print (params.threshold())"`
 # threshold=0.40
+patch=100
 
 threshname=$(echo $threshold 100 | awk '{printf "%2d\n",$1*$2}')
 
 # make dir local patch
-mkdir -p "local_patch/${mapname}_${inputname}_${threshname}"
+mkdir -p "./local_patchMS/${mapname}_${inputname}_${threshname}"
 
 #=================================================
 varname="weightage"

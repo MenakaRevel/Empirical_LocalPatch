@@ -51,8 +51,8 @@ integer                               :: syear,eyear
 !-map variables
 real                                  :: gsize,west, north, east, south ! map boundries
 integer                               :: latpx,lonpx,nflp    ! pixel size, calculated
-real,allocatable                      :: rivwth(:,:),rivlen(:,:),nextdst(:,:),rivseq(:,:),uparea(:,:)
-integer,allocatable                   :: nextX(:,:),nextY(:,:),ocean(:,:)
+real,allocatable                      :: rivwth(:,:),rivlen(:,:),nextdst(:,:),uparea(:,:)
+integer,allocatable                   :: nextX(:,:),nextY(:,:),rivseq(:,:),ocean(:,:)
 integer                               :: i,j,ios,N
 real                                  :: lat,lon
 real,allocatable                      :: weightage(:,:),gauss_weight(:,:)
@@ -123,7 +123,7 @@ print*, threshold*100
 write(thrname,'(i2.0)') int(threshold*100)
 print*, thrname
 
-fname=trim(adjustl(outdir))//"local_patchMS/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/lonlat.txt"
+fname=trim(adjustl(outdir))//"/local_patchMS/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/lonlat.txt"
 open(78,file=fname,status='replace')
 
 21 format(i4.4,2x,i4.4,2x,f10.7)
@@ -218,19 +218,20 @@ allocate(upx(lonpx,latpx),upy(lonpx,latpx),lps(lonpx,latpx))
 !$omp& shared(ocean,rivwth,targetp,countp,patch_size,weightage,gauss_weight)
 !$omp do
 !--
-do ix = 1,nx !int((assimW+180)*4+1),int((assimE+180)*4+1),1
+do ix = 1, nx !int((assimW+180)*4+1),int((assimE+180)*4+1),1
   do iy = 1, ny !int((90-assimN)*4+1),int((90-assimS)*4+1),1
-        lat = 90.0-(iy-1.0)/4.0
-        lon = (ix-1.0)/4.0-180.0
+        lat = 90.0-(real(iy)-1.0)/4.0
+        lon = (real(ix)-1.0)/4.0-180.0
         !remove ocean
         if (ocean(ix,iy)==1) then
             cycle
             !continue
         end if
-        ! remove rivwth <= 0m
-        if (rivwth(ix,iy) <=0.0) then
-            cycle
-        end if
+        ! ! remove rivwth <= 0m
+        ! if (rivwth(ix,iy) <=0.0) then
+        !     cycle
+        ! end if
+        write(*,*)"===",lat,lon,"===",ix,iy,rivwth(ix,iy)
         ! open emperical weightage
         write(llon,'(i4.4)') ix
         write(llat,'(i4.4)') iy
@@ -238,7 +239,7 @@ do ix = 1,nx !int((assimW+180)*4+1),int((assimE+180)*4+1),1
         fn = 34
         call read_wgt(fname,lonpx,latpx,weightage)
         ! read gausssian weight
-        fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/"//trim(llon)//trim(llat)//".bin"
+        fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"/"//trim(llon)//trim(llat)//".bin"
         fn = 34
         call read_wgt(fname,lonpx,latpx,gauss_weight)
         ! get the mainstream pixels
@@ -252,7 +253,7 @@ do ix = 1,nx !int((assimW+180)*4+1),int((assimE+180)*4+1),1
         lps(ix,iy)=k
         write(*,*)"===",ix,iy,"===",iix,iiy,k
         allocate(xlist(k),ylist(k))
-        call downstream_pixels(ix,iy,k,lonpx,latpx,weightage,nextX,nextY,xlist,ylist,info)
+        call downstream_pixels(iix,iiy,k,lonpx,latpx,weightage,nextX,nextY,xlist,ylist,info)
         if (info /= 0) then
             write(*,*) "info:",info
             deallocate(xlist,ylist)
@@ -260,7 +261,7 @@ do ix = 1,nx !int((assimW+180)*4+1),int((assimE+180)*4+1),1
         end if
         ! file to save
         fn=72
-        fname=trim(adjustl(outdir))//"/local_patchMS/"//trim(mapname)//"_"//trim(inname)//"/patch"//trim(llon)//trim(llat)//".txt"
+        fname=trim(adjustl(outdir))//"/local_patchMS/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/patch"//trim(llon)//trim(llat)//".txt"
         open(fn,file=fname,status='replace')
         !write(fn,22)"lon","lat","","forcast","assim"
         do i=1,k
@@ -291,13 +292,13 @@ end do
 !$omp end do
 !$omp end parallel
 !---
-fname=trim(adjustl(outdir))//"/local_patchMS/"//trim(mapname)//"_"//trim(inname)//"/countnum.bin"
+fname=trim(adjustl(outdir))//"/local_patchMS/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/countnum.bin"
 open(84,file=fname,form="unformatted",access="direct",recl=4*latpx*lonpx,status="replace",iostat=ios)
 if(ios==0)then
     write(84,rec=1) countp
     write(84,rec=2) targetp
 else
-    write(*,*) "no weightage", fname
+    write(*,*) "no countnum.bin", fname
 end if
 close(84)
 !--
@@ -309,7 +310,7 @@ if(ios==0)then
     write(85,rec=2) upy
     write(85,rec=3) lps
 else
-    write(*,*) "no weightage", fname
+    write(*,*) "no lpara_patch.bin", fname
 end if
 close(85)
 
@@ -575,7 +576,7 @@ real                                :: length,rl
 !--
 x=-9999
 y=-9999
-d=100 ! look at 100*100 box
+d=10 ! look at 100*100 box
 dA=1.0e20 ! area differnce
 !--
 !write(*,*)i,j
@@ -715,7 +716,7 @@ do while (num<=k)
   iiy=iy
   ix=nextX(iix,iiy)
   iy=nextY(iix,iiy)
-  !write(*,*)ix,iy
+  ! write(*,*)ix,iy
   if (ix==-9 .or. iy==-9) then
     num=num+1
     exit

@@ -56,6 +56,9 @@ write(*,*) outdir
 
 call getarg(9,buf)
 read(buf,*) threshold ! threshold for defining the local patch
+
+call getarg(10,buf)   ! radius of search area
+read(buf,*) patch_size
 !-
 varname=outname
 !==
@@ -73,7 +76,7 @@ read(11,*) north
 close(11)
 !-------
 !======
-patch_size=1000
+! patch_size=100
 patch_side=patch_size*2+1
 patch_nums=patch_side**2
 
@@ -151,7 +154,7 @@ ny=(north-south)/gsize !dble(gsize)
 !--
 ! do parallel
 !$omp parallel default(none)&
-!$omp& private(iy,lat_cent,lat,lon,llon,llat,fname,fn,lag,countnum,i,j,i_m,j_m,threshold)&
+!$omp& private(iy,ix,lat,lon,llon,llat,fname,fn,lag_dist,countnum,i,j,i_m,j_m,threshold)&
 !$omp& shared(ocean,rivwth,targetp,countp,patch_size,weightage,gauss_weight)
 !$omp do
 !--
@@ -252,6 +255,7 @@ do ix = 1,nx ! pixels along longtitude direction
         !========
         targetp(ix,iy)=target_pixel
         countp(ix,iy)=countnum
+        !$omp end critical
     end do
 end do
 !$omp end do
@@ -263,7 +267,7 @@ if(ios==0)then
     write(84,rec=1) countp
     write(84,rec=2) targetp
 else
-    write(*,*) "no weightage", fname
+    write(*,*) "no countnum.bin", fname
 end if
 close(84)
 close(78)
