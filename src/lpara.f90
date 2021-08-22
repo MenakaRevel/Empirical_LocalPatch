@@ -158,8 +158,8 @@ ny=(north-south)/gsize !dble(gsize)
 !$omp& shared(ocean,rivwth,targetp,countp,patch_size,weightage,gauss_weight)
 !$omp do
 !--
-do ix = 1,nx ! pixels along longtitude direction
-    do iy = 1,ny ! pixel along latitude direction
+do ix = 1, nx ! pixels along longtitude direction
+    do iy = 1, ny ! pixel along latitude direction
         lat = 90.0-(iy-1.0)/4.0
         lon = (ix-1.0)/4.0-180.0
         !remove ocean
@@ -176,7 +176,7 @@ do ix = 1,nx ! pixels along longtitude direction
         fn = 34
         call read_wgt(fname,lonpx,latpx,weightage)
         ! read gausssian weight
-        !print*, "read gausssian weight"
+        !print*, "read gausssian weight" 
         fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"/"//trim(llon)//trim(llat)//".bin"
         fn = 34
         call read_wgt(fname,lonpx,latpx,gauss_weight)
@@ -188,7 +188,7 @@ do ix = 1,nx ! pixels along longtitude direction
         ! patch size should be >=1000
         target_pixel=-9999
         do j=iy-patch_size,iy+patch_size
-            do i=iy-patch_size,iy+patch_size
+            do i=ix-patch_size,ix+patch_size !bugfix on 2021/08/23
                 i_m = i
                 j_m = j
                 if (mapname(1:3)=="glb") then
@@ -206,17 +206,20 @@ do ix = 1,nx ! pixels along longtitude direction
                 end if
                 ! weitage >= threshold is considered
                 if (weightage(i_m,j_m) < threshold) then
+                    ! print*, "low weightage: ",i_m, j_m, weightage(i_m,j_m)
                     cycle
                 end if
                 !print*, i_m,j_m,weightage(i_m,j_m),threshold
                 !write(*,*)i_m,j_m
                 ! ocean removed
                 if (ocean(i_m,j_m)==1) then
+                    ! print*, "Ocean: ",i_m, j_m
                     cycle
                     !continue
                 end if
                 ! non river pixels removed
                 if (rivwth(i_m,j_m)<=0.0) then
+                    ! print*, "zero river width: ",i_m, j_m, rivwth(i_m,j_m)
                     cycle
                 end if
                 ! calculate lag distance
@@ -226,19 +229,21 @@ do ix = 1,nx ! pixels along longtitude direction
                 !---
                 ! only river pixels which connects to target pixel is considered
                 if (lag_dist == -9999.0) then
+                    ! print*, "not connected: ",i_m, j_m
                     cycle
                     !continue
                 end if
                 ! consistancy of weigtage
                 call wgt_consistancy(i_m,j_m,ix,iy,lonpx,latpx,nextX,nextY,weightage,threshold,conflag)
                 if (conflag == 0.0) then
+                    ! print*, "weight consistancy: ",i_m, j_m, weightage(i_m,j_m)
                     cycle
                     !continue
                 end if
                 !---
                 !print*, i_m,j_m
                 write(fn,21)i_m,j_m,gauss_weight(i_m,j_m)
-                !write(*,21)i_m,j_m,gauss_weight(i_m,j_m)
+                write(*,21)i_m,j_m,gauss_weight(i_m,j_m)
                 ! find the target pixel
                 if (i_m==ix .and. j_m==iy) then
                   target_pixel=countnum

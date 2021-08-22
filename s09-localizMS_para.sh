@@ -5,8 +5,8 @@
 # 2020/06/01
 #====================
 #*** PBS setting when needed
-#PBS -q F20
-#PBS -l select=1:ncpus=20:mem=40gb
+#PBS -q F40
+#PBS -l select=1:ncpus=40:mem=40gb
 #PBS -j oe
 #PBS -m ea
 #PBS -M menaka@rainbow.iis.u-tokyo.ac.jp
@@ -17,7 +17,7 @@
 cd "/cluster/data6/menaka/Empirical_LocalPatch"
 #================================================
 # OpenMP Thread number
-export OMP_NUM_THREADS=20
+export OMP_NUM_THREADS=40
 
 # input settings
 syear=`python -c "import params; print (params.starttime()[0])"`
@@ -34,8 +34,8 @@ mapname=`python -c "import params; print (params.map_name())"`
 inputname=`python -c "import params; print (params.input_name())"`
 echo $syear $smonth $sdate $eyear $emonth $edate
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
-threshold=`python -c "import params; print (params.threshold())"`
-# threshold=0.40
+# threshold=`python -c "import params; print (params.threshold())"`
+threshold=0.90
 patch=100
 
 threshname=$(echo $threshold 100 | awk '{printf "%2d\n",$1*$2}')

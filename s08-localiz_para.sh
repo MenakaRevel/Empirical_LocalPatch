@@ -34,8 +34,8 @@ mapname=`python -c "import params; print (params.map_name())"`
 # mapname="amz_06min" #
 inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
-threshold=`python -c "import params; print (params.threshold())"`
-# threshold=0.80
+# threshold=`python -c "import params; print (params.threshold())"`
+threshold=0.60
 patch=100
 
 threshname=$(echo $threshold 100 | awk '{printf "%2d\n",$1*$2}')
