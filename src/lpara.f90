@@ -12,6 +12,7 @@ character(len=32)                     :: outname,varname,mapname,inname
 integer                               :: syear,eyear
 !-map variables
 real                                  :: gsize,west, north, east, south ! map boundries
+integer                               :: dam ! represent dams
 integer                               :: latpx,lonpx,nflp    ! pixel size, calculated
 real,allocatable                      :: rivwth(:,:),rivlen(:,:),nextdst(:,:)
 integer,allocatable                   :: nextX(:,:),nextY(:,:),ocean(:,:)
@@ -19,7 +20,7 @@ integer                               :: i,j,ios,N
 real                                  :: lat,lon
 real,allocatable                      :: weightage(:,:),gauss_weight(:,:)
 integer,allocatable                   :: targetp(:,:),countp(:,:)
-real                                  :: lag_dist,conflag
+real                                  :: lag_dist,conflag, damflag
 integer                               :: ix,iy,nx,ny
 integer                               :: patch_size,patch_side,countnum,patch_nums
 integer(kind=4)                       :: i_m,j_m
@@ -37,30 +38,33 @@ read(buf,*) syear ! start year
 call getarg(3,buf)
 read(buf,*) eyear ! end year
 
-call getarg(4,buf)
-read(buf,'(A)') outname ! variable name [e.g. sfcelv,rivout,outflw]
+! call getarg(4,buf)
+! read(buf,'(A)') outname ! variable name [e.g. sfcelv,rivout,outflw]
 
-call getarg(5,buf)
+call getarg(4,buf)
 read(buf,"(A)") mapname ! map name
 
-call getarg(6,buf)
+call getarg(5,buf)
 read(buf,'(A)') inname ! input runoff forcing name
 
-call getarg(7,buf)
+call getarg(6,buf)
 read(buf,"(A)") camadir
 write(*,*) camadir
 
-call getarg(8,buf)
+call getarg(7,buf)
 read(buf,"(A)") outdir
 write(*,*) outdir
 
-call getarg(9,buf)
+call getarg(8,buf)
 read(buf,*) threshold ! threshold for defining the local patch
 
-call getarg(10,buf)   ! radius of search area
+call getarg(9,buf)   ! radius of search area
 read(buf,*) patch_size
+
+call getarg(9,buf)   ! to represent dams or not
+read(buf,*) dam
 !-
-varname=outname
+! varname=outname
 !==
 fname=trim(camadir)//"/map/"//trim(mapname)//"/params.txt"
 print *, fname
@@ -177,7 +181,7 @@ do ix = 1, nx ! pixels along longtitude direction
         call read_wgt(fname,lonpx,latpx,weightage)
         ! read gausssian weight
         !print*, "read gausssian weight" 
-        fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"/"//trim(llon)//trim(llat)//".bin"
+        fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/"//trim(llon)//trim(llat)//".bin"
         fn = 34
         call read_wgt(fname,lonpx,latpx,gauss_weight)
         countnum=1
@@ -239,6 +243,13 @@ do ix = 1, nx ! pixels along longtitude direction
                     ! print*, "weight consistancy: ",i_m, j_m, weightage(i_m,j_m)
                     cycle
                     !continue
+                end if
+                ! dam represent
+                if (dam == 1) then
+                  call check_dam_grid(i_m,j_m,damflag)
+                  if (damflag == 1) then
+                    cycle
+                  end if
                 end if
                 !---
                 !print*, i_m,j_m
@@ -527,3 +538,34 @@ end if
 return
 end subroutine ixy2iixy
 !*****************************************************************        
+subroutine check_dam_grid(ix,iy,damflag)
+implicit none
+!- for input -----------------
+integer                   ix, iy
+!- for output ----------------
+integer                   damflag
+!- for calculation -----------
+character(len=128)        fname, damName
+integer                   damId, damIX, damIY, nextIX, nextIY
+real                      damLon, damLat
+
+!--
+damflag=-9999
+! ===============================================
+! read data 
+! ===============================================
+    fname="./dat/dam_glb_15min.txt"
+    open(11, file=fname, form='formatted')
+    read(11,*)
+1000 continue
+    read(11,*,end=1090) damId, damName, damLon, damLat, damIX, damIY, nextIX, nextIY
+    ! check the dam grid
+    if (ix == damIX .and. iy == damIY) then
+      damflag=1
+    end if
+    goto 1000
+1090 continue
+    close(11)
+return
+end subroutine check_dam_grid
+!*****************************************************************

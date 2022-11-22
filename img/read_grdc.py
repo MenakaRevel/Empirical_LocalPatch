@@ -209,7 +209,7 @@ def get_grdc_loc_v396(name):
     line    = filter(None, re.split(";",line))
     #print line
     grdc_id = line[0]
-    river   = line[1].strip()
+    river   = filter(None, re.split(",",line[1]))[0].strip()
     station = line[2].strip()
     ix      = int(line[3])-1
     iy      = int(line[4])-1

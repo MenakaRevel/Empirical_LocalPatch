@@ -79,27 +79,27 @@ read(buf,*) syear ! start year
 call getarg(3,buf)
 read(buf,*) eyear ! end year
 
-call getarg(4,buf)
-read(buf,'(A)') outname ! variable name [e.g. sfcelv,rivout,outflw]
+! call getarg(4,buf)
+! read(buf,'(A)') outname ! variable name [e.g. sfcelv,rivout,outflw]
 
-call getarg(5,buf)
+call getarg(4,buf)
 read(buf,"(A)") mapname ! map name
 
-call getarg(6,buf)
+call getarg(5,buf)
 read(buf,'(A)') inname ! input runoff forcing name
 
-call getarg(7,buf)
+call getarg(6,buf)
 read(buf,"(A)") camadir
 write(*,*) camadir
 
-call getarg(8,buf)
+call getarg(7,buf)
 read(buf,"(A)") outdir
 write(*,*) outdir
 
-call getarg(9,buf)
+call getarg(8,buf)
 read(buf,*) threshold ! threshold for defining the local patch
 !-
-varname=outname
+! varname=outname
 !==
 fname=trim(camadir)//"/map/"//trim(mapname)//"/params.txt"
 print *, fname
@@ -239,7 +239,7 @@ do ix = 1, nx !int((assimW+180)*4+1),int((assimE+180)*4+1),1
         fn = 34
         call read_wgt(fname,lonpx,latpx,weightage)
         ! read gausssian weight
-        fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"/"//trim(llon)//trim(llat)//".bin"
+        fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/"//trim(llon)//trim(llat)//".bin"
         fn = 34
         call read_wgt(fname,lonpx,latpx,gauss_weight)
         ! get the mainstream pixels

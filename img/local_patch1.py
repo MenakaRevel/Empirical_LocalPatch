@@ -24,7 +24,8 @@ from mpl_toolkits.basemap import Basemap
 from multiprocessing import Pool
 from multiprocessing import Process
 #---
-os.system("cp ../params.py params.py")
+# os.system("cp ../params.py params.py")
+sys.path.append("../")
 import LMA_semivari as LMA
 import params as pm
 import read_grdc as grdc
@@ -50,6 +51,11 @@ def latlon_river(rivername,ix,iy,mapname="glb_06min",nYY=1800,nXX=3600):
         lllon = -10.
         urlon = 15.
     if rivername=="AMAZONAS" or rivername=="AMAZON":
+        lllat = -20.
+        urlat = 10.
+        lllon = -80.
+        urlon = -45.
+    if rivername=="MADEIRA":
         lllat = -20.
         urlat = 10.
         lllon = -80.
@@ -107,6 +113,8 @@ def riveridname(rivername):
     if rivername=="NIGER":
         river="Niger"
     if rivername=="AMAZONAS":
+        river="Amazon"
+    if rivername=="MADEIRA":
         river="Amazon"
     if rivername=="MEKONG":
         river="Mekong"  
@@ -179,6 +187,14 @@ nexty  = nextxy[1]#ma.masked_where(rivwth<=500.0,nextxy[1]).filled(0)
 #trueforo = np.fromfile(fname,np.float32).reshape([2,nYY,nXX])
 #dis=(trueforo[0]>500.)*1
 #dis=dis*((nextx>0)*1)
+threshold=0.90 #pm.threshold()
+patchname="amz_06min_S14FD"
+patch_id="amz_06min_S14FD_90"
+#---
+local_patch="local_patch"#"_%3.2f"%(pm.threshold())
+local_patch1="local_patch_one_%02d"%(threshold*100)
+
+
 #--major rivers and Ids
 rivid={}
 fname=pm.out_dir()+"/dat/river30_id.txt"
@@ -201,7 +217,8 @@ staid=[]
 #--
 #rivernames  = ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS"]#,"INDUS"]# ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS","INDUS"] ["AMAZONAS"]#"CONGO"]#
 #rivernames = grdc.grdc_river_name()
-rivernames = ["AMAZON"]
+# rivernames = ["AMAZON"]
+rivernames = ["MADEIRA"]
 for rivername in rivernames:
 #for rivername in ["AMAZONAS"]:#"LENA","NIGER","INDUS","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS"]:
 #  oname = "../assim_out/img/sfcelv/%s"%(rivername)
@@ -303,9 +320,6 @@ alpha=1
 alpha1=1
 width=0.5
 #---
-#---
-local_patch="local_patch"#"_%3.2f"%(pm.threshold())
-local_patch1="local_patch_one_%3.2f"%(pm.threshold())
 #pathname="../img/local_patch_one_0.90"
 pathname="../figures/%s"%(local_patch1)
 mk_dir(pathname)
@@ -320,7 +334,7 @@ for point in np.arange(pnum):
   if not riveridname(river[point]) in rivid.keys():
     continue
   #----
-  fname=pm.out_dir()+"/weightage/%04d%04d.bin"%(ix,iy)
+  fname=pm.out_dir()+"/weightage/%s/%04d%04d.bin"%(patchname,ix,iy)
   wgt=np.fromfile(fname,np.float32).reshape([ny,nx])
   #--
   rivername=river[point]
@@ -357,7 +371,7 @@ for point in np.arange(pnum):
   box="%f %f %f %f"%(lllon,urlon,urlat,lllat)
   #  os.system("./bin/txt_vector "+str(lllon)+str(urlon)+str(urlat)+str(lllat)+" > tmp.txt")
   os.system("./bin/txt_vector "+box+" "+pm.CaMa_dir()+" "+glbname+" > tmp.txt")
-  for LEVEL in range(1,10+1):
+  for LEVEL in range(5,10+1):
     os.system("./bin/print_rivvec tmp.txt 1 "+str(LEVEL)+" > tmp2.txt")
     width=float(LEVEL)*w
     #print width#, lon1,lat1,lon2-lon1,lat2-lat1#x1[0],y1[0],x1[1]-x1[0],y1[1]-y1[0]
@@ -378,12 +392,12 @@ for point in np.arange(pnum):
         #----
         if c_nextx[iiy,iix] <= 0:
           continue
-        #print lon1,lat1,width
+        print lon1,lat1,width
         x1,y1=M(lon1,lat1)
         x2,y2=M(lon2,lat2)
         M.plot([x1,x2],[y1,y2],color="#C0C0C0",linewidth=width,zorder=101,alpha=alpha)
   #--
-  fname=pm.out_dir()+"/"+local_patch+"/patch%04d%04d.txt"%(ix,iy)
+  fname=pm.out_dir()+"/"+local_patch+"/"+patch_id+"/patch%04d%04d.txt"%(ix,iy)
   f=open(fname,"r")
   lines = f.readlines()
   f.close()
@@ -447,4 +461,4 @@ for point in np.arange(pnum):
   plt.savefig(figname)
   #plt.show()
 # remove tmp
-os.system("rm -r tmp*")
+# os.system("rm -r tmp*")

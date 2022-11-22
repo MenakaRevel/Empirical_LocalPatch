@@ -44,5 +44,5 @@ threshname=$(echo $threshold 100 | awk '{printf "%2d\n",$1*$2}')
 mkdir -p "./local_patchMS/${mapname}_${inputname}_${threshname}"
 
 #=================================================
-varname="weightage"
-./src/lparaMS $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold
+# Write local patch parameters
+./src/lparaMS $N $syear $eyear $mapname $inputname $CAMADIR $outdir $threshold

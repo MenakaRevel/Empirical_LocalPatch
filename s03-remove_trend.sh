@@ -14,7 +14,8 @@
 #PBS -V
 #PBS -N rm_trd
 #========
-cd $PBS_O_WORKDIR
+# cd $PBS_O_WORKDIR
+cd "/cluster/data6/menaka/Empirical_LocalPatch"
 #================================================
 # OpenMP Thread number
 export OMP_NUM_THREADS=20

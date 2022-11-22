@@ -3,7 +3,8 @@
 """ fit the semivariogams using gaussian model
   use LMA_semivari to fit the model
   Gaussian weight => w= exp(-r^2 / 2 * sigma^2) see Miyoshi etal 2007a,b
-  Menaka@IIS 2020/06/02"""
+  ******Calculate the gaussian weights only*********
+  Menaka@IIS 2021/08/24"""
 import numpy as np
 import datetime
 import sys
@@ -108,9 +109,8 @@ para=int(sys.argv[5])
 threshold=float(sys.argv[6])
 #==============================================
 fname=CaMa_dir+"/map/"+mapname+"/params.txt"
-f=open(fname,"r")
-lines=f.readlines()
-f.close()
+with open(fname,"r") as f:
+  lines=f.readlines()
 #==============================================
 nx     = int(filter(None, re.split(" ",lines[0]))[0])
 ny     = int(filter(None, re.split(" ",lines[1]))[0])
@@ -132,27 +132,26 @@ nexty  = nextxy[1]
 #==============================================
 print out_dir
 #==============================================
-# spatial dependancy weight
-pathname0=out_dir+"/weightage"
-mk_dir(pathname0)
-print pathname0
-pathname1=out_dir+"/weightage/"+mapname+"_"+inname
-mk_dir(pathname1)
-print pathname1
+# # spatial dependancy weight
+# pathname0=out_dir+"/weightage"
+# mk_dir(pathname0)
+# print pathname0
+# pathname1=out_dir+"/weightage/"+mapname+"_"+inname
+# mk_dir(pathname1)
+# print pathname1
 #==============================================
-# gaussian weight for data assimilatioi
-pathname2=out_dir+"/gaussian_weight"
-mk_dir(pathname2)
-print pathname2
+# # gaussian weight for data assimilation
+# pathname2=out_dir+"/gaussian_weight"
+# mk_dir(pathname2)
+# print pathname2
 thresname="%02d"%(int(threshold*100))
 pathname3=out_dir+"/gaussian_weight/"+mapname+"_"+inname+"_"+thresname
-mk_dir(pathname3)
+# mk_dir(pathname3)
 print pathname3
 #==============================================
 fname=out_dir+"/semivar/"+mapname+"_"+inname+"/lonlat_list.txt"
-f=open(fname,"r")
-lines=f.readlines()
-f.close()
+with open(fname,"r") as f:
+  lines=f.readlines()
 #==============================================
 # threshold for defining the local patch boundries
 #threshold=0.6
@@ -165,7 +164,7 @@ baseline=11 # Revel_etal,. (2019) proves 21 x 21 patch works well in upstreams
 def mk_wgt(line):
     #print line
     line  = filter(None, re.split(" ",line))
-    print line[0], line[1], line[2], line[3]
+    # print line[0], line[1], line[2], line[3]
     lon   = int(line[0])
     lat   = int(line[1])
     up    = int(line[2])
@@ -182,7 +181,7 @@ def mk_wgt(line):
     Gwt[lat-1,lon-1]=1.0
     #---
     if dn>0:
-        print "downstream"
+        # print "downstream"
         #--
         lix=[]
         liy=[]
@@ -271,7 +270,7 @@ def mk_wgt(line):
     #print "upstream"
     #plt.clf()
     if up > 0:
-        print "upstream"
+        # print "upstream"
         for iup in np.arange(1,up+1):
             #print "upstream",iup
             #--
@@ -347,10 +346,10 @@ def mk_wgt(line):
                     wgt[y,x]=max(1.0-(lgamma[i]/(c+1.0e-20)),wgt[y,x])
                     # Gaussian Weight 
                     Gwt[y,x]=max(math.exp(-ldis[i]**2/(2.0*sigma1**2)),Gwt[y,x])
-    #-----
-    oname=pathname1+"/%04d%04d.bin"%(lon,lat)
-    wgt.tofile(oname)
-    print oname
+    # #-----
+    # oname=pathname1+"/%04d%04d.bin"%(lon,lat)
+    # wgt.tofile(oname)
+    # print oname
     #-----
     oname=pathname3+"/%04d%04d.bin"%(lon,lat)
     Gwt.tofile(oname)

@@ -7,15 +7,25 @@
 # 2020/05/29
 #====================
 #*** PBS setting when needed
-#PBS -q E40
+#PBS -q F40
 #PBS -l select=1:ncpus=40:mem=100gb
 #PBS -j oe
 #PBS -m ea
 #PBS -M menaka@rainbow.iis.u-tokyo.ac.jp
 #PBS -V
 #PBS -N EmpLP
+#===========================
+# import virtual environment
+source ~/.bashrc
+source ~/.bash_conda
+
+source activate pydef
+
+which python
+
 #========
-cd $PBS_O_WORKDIR
+# cd $PBS_O_WORKDIR
+cd "/cluster/data6/menaka/Empirical_LocalPatch"
 #================================================
 # OpenMP Thread number
 export OMP_NUM_THREADS=40
@@ -101,13 +111,16 @@ mkdir -p "local_patch/${mapname}_${inputname}_${threshname}"
 #=================================================
 ./src/lpara $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold
 
-# # #=========================
-# # # write local patch [main stream] to text files
-# # #=========================
-# # varname="weightage"
+#=========================
+# write local patch [main stream] to text files
+#=========================
+varname="weightage"
 
-# # # make dir local patch
-# # mkdir -p "local_patchMS/${mapname}_${inputname}_${threshname}"
-# # #=================================================
-# # #./src/lparaMS $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold
+# make dir local patch
+mkdir -p "local_patchMS/${mapname}_${inputname}_${threshname}"
+#=================================================
+#./src/lparaMS $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold
 
+wait
+
+conda deactivate

@@ -16,10 +16,10 @@ def timestep():
      return 86400 # outer timestep in seconds
 
 def starttime():
-     return [1958,1,1] # start date: [year,month,date]
+     return [1979,1,1] # start date: [year,month,date]
 
 def endtime():
-     return [2013,12,31] # end date: [year,month,date]
+     return [2019,12,31] # end date: [year,month,date]
                       # *note: this date is not included
 
 def CaMa_dir():
@@ -35,13 +35,14 @@ def out_dir():
     #return "/media/menaka/HDJA-UT/covariance"
 
 def map_name():
-    return "amz_06min" #Amazon river 6 min
+    # return "amz_06min" #Amazon river 6 min
     # return "congo_06min" #Congo river 6min
-    # return "glb_06min" # global 6 min
+    return "glb_06min" # global 6 min
     # return "glb_15min" # global 15 min
 
 def input_name():
-    return "S14FD"
+    # return "S14FD"
+    return "VIC_BC"
 
 def spinup_mode():
      return 0
@@ -50,7 +51,7 @@ def spinup_mode():
      ### if initial restart file is ready, spinup simulation is no need
 
 def spinup_end_year():
-    return 1958
+    return 1979
 
 def spinup_end_month():
     return 12
@@ -59,15 +60,18 @@ def spinup_end_date():
     return 31
 
 def patch_start():
-    return 1960,1,1
+    return 1979,1,1
 
 def patch_end():
-    return 2013,12,31
+    return 2019,12,31
 
 def threshold():
     return 0.6000000
     # return 0.4000000
     # return 0.2000000
+
+def dam_rep():
+    return 1 # represent dams in local patch
 
 def para_nums():
     return 6
@@ -86,14 +90,14 @@ def cpu_nums():
     return 40
     # number of cpus used 
 
-def qsub():
-    return 0
-    # 1: submit the job via qsub , resource allocation should be done
-    # 0: direct execution in forntnode
+# def qsub():
+#     return 0
+#     # 1: submit the job via qsub , resource allocation should be done
+#     # 0: direct execution in forntnode
 
-def qoption():
-    return "-q E40 -l select=1:ncpus=40:mem=10gb -d "
-    # if qsub = 1 the theses options will be used
+# def qoption():
+#     return "-q E40 -l select=1:ncpus=40:mem=10gb -d "
+#     # if qsub = 1 the theses options will be used
 
 def version():
     return "v3.0.0 (updated 2020-05-25): CaMa-Flood v396"
