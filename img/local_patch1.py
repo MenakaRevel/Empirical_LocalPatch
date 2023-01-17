@@ -66,7 +66,7 @@ def latlon_river(rivername,ix,iy,mapname="glb_06min",nYY=1800,nXX=3600):
         lllon = 90.
         urlon = 120.
     if rivername=="MISSISSIPPI":
-        lllat = 20.
+        lllat = 30.
         urlat = 50.
         lllon = -115.
         urlon = -75.
@@ -100,6 +100,16 @@ def latlon_river(rivername,ix,iy,mapname="glb_06min",nYY=1800,nXX=3600):
         urlat = 75.
         lllon = -165.
         urlon = -130.
+    if rivername=="YELLOW":
+        lllat = 30.
+        urlat = 45.
+        lllon = 95.
+        urlon = 120.
+    if rivername=="MISSOURI":
+        lllat = 20.
+        urlat = 50.
+        lllon = -115.
+        urlon = -75.
     #if rivername not in ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS","INDUS"]:
     #    adj=20.
     #    lllat, urlat, lllon, urlon = max(llat-adj,-90.),min(llat+adj,90.),max(llon-adj,-180.),min(llon+adj,180.)
@@ -130,6 +140,10 @@ def riveridname(rivername):
         river="St Lawrence"
     if rivername=="BRAHMAPUTRA":
         river="Ganges-Brahamaputra"
+    if rivername=="YELLOW":
+        river="Huang He"
+    if rivername=="MISSOURI":
+        river="Mississippi"
 
     return river
 #----
@@ -140,9 +154,8 @@ def mk_dir(sdir):
     pass
 #--
 fname=pm.CaMa_dir()+"/map/"+pm.map_name()+"/params.txt"
-f=open(fname,"r")
-lines=f.readlines()
-f.close()
+with open(fname,"r") as f:
+  lines=f.readlines()
 #-- map params --
 nx     = int(filter(None, re.split(" ",lines[0]))[0])
 ny     = int(filter(None, re.split(" ",lines[1]))[0])
@@ -158,7 +171,7 @@ offsetY= int((90.0-north)/gsize)
 glbname="glb_"+pm.map_name()[-5::]
 nXX    = int((180.0+180.0)/gsize)
 nYY    = int((90.0+90.0)/gsize)
-print glbname
+print (glbname)
 #--------------
 nextxy = pm.CaMa_dir()+"/map/"+pm.map_name()+"/nextxy.bin"
 rivwth = pm.CaMa_dir()+"/map/"+pm.map_name()+"/rivwth.bin"
@@ -187,20 +200,27 @@ nexty  = nextxy[1]#ma.masked_where(rivwth<=500.0,nextxy[1]).filled(0)
 #trueforo = np.fromfile(fname,np.float32).reshape([2,nYY,nXX])
 #dis=(trueforo[0]>500.)*1
 #dis=dis*((nextx>0)*1)
-threshold=0.90 #pm.threshold()
-patchname="amz_06min_S14FD"
-patch_id="amz_06min_S14FD_90"
-#---
-local_patch="local_patch"#"_%3.2f"%(pm.threshold())
-local_patch1="local_patch_one_%02d"%(threshold*100)
-
-
+threshold=0.60 #0.90 #pm.threshold()
+damrep=1
+# damrep=0
+if damrep == 1:
+  patchname="glb_15min_S14FD_dam" #"amz_06min_S14FD"
+  patch_id="glb_15min_S14FD_60_dam" #"amz_06min_S14FD_90"
+  #---
+  local_patch="local_patch"#"_%3.2f"%(pm.threshold())
+  local_patch1="local_patch_one_%02d_dam"%(threshold*100)
+else:
+  patchname="glb_15min_S14FD" #"amz_06min_S14FD"
+  patch_id="glb_15min_S14FD_60" #"amz_06min_S14FD_90"
+  #---
+  local_patch="local_patch"#"_%3.2f"%(pm.threshold())
+  local_patch1="local_patch_one_%02d"%(threshold*100)
+#======================
 #--major rivers and Ids
 rivid={}
 fname=pm.out_dir()+"/dat/river30_id.txt"
-f = open(fname,"r")
-lines = f.readlines()
-f.close()
+with open(fname,"r") as f:
+  lines = f.readlines()
 #---
 for line in lines:
   line    = filter(None, re.split(",",line))
@@ -208,6 +228,23 @@ for line in lines:
   river   = filter(None, re.split("\n",line[1]))[0].strip()
   #print river 
   rivid[river]=riverid
+#----
+damID=[]
+damLat=[]
+damLon=[]
+damIX=[]
+damIY=[]
+fname="../dat/dam_glb_15min.txt"
+with open(fname,"r") as f:
+  lines=f.readlines()
+for line in lines[1::]:
+  line    = re.split(" ",line)
+  line    = list(filter(None, line))
+  damID.append(int(line[0]))
+  damLon.append(float(line[2]))
+  damLat.append(float(line[3]))
+  damIX.append(int(line[4]) - 1)
+  damIY.append(int(line[5]) - 1)
 #----
 pname=[]
 xlist=[]
@@ -218,13 +255,16 @@ staid=[]
 #rivernames  = ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS"]#,"INDUS"]# ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS","INDUS"] ["AMAZONAS"]#"CONGO"]#
 #rivernames = grdc.grdc_river_name()
 # rivernames = ["AMAZON"]
-rivernames = ["MADEIRA"]
+# rivernames = ["MADEIRA"]
+# rivernames = ["VOLGA","YELLOW","MISSISSIPPI","MISSOURI"]
+# rivernames = ["YELLOW","MISSOURI"]
+rivernames = ["AMAZON","NIGER","CONGO","VOLGA","YELLOW","MISSISSIPPI","MISSOURI"]
 for rivername in rivernames:
 #for rivername in ["AMAZONAS"]:#"LENA","NIGER","INDUS","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS"]:
 #  oname = "../assim_out/img/sfcelv/%s"%(rivername)
 #  mk_dir(oname)
     grdc_id,station_loc,x_list,y_list = grdc.get_grdc_loc_v396(rivername)
-    print rivername, grdc_id,station_loc
+    print (rivername, grdc_id,station_loc)
     river.append([rivername]*len(station_loc))
     staid.append(grdc_id)
     pname.append(station_loc)
@@ -331,8 +371,8 @@ for point in np.arange(pnum):
   ix=xlist[point]+1
   iy=ylist[point]+1
   #--
-  if not riveridname(river[point]) in rivid.keys():
-    continue
+  # if not riveridname(river[point]) in rivid.keys():
+  #   continue
   #----
   fname=pm.out_dir()+"/weightage/%s/%04d%04d.bin"%(patchname,ix,iy)
   wgt=np.fromfile(fname,np.float32).reshape([ny,nx])
@@ -344,7 +384,7 @@ for point in np.arange(pnum):
 #  y=point%2
 #  print point,x,y 
   plt.close() 
-#--figure in A4 size
+  #--figure in A4 size
   #fig=plt.figure(figsize=(8.27,11.69))
   fig=plt.figure()#figsize=(11.69,8.27))
   G = gridspec.GridSpec(1,1)
@@ -371,14 +411,13 @@ for point in np.arange(pnum):
   box="%f %f %f %f"%(lllon,urlon,urlat,lllat)
   #  os.system("./bin/txt_vector "+str(lllon)+str(urlon)+str(urlat)+str(lllat)+" > tmp.txt")
   os.system("./bin/txt_vector "+box+" "+pm.CaMa_dir()+" "+glbname+" > tmp.txt")
-  for LEVEL in range(5,10+1):
+  for LEVEL in range(1,10+1):
     os.system("./bin/print_rivvec tmp.txt 1 "+str(LEVEL)+" > tmp2.txt")
     width=float(LEVEL)*w
     #print width#, lon1,lat1,lon2-lon1,lat2-lat1#x1[0],y1[0],x1[1]-x1[0],y1[1]-y1[0]
     # open tmp2.txt
-    f = open("tmp2.txt","r")
-    lines = f.readlines()
-    f.close()
+    with open("tmp2.txt","r") as f:
+      lines = f.readlines()
     #----------------
     for line in lines:
         line = filter(None, re.split(" ",line))
@@ -392,41 +431,38 @@ for point in np.arange(pnum):
         #----
         if c_nextx[iiy,iix] <= 0:
           continue
-        print lon1,lat1,width
+        print (lon1,lat1,width)
         x1,y1=M(lon1,lat1)
         x2,y2=M(lon2,lat2)
         M.plot([x1,x2],[y1,y2],color="#C0C0C0",linewidth=width,zorder=101,alpha=alpha)
   #--
   fname=pm.out_dir()+"/"+local_patch+"/"+patch_id+"/patch%04d%04d.txt"%(ix,iy)
-  f=open(fname,"r")
-  lines = f.readlines()
-  f.close()
+  with open(fname,"r") as f:
+    lines = f.readlines()
   #--
-  f=open("tmp.txt","w")
-  for line in lines:#[:1]:
-    line = filter(None, re.split(" ",line))
-    #print line
-    iix = int(line[0])
-    iiy = int(line[1])
-    jjx = nextx[iiy-1,iix-1]
-    jjy = nexty[iiy-1,iix-1]
-    #-----
-    lon1 = lonlat[0,iiy-1,iix-1]
-    lat1 = lonlat[1,iiy-1,iix-1]
-    lon2 = lonlat[0,jjy-1,jjx-1]
-    lat2 = lonlat[1,jjy-1,jjx-1]
-    #--
-    line1="%12.5f %12.5f %12.5f %12.5f %12.1f\n"%(lon1, lat1, lon2, lat2, uparea[iiy-1,iix-1]/1000.**2)
-    f.write(line1)
-  f.close()
+  with open("tmp.txt","w") as f:
+    for line in lines:#[:1]:
+      line = filter(None, re.split(" ",line))
+      #print line
+      iix = int(line[0])
+      iiy = int(line[1])
+      jjx = nextx[iiy-1,iix-1]
+      jjy = nexty[iiy-1,iix-1]
+      #-----
+      lon1 = lonlat[0,iiy-1,iix-1]
+      lat1 = lonlat[1,iiy-1,iix-1]
+      lon2 = lonlat[0,jjy-1,jjx-1]
+      lat2 = lonlat[1,jjy-1,jjx-1]
+      #--
+      line1="%12.5f %12.5f %12.5f %12.5f %12.1f\n"%(lon1, lat1, lon2, lat2, uparea[iiy-1,iix-1]/1000.**2)
+      f.write(line1)
   for LEVEL in range(1,10+1):
     os.system("./bin/print_rivvec tmp.txt 1 "+str(LEVEL)+" > tmp2.txt")
     width=float(LEVEL)*w
     #print width#, lon1,lat1,lon2-lon1,lat2-lat1#x1[0],y1[0],x1[1]-x1[0],y1[1]-y1[0]
     # open tmp2.txt
-    f = open("tmp2.txt","r")
-    lines = f.readlines()
-    f.close() 
+    with open("tmp2.txt","r") as f:
+      lines = f.readlines()
     #--- 
     for line in lines:
         line = filter(None, re.split(" ",line))
@@ -447,7 +483,12 @@ for point in np.arange(pnum):
   # target pixel 
   lon = west  + (ix-1)*gsize
   lat = north - (iy-1)*gsize
-  plt.scatter(lon,lat,s=100,marker="o",color="red",zorder=105)
+  plt.scatter(lon,lat,s=75,marker="o",color="red",zorder=105)
+  if damrep == 0 or damrep == 1:
+    for dpoint in np.arange(len(damID)):
+      if c_nextx[damIY[dpoint],damIX[dpoint]] <= 0:
+          continue
+      plt.scatter(damLon[dpoint], damLat[dpoint],s=50,marker="^",color="k",zorder=104)
   #plt.annotate(annotate_string,xy=(lon,lat),xycoords="data",horizontalalignment="left",verticalalignment="top",fontsize=12,zorder=106)
   #--title--
 #  stitle= "%s)"%(string.ascii_lowercase[point])

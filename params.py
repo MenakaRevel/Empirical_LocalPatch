@@ -5,7 +5,7 @@
 # Creating Empirical Local Patch
 # By Menaka Revel@IIS,U-Tokyo
 # 2020/05/25
-# Revel et al,. (2019,2021)
+# Revel et al,. (2019,2021,2022)
 ########################
 #
 # parameters list
@@ -32,17 +32,18 @@ def CaMa_dir():
 
 def out_dir():
     return "/cluster/data6/menaka/Empirical_LocalPatch"
+    # return "/work/a06/menaka/Empirical_LocalPatch"
     #return "/media/menaka/HDJA-UT/covariance"
 
 def map_name():
     # return "amz_06min" #Amazon river 6 min
     # return "congo_06min" #Congo river 6min
-    return "glb_06min" # global 6 min
-    # return "glb_15min" # global 15 min
+    # return "glb_06min" # global 6 min
+    return "glb_15min" # global 15 min
 
 def input_name():
-    # return "S14FD"
-    return "VIC_BC"
+    return "S14FD"
+    # return "VIC_BC"
 
 def spinup_mode():
      return 0
@@ -72,6 +73,7 @@ def threshold():
 
 def dam_rep():
     return 1 # represent dams in local patch
+    # return 0 # represent dams in local patch
 
 def para_nums():
     return 6
@@ -87,7 +89,7 @@ def slack_notification():
     # for more information refer https://api.slack.com/incoming-webhooks
 
 def cpu_nums():
-    return 40
+    return 20
     # number of cpus used 
 
 # def qsub():
@@ -100,6 +102,7 @@ def cpu_nums():
 #     # if qsub = 1 the theses options will be used
 
 def version():
-    return "v3.0.0 (updated 2020-05-25): CaMa-Flood v396"
+    # return "v3.0.0 (updated 2020-05-25): CaMa-Flood v396"
+    return "v3.0.1 (updated 2022-11-23): CaMa-Flood v4, dams included"
     # version  396 merit DEM
     # differnt maps [glb_15min,glb_06min, etc]

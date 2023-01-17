@@ -61,7 +61,7 @@ read(buf,*) threshold ! threshold for defining the local patch
 call getarg(9,buf)   ! radius of search area
 read(buf,*) patch_size
 
-call getarg(9,buf)   ! to represent dams or not
+call getarg(10,buf)   ! to represent dams or not
 read(buf,*) dam
 !-
 ! varname=outname
@@ -89,6 +89,10 @@ write(thrname,'(i2.0)') int(threshold*100)
 print*, thrname
 
 fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/lonlat.txt"
+if (dam==1) then
+  fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_dam/lonlat.txt"
+end if
+print *, fname
 open(78,file=fname,status='replace')
 
 21 format(i4.4,2x,i4.4,2x,f10.7)
@@ -176,18 +180,28 @@ do ix = 1, nx ! pixels along longtitude direction
         write(llat,'(i4.4)') iy
         ! read weightage
         fname=trim(adjustl(outdir))//"/weightage/"//trim(mapname)//"_"//trim(inname)//"/"//trim(llon)//trim(llat)//".bin"
+        if (dam==1) then
+          fname=trim(adjustl(outdir))//"/weightage/"//trim(mapname)//"_"//trim(inname)//"_dam/"//trim(llon)//trim(llat)//".bin"
+        end if  
         !print*, "read weightage",fname
         fn = 34
         call read_wgt(fname,lonpx,latpx,weightage)
         ! read gausssian weight
         !print*, "read gausssian weight" 
         fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/"//trim(llon)//trim(llat)//".bin"
+        if (dam==1) then
+          fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_dam/"//trim(llon)//trim(llat)//".bin"
+        end if 
         fn = 34
         call read_wgt(fname,lonpx,latpx,gauss_weight)
         countnum=1
         ! file to save
         fn=72
         fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/patch"//trim(llon)//trim(llat)//".txt"
+        if (dam==1) then
+          fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_dam/patch"//trim(llon)//trim(llat)//".txt"
+        end if
+        print *, fname
         open(fn,file=fname,status='replace')
         ! patch size should be >=1000
         target_pixel=-9999
@@ -244,13 +258,14 @@ do ix = 1, nx ! pixels along longtitude direction
                     cycle
                     !continue
                 end if
-                ! dam represent
-                if (dam == 1) then
-                  call check_dam_grid(i_m,j_m,damflag)
-                  if (damflag == 1) then
-                    cycle
-                  end if
-                end if
+                ! ! dam represent
+                ! if (dam == 1) then
+                !   call check_dam_grid(i_m,j_m,damflag)
+                !   if (damflag == 1) then
+                !     print*, "==== A dam found..... ===", i_m, j_m, "for", i, j
+                !     cycle
+                !   end if
+                ! end if
                 !---
                 !print*, i_m,j_m
                 write(fn,21)i_m,j_m,gauss_weight(i_m,j_m)
@@ -278,6 +293,9 @@ end do
 !$omp end parallel
 !---
 fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/countnum.bin"
+if (dam==1) then
+  fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_dam/countnum.bin"
+end if
 open(84,file=fname,form="unformatted",access="direct",recl=4*latpx*lonpx,status="replace",iostat=ios)
 if(ios==0)then
     write(84,rec=1) countp
