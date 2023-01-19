@@ -1,6 +1,6 @@
 #!/bin/sh
 #====================
-# Calcualte the experimental semivarinces along each river stem
+# Calcualte the weights considering the distacne along each river stem [e.g., 500km]
 # Menaka@IIS
 # 2020/06/01
 #====================
