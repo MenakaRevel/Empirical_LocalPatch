@@ -11,15 +11,19 @@ import sys
 
 ## initial settings ===============================================
 ## allocation parameters
-tag  =sys.argv[1]               # projhect name
-minuparea = float(sys.argv[2])  # minimum drainage area to output
+## $TAG $MINUPAREA $MAPDIR $OUT_TMP $OUT_DAMLOC
+tag        = sys.argv[1]            # project name
+minuparea  = float(sys.argv[2])     # minimum drainage area to output
+mapdir     = sys.argv[3]
+inputfile  = sys.argv[4]
+outputfile = sys.argv[5]
 
-# [grandid,lon,lat,x,y,upreal,upreal_cama]
-inputfile  = './'+tag+'/damloc_tmp.txt'
-outputfile = './'+tag+'/damloc_modified.csv'
+# # [grandid,lon,lat,x,y,upreal,upreal_cama]
+# inputfile  = './'+tag+'/damloc_tmp.txt'
+# outputfile = './'+tag+'/damloc_modified.csv'
 
 # drainage area from cama map dir
-mapdir = './inp/map/'
+# mapdir = './inp/map/'
 upareafile = str(mapdir)+'/uparea.bin' 
 
 # minimum uparea error to allow
@@ -155,6 +159,14 @@ dam_data_m['iy'] = y_m
 
 print(dam_data_m)
 
-dam_data_m.to_csv(outputfile, index=False) 
+# dam_data_m.to_csv(outputfile, index=False) 
 print('') 
 print("file outputted to:", outputfile)
+
+with open(outputfile, "w") as fout:
+    head="%6s%43s%10s%10s%8s%8s%12s%12s\n"%("Dam_ID","DamName","DamLon","DamLat","DamIX","DamIY","UpArea","Capacity")
+    fout.write(head)
+    for index, row in dam_data_m.iterrows():          #damlon   damlat   ix   iy   upreal   uparea_cama   totalsto_mcm
+        line="%06d%43s%10.2f%10.2f%8d%8d%12d%12d\n"%(dam_data_m['damid'],dam_data_m['damname'],dam_data_m['damlon'],dam_data_m['damlat'],dam_data_m['ix'],dam_data_m['iy'],dam_data_m['uparea_cama'],dam_data_m['totalsto_mcm'])
+        print(line)
+        fout.write(line)
