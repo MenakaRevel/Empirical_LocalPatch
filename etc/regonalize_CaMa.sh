@@ -51,7 +51,8 @@ glbmapname="glb_06min"
 
 # link simulated files
 cd "../CaMa_out/${mapname}_${inputname}"
-ln -sf "/home/yamadai/data/CaMa_v400_simulations/VIC_BC_3h_06min/* ."
+pwd
+# ln -sf "/home/yamadai/data/CaMa_v400_simulations/VIC_BC_3h_06min/* ."
 cd ../../etc
 
 #======
