@@ -166,7 +166,8 @@ print("file outputted to:", outputfile)
 with open(outputfile, "w") as fout:
     head="%6s%43s%10s%10s%8s%8s%12s%12s\n"%("Dam_ID","DamName","DamLon","DamLat","DamIX","DamIY","UpArea","Capacity")
     fout.write(head)
-    for index, row in dam_data_m.iterrows():          #damlon   damlat   ix   iy   upreal   uparea_cama   totalsto_mcm
-        line="%06d%43s%10.2f%10.2f%8d%8d%12d%12d\n"%(dam_data_m['damid'],dam_data_m['damname'],dam_data_m['damlon'],dam_data_m['damlat'],dam_data_m['ix'],dam_data_m['iy'],dam_data_m['uparea_cama'],dam_data_m['totalsto_mcm'])
+    for index, row in dam_data_m.iterrows():          
+        # damid   damname   damlon   damlat   ix   iy   upreal   uparea_cama   totalsto_mcm
+        line="%06d%43s%10.2f%10.2f%8d%8d%12.2f%12.2f\n"%(row['damid'],row['damname'],row['damlon'],row['damlat'],row['ix'],row['iy'],row['uparea_cama'],row['totalsto_mcm'])
         print(line)
         fout.write(line)

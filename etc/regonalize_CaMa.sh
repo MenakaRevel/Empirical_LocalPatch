@@ -49,11 +49,11 @@ patch=100
 # global map name
 glbmapname="glb_06min"
 
-# link simulated files
-cd "../CaMa_out/${mapname}_${inputname}"
-pwd
+# # link simulated files
+# cd "../CaMa_out/${mapname}_${inputname}"
+# pwd
 # ln -sf "/home/yamadai/data/CaMa_v400_simulations/VIC_BC_3h_06min/* ."
-cd ../../etc
+# cd ../../etc
 
 #======
 # create folder name in CaMa_out
@@ -63,10 +63,12 @@ mkdir -p "../CaMa_out/${mapname}_${inputname}"
 varname="sfcelv"
 #=================================================
 echo ./src/bin2nc_reg $N $syear $eyear $varname $mapname $glbmapname $inputname $CAMADIR $outdir &
-# time ./src/bin2nc_reg $N $syear $eyear $varname $mapname $glbmapname $inputname $CAMADIR $outdir &
+time ./src/bin2nc_reg $N $syear $eyear $varname $mapname $glbmapname $inputname $CAMADIR $outdir &
 
 # discharge
 varname="outflw"
 #=================================================
 echo ./src/bin2nc_reg $N $syear $eyear $varname $mapname $glbmapname $inputname $CAMADIR $outdir &
-# time ./src/bin2nc_reg $N $syear $eyear $varname $mapname $glbmapname $inputname $CAMADIR $outdir &
+time ./src/bin2nc_reg $N $syear $eyear $varname $mapname $glbmapname $inputname $CAMADIR $outdir &
+
+wait
