@@ -1,0 +1,10 @@
+# fortran files
+src/bin2nc_reg
+src/get_rivinfo_glb
+
+# params.py
+params.py
+params.pyc
+
+# pbs o/e files 
+*.O*
