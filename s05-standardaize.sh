@@ -35,4 +35,4 @@ N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 
 #=================================================
 varname="rmdsesn"
-./src/standardize $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
+time ./src/standardize $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir

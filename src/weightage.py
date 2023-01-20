@@ -77,6 +77,9 @@ def mk_svg1(sv,lag,model="gaussian"):
   return a
 #==============================================
 def mk_svg(sv,lag,model="gaussian"):
+  """
+  Fit semivariogram model
+  """
   # up = 0 is downsream
   # up > 0 is upstream number
   fit=[0,1,1]
@@ -99,10 +102,14 @@ def mk_svg(sv,lag,model="gaussian"):
         c,a=sv[-1],lag[-1] 
   return c,a 
 #==============================================
-def check_dam_loc(ix,iy,damrep=1):
+def check_dam_loc(ix,iy,mapname="glb_15min",damrep=1):
+  """
+  Check for dam grid
+  Dam location allocation done as in Hanasaki et al,. (2022) JAMES
+  """
   damflag=-9999
   if damrep == 1:
-    fname="./dat/dam_glb_15min.txt"
+    fname="./dat/damloc_"+mapname+".txt"
     with open(fname,"r") as f:
       lines=f.readlines()
     for line in lines[1::]:
@@ -117,6 +124,9 @@ def check_dam_loc(ix,iy,damrep=1):
   return damflag
 #==============================================
 def weight_allocation(out_dir,mapname,inname,lon,lat,iup,uord,threshold,baseline,wgt,Gwt):
+  """
+  Assining weights (spatial dependency weight & observation localization weights) along each river branch
+  """
   lix=[]
   liy=[]
   ldis=[]
@@ -146,7 +156,7 @@ def weight_allocation(out_dir,mapname,inname,lon,lat,iup,uord,threshold,baseline
       std   = float(line[4])
       #print dis,gamma
       # check dam location
-      damflag=check_dam_loc(ix-1,iy-1)
+      damflag=check_dam_loc(ix-1,iy-1,mapname,damrep)
       if damflag == 1:
         print ("A dam is found at: ", float(line[2]))
         ldam.append(1)
@@ -290,6 +300,9 @@ baseline=11 # Revel_etal,. (2019) proves 21 x 21 patch works well in upstreams
 #for line in lines[1::]:
 #==============================================
 def mk_wgt(line):
+    """
+    Calculation of weights using weight_allocation function
+    """
     #print line
     line  = filter(None, re.split(" ",line))
     print (line[0], line[1], line[2], line[3])
@@ -311,218 +324,11 @@ def mk_wgt(line):
     if dn>0:
         print ("downstream")
         weight_allocation(out_dir,mapname,inname,lon,lat,0,"downstream",threshold,baseline,wgt,Gwt)
-        # # # #--
-        # # # lix=[]
-        # # # liy=[]
-        # # # ldis=[]
-        # # # lgamma=[]
-        # # # lstd=[]
-        # # # ldam=[]
-        # # # #--
-        # # # fname="%s/semivar/%s_%s/%04d%04d/dn%05d.svg"%(out_dir,mapname,inname,lon,lat,0)
-        # # # try:
-        # # #     with open(fname,"r") as f:
-        # # #       lines=f.readlines()
-        # # # except:
-        # # #     print ("no file", fname)
-        # # #     return 0
-        # # # #--
-        # # # for line in lines[1::]:
-        # # #     line  = filter(None, re.split(" ",line))
-        # # #     #print line
-        # # #     ix    = int(line[0])
-        # # #     iy    = int(line[1])
-        # # #     dis   = float(line[2])
-        # # #     gamma = float(line[3])
-        # # #     std   = float(line[4])
-        # # #     #print dis,gamma
-        # # #     # check dam location
-        # # #     damflag=check_dam_loc(ix-1,iy-1,damrep)
-        # # #     if damflag == 1:
-        # # #       ldam.append(1)
-        # # #     else:
-        # # #       ldam.append(0)
-        # # #     #--
-        # # #     lix.append(ix)
-        # # #     liy.append(iy)
-        # # #     ldis.append(dis)
-        # # #     lgamma.append(gamma)
-        # # #     lstd.append(std)
-        # # # # find auto correlation length
-        # # # c,a=mk_svg(lgamma,ldis)
-        # # # #print c, a
-        # # # # cal weigtage
-        # # # lwgt=1.0 - np.array(lgamma)/(c+1.0e-20)
-        # # # #--
-        # # # # if dam is found make the wgt zero after the dam.
-        # # # # guassian weight calculated taking dam location as the boundry.
-        # # # if sum(ldam) >= 1:
-        # # #     pnum=max(0,ldam.index(1)-1)
-        # # #     a1=ldis[ldam.index(1)]
-        # # #     sigma=a1/math.sqrt(2.0*abs(math.log(threshold))) # calculate sigma for r=a1 and w-0.6 using w=exp(-r^2 /2*sigma^2)
-        # # #     #define sigma => r = 2 * sqrt(10/3) * sigma ==> sigma = sqrt(3/10) * r/2
-        # # #     sigma1=math.sqrt(3.0/10.0)*a1/2.0
-        # # #     #---
-        # # #     for i in range(0,pnum):
-        # # #         x=lix[i]-1
-        # # #         y=liy[i]-1
-        # # #         #wgt[y,x]=max(gaussian(ldis[i],a),wgt[y,x])
-        # # #         wgt[y,x]=max(1.0-(lgamma[i]/(c+1.0e-20)),wgt[y,x])
-        # # #         # Gaussian Weight
-        # # #         Gwt[y,x]=max(math.exp(-ldis[i]**2/(2.0*sigma1**2)),Gwt[y,x])
-        # # # # =====> for downstream not needed
-        # # # # elif sum((lwgt>=threshold)*1)<baseline: #6
-        # # # #     a1=1.0e-20
-        # # # #     if len(ldis)>1:
-        # # # #         a1=(ldis[-1]/float(len(ldis)-1))*(float(baseline) - 1.)
-        # # # #         sigma=a1/math.sqrt(2.0*abs(math.log(threshold))) # calculate sigma for r=a1 and w-0.6 using w=exp(-r^2 /2*sigma^2)
-        # # # #         #define sigma => r = 2 * sqrt(10/3) * sigma
-        # # # #         sigma1=math.sqrt(3.0/10.0)*a1/2.0
-        # # # #         #---
-        # # # #         for i in range(0,len(ldis)-1):
-        # # # #             x=lix[i]-1
-        # # # #             y=liy[i]-1
-        # # # #             #wgt[y,x]=max(gaussian(ldis[i],a),wgt[y,x])
-        # # # #             wgt[y,x]=max(math.exp(-ldis[i]**2/(2.0*sigma**2)),wgt[y,x])
-        # # # #             # Gaussian Weight
-        # # # #             Gwt[y,x]=max(math.exp(-ldis[i]**2/(2.0*sigma1**2)),Gwt[y,x])
-        # # # #     else: # river mouth, inland termination
-        # # # #         if nextx[lat-1,lon-1] == -9 : # river mouth
-        # # # #             x=lix[0]-1
-        # # # #             y=liy[0]-1
-        # # # #             wgt[y,x]=1.0
-        # # # #             # Gaussian Weight
-        # # # #             Gwt[y,x]=1.0
-        # # # #         #--
-        # # # #         if nextx[lat-1,lon-1] == -10 : # inland termination
-        # # # #             x=lix[0]-1
-        # # # #             y=liy[0]-1
-        # # # #             wgt[y,x]=1.0
-        # # # #             # Gaussian Weight
-        # # # #             Gwt[y,x]=1.0
-        # # # #         # -9999
-        # # # #         if nextx[lat-1,lon-1] == -9999 :
-        # # # #             print ("-9999")
-        # # # #             #return 0
-        # # # else:
-        # # #     if sum((lwgt>=threshold)*1) >= len(ldis):
-        # # #         a1=ldis[-1]
-        # # #     else:
-        # # #         a1=ldis[int(sum((lwgt>=threshold)*1))]
-        # # #     #define sigma
-        # # #     sigma1=math.sqrt(3.0/10.0)*a1/2.0 # calculate sigma for r=a1 and w-0.6 using w=exp(-r^2 /2*sigma^2)
-        # # #     pnum=max(0,len(ldis)-1)
-        # # #     for i in range(0,pnum):
-        # # #         x=lix[i]-1
-        # # #         y=liy[i]-1
-        # # #         #wgt[y,x]=max(gaussian(ldis[i],a),wgt[y,x])
-        # # #         wgt[y,x]=max(1.0-(lgamma[i]/(c+1.0e-20)),wgt[y,x])
-        # # #         # Gaussian Weight
-        # # #         Gwt[y,x]=max(math.exp(-ldis[i]**2/(2.0*sigma1**2)),Gwt[y,x])
-    #--
-    #print "upstream"
-    #plt.clf()
     if up > 0:
         print ("upstream")
         for iup in np.arange(1,up+1):
             #print "upstream",iup
             weight_allocation(out_dir,mapname,inname,lon,lat,iup,"upstream",threshold,baseline,wgt,Gwt)
-            #--
-            # # # lix=[]
-            # # # liy=[]
-            # # # ldis=[]
-            # # # lgamma=[]
-            # # # lstd=[]
-            # # # ldam=[]
-            # # # #--
-            # # # fname="%s/semivar/%s_%s/%04d%04d/up%05d.svg"%(out_dir,mapname,inname,lon,lat,iup)
-            # # # try:
-            # # #     f=open(fname,"r")
-            # # #     lines=f.readlines()
-            # # #     f.close()
-            # # # except:
-            # # #     print ("no file", fname)
-            # # #     #continue
-            # # #     return 0
-            # # # #--
-            # # # for line in lines[1::]:
-            # # #     line  = filter(None, re.split(" ",line))
-            # # #     ix    = int(line[0])
-            # # #     iy    = int(line[1])
-            # # #     dis   = float(line[2])
-            # # #     gamma = float(line[3])
-            # # #     std   = float(line[4])
-            # # #     #print dis,gamma
-            # # #     # check dam location
-            # # #     damflag=check_dam_loc(ix-1,iy-1)
-            # # #     if damflag == 1:
-            # # #       ldam.append(1)
-            # # #     else:
-            # # #       ldam.append(0)
-            # # #     #--
-            # # #     lix.append(ix)
-            # # #     liy.append(iy)
-            # # #     ldis.append(dis)
-            # # #     lgamma.append(gamma)
-            # # #     lstd.append(std)
-            # # # #--
-            # # # c,a=mk_svg(lgamma,ldis)
-            # # # #print c, a
-            # # # # cal weigtage
-            # # # lwgt=1.0 - np.array(lgamma)/(c+1.0e-20)
-            # # # #--
-            # # # # if dam is found make the wgt zero after the dam.
-            # # # # guassian weight calculated taking dam location as the boundry.
-            # # # if sum(ldam) >= 1:
-            # # #     pnum=max(0,ldam.index(1)-1)
-            # # #     a1=ldis[ldam.index(1)]
-            # # #     sigma=a1/math.sqrt(2.0*abs(math.log(threshold))) # calculate sigma for r=a1 and w-0.6 using w=exp(-r^2 /2*sigma^2)
-            # # #     #define sigma => r = 2 * sqrt(10/3) * sigma ==> sigma = sqrt(3/10) * r/2
-            # # #     sigma1=math.sqrt(3.0/10.0)*a1/2.0
-            # # #     #---
-            # # #     for i in range(0,pnum):
-            # # #         x=lix[i]-1
-            # # #         y=liy[i]-1
-            # # #         #wgt[y,x]=max(gaussian(ldis[i],a),wgt[y,x])
-            # # #         wgt[y,x]=max(1.0-(lgamma[i]/(c+1.0e-20)),wgt[y,x])
-            # # #         # Gaussian Weight
-            # # #         Gwt[y,x]=max(math.exp(-ldis[i]**2/(2.0*sigma1**2)),Gwt[y,x])
-            # # # elif sum((lwgt>=threshold)*1)<baseline:
-            # # #     a1=1.0e-20
-            # # #     if len(ldis)>1:
-            # # #         a1=(ldis[-1]/float(len(ldis)-1))*(float(baseline) - 1.) # calculate sigma for r=a1 and w-0.6 using w=exp(-r^2 /2*sigma^2)
-            # # #         #define sigma => r = 2 * sqrt(10/3) * sigma
-            # # #         sigma=a1/math.sqrt(2.0*abs(math.log(threshold)))
-            # # #         #define sigma
-            # # #         sigma1=math.sqrt(3.0/10.0)*a1/2.0
-            # # #         #---
-            # # #         for i in range(0,len(ldis)-1):
-            # # #             x=lix[i]-1
-            # # #             y=liy[i]-1
-            # # #             #wgt[y,x]=max(gaussian(ldis[i],a),wgt[y,x])
-            # # #             wgt[y,x]=max(math.exp(-ldis[i]**2/(2.0*sigma**2)),wgt[y,x])
-            # # #             # Gaussian Weight
-            # # #             Gwt[y,x]=max(math.exp(-ldis[i]**2/(2.0*sigma1**2)),Gwt[y,x])
-            # # #     else: # only that grid
-            # # #             x=lix[0]-1
-            # # #             y=liy[0]-1
-            # # #             wgt[y,x]=1.0
-            # # #             # Gaussian Weight
-            # # #             Gwt[y,x]=1.0
-            # # # else:
-            # # #     if sum((lwgt>=threshold)*1) >= len(ldis):
-            # # #         a1=ldis[-1]
-            # # #     else:
-            # # #         a1=ldis[int(sum((lwgt>=threshold)*1))]
-            # # #     #define sigma
-            # # #     sigma1=math.sqrt(3.0/10.0)*a1/2.0
-            # # #     for i in range(0,len(ldis)-1):
-            # # #         x=lix[i]-1
-            # # #         y=liy[i]-1
-            # # #         #wgt[y,x]=max(gaussian(ldis[i],a),wgt[y,x])
-            # # #         wgt[y,x]=max(1.0-(lgamma[i]/(c+1.0e-20)),wgt[y,x])
-            # # #         # Gaussian Weight 
-            # # #         Gwt[y,x]=max(math.exp(-ldis[i]**2/(2.0*sigma1**2)),Gwt[y,x])
     #-----
     oname=pathname1+"/%04d%04d.bin"%(lon,lat)
     wgt.tofile(oname)
@@ -533,6 +339,7 @@ def mk_wgt(line):
     print (oname)
     return 0
 ##############################################
+# main program
 if para>0:
     print ("do it parallel")
     os.system("export OMP_NUM_THREADS=%d"%(para))

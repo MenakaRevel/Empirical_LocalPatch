@@ -39,4 +39,4 @@ N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 
 #=================================================
 varname="standardized"
-./src/semivariance $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
+time ./src/semivariance $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir

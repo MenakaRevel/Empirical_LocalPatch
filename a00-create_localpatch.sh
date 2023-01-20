@@ -55,71 +55,72 @@ N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 # # # water surface elevation
 # # varname="sfcelv"
 # # #=================================================
-# # ./src/bin2nc $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
+# # time ./src/bin2nc $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
 
 # # # discharge
 # # varname="outflw"
 # # #=================================================
-# # ./src/bin2nc $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
+# # time ./src/bin2nc $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
 
 #=========================
 # remove trend lines
 #=========================
 varname="sfcelv"
 #=================================================
-./src/remove_trend $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
+time ./src/remove_trend $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
 
 #=========================
 # remove seasonality
 #=========================
 varname="rmdtrnd"
 #=================================================
-./src/remove_season $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
+time ./src/remove_season $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
 
 #=========================
 # standardized sfcelve
 #=========================
 varname="rmdsesn"
 #=================================================
-./src/standardize $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
+time ./src/standardize $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
 
-#=========================
-# calculate experimental semi-varaince
-#=========================
-varname="standardized"
-#===make directories for semivar
-`python src/make_semivari.py $CAMADIR $mapname $outdir`
-#=================================================
-./src/semivariance $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
+# #=========================
+# # calculate experimental semi-varaince
+# #=========================
+# varname="standardized"
+# #===make directories for semivar
+# `python src/make_semivari.py $CAMADIR $mapname $outdir`
+# #=================================================
+# ./src/semivariance $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
 
-#=========================
-# calculate spatial auto-correlation weightage
-#=========================
-threshold=`python -c "import params; print (params.threshold())"`
-threshname=$(echo $threshold 100 | awk '{printf "%2d\n",$1*$2}')
-#=================================================
-python src/weightage.py $CAMADIR $mapname $outdir $cpunums $threshold
+# #=========================
+# # calculate spatial auto-correlation weightage
+# #=========================
+# threshold=`python -c "import params; print (params.threshold())"`
+# threshname=$(echo $threshold 100 | awk '{printf "%2d\n",$1*$2}')
+# damrep=`python -c "import params; print (params.dam_rep())"` # represnt dams
+# #=================================================
+# python src/weightage.py $CAMADIR $mapname $inputname $outdir $cpunums $threshold $damrep
 
-#=========================
-# write local patch to text files
-#=========================
-varname="weightage"
+# #=========================
+# # write local patch to text files
+# #=========================
+# varname="weightage"
 
-# make dir local patch
-mkdir -p "local_patch/${mapname}_${inputname}_${threshname}"
+# # make dir local patch
+# mkdir -p "local_patch/${mapname}_${inputname}_${threshname}"
 
-#=================================================
-./src/lpara $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold
+# #=================================================
+# ./src/lpara $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold
 
-#=========================
-# write local patch [main stream] to text files
-#=========================
-varname="weightage"
+# #=========================
+# # write local patch [main stream] to text files
+# #=========================
+# varname="weightage"
 
-# make dir local patch
-mkdir -p "local_patchMS/${mapname}_${inputname}_${threshname}"
-#=================================================
-#./src/lparaMS $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold
+# # make dir local patch
+# mkdir -p "local_patchMS/${mapname}_${inputname}_${threshname}"
+# #=================================================
+# #./src/lparaMS $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $threshold
 
 wait
 

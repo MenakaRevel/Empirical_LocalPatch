@@ -37,4 +37,4 @@ N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 
 #=================================================
 varname="sfcelv"
-./src/remove_trend $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
+time ./src/remove_trend $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir

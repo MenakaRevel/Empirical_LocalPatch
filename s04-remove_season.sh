@@ -36,4 +36,4 @@ N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 
 #=================================================
 varname="rmdtrnd"
-./src/remove_season $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
+time ./src/remove_season $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
