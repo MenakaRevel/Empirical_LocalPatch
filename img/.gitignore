@@ -1,0 +1,5 @@
+# txt file
+*.txt
+
+# PBS oe files
+*.o*

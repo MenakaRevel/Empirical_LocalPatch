@@ -227,7 +227,7 @@ end do
 call nccheck( nf90_close(ncidin ) )
 call nccheck( nf90_close(ncidout) )
 !---
-deallocate(nextX,nextY,ocean,globaltrue,rmdtrnd)
+deallocate(nextX,nextY,ocean,globaltrue) !,rmdtrnd)
 end program standardized
 !****************
 SUBROUTINE standadize(data,N) 

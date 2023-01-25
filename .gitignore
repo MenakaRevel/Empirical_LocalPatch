@@ -65,3 +65,6 @@ EmpLP.o*
 *src/mean_sfcelv.f90
 *src/mean_slope.f90
 *src/open_sfcelv.f90
+
+# fortran files
+fort.*
