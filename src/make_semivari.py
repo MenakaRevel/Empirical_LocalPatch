@@ -37,9 +37,8 @@ inname=sys.argv[3]
 out_dir=sys.argv[4]
 #==============================================
 fname=CaMa_dir+"/map/"+mapname+"/params.txt"
-f=open(fname,"r")
-lines=f.readlines()
-f.close()
+with open(fname,"r") as f:
+  lines=f.readlines()
 #==============================================
 nx     = int(filter(None, re.split(" ",lines[0]))[0])
 ny     = int(filter(None, re.split(" ",lines[1]))[0])
@@ -62,14 +61,14 @@ nexty  = nextxy[1]
 # make semivar
 oname="%s/semivar"%(out_dir)
 if not os.path.exists(oname):
-  print oname
+  print (oname)
   mk_dir(oname)
 #==============================================
 ##make sub directory
 # /semivar/{mapname}_{inputname}
 oname="%s/semivar/%s_%s"%(out_dir,mapname,inname)
 if not os.path.exists(oname):
-  print oname
+  print (oname)
   mk_dir(oname)
 #==============================================
 for i in np.arange(1,nx+1):
@@ -78,6 +77,6 @@ for i in np.arange(1,nx+1):
       continue
     oname="%s/semivar/%s_%s/%04d%04d"%(out_dir,mapname,inname,i,j)
     if not os.path.exists(oname):
-      print oname
+      print (oname)
       mk_dir(oname)
 #==============================================
