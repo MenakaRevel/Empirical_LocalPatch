@@ -15,7 +15,7 @@ integer                               :: latpx, lonpx, nflp    ! pixel size, cal
 real                                  :: gsize0, lon_ori, lat_ori, lon_end, lat_end ! for global map
 integer                               :: nx0, ny0, nflp0 ! for global map
 integer                               :: dx,dy
-real,allocatable                      :: globaltrue(:,:,:)
+real,allocatable                      :: globaltrue(:,:,:),regtrue(:,:,:)
 integer*4                             :: i!,j!,i_m,j_m,pixel
 integer                               :: days,ios,N!,countnum
 integer                               :: ncid,timeid,varid,latid,lonid
@@ -81,8 +81,11 @@ read(11,*) south
 read(11,*) north
 close(11)
 !========
-dx=nint( dble(west-lon_ori) /dble(gsize) )
-dy=nint( dble(lat_ori-north)/dble(gsize) )
+! dx=nint( dble(west-lon_ori) /dble(gsize) )
+! dy=nint( dble(lat_ori-north)/dble(gsize) )
+dx=nint( dble(west-lon_ori) /dble(gsize) +0.001 )
+dy=nint( dble(lat_ori-north)/dble(gsize) +0.001 )
+print*, dx, dy
 !-------
 !======
 ! write netCDF file
@@ -95,8 +98,9 @@ south=max(south,-60.0)
 nx=lonpx
 !ny=latpx-30.0/dble(gsize) ! writed only up -60S latitude
 ny=(north-south)/gsize !dble(gsize)
-!print*, north,south,gsize
-!print*, nx,ny
+! print*, north,south,gsize
+print*, nx,ny
+print*, dx," : ",dx+nx," , ",dy," : ",dy+ny
 write(tag,'(i4.0,a,i4.0)')syear,"-",eyear
 ! edited the file name as /CaMa_out/{mapname}_{inputname}/{var}{syear}-{eyear}.nc
 fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(mapname)//"_"//trim(inname)//"/"//trim(varname)//trim(tag)//".nc"
@@ -174,29 +178,34 @@ call nccheck( nf90_inq_varid(ncid,trim(varname),varid) )
 ! read variable
 i=1
 do year=syear,eyear
-    write(yyyy,'(i4.0)') year
-    write(*,*) yyyy !day,, days(day) 
+    write(yyyy,'(i4.0)') year !day,, days(day) 
     days=dyear(year)
-    allocate(globaltrue(nx0,ny0,days))
+    print*, yyyy, days
+    allocate(globaltrue(nx0,ny0,days),regtrue(nx,ny,days))
     fname=trim(adjustl(outdir))//"/CaMa_out/"//trim(mapname)//"_"//trim(inname)//"/"//trim(varname)//yyyy//".bin"
     !print *,"L153",trim(varname),days!fname
     open(34,file=fname,form="unformatted",access="direct",recl=4*days*nx0*ny0,status="old",iostat=ios)
     if(ios==0)then
-        read(34,rec=1) globaltrue(:,:,:)
+        read(34,rec=1) globaltrue !(:,:,:)
     else
-        write(*,*) "no",trim(varname),trim(fname)
+        print*, "no",trim(varname),trim(fname)
     end if
     close(34)
     !print*, "L161",trim(varname)
     start(3)=i
     count(3)=days
-    call nccheck( nf90_put_var(ncid,varid,globaltrue(dx:dx+nx,dy:dy+ny,1:days),start=start,count=count) )
+    ! print*, start, count, shape(globaltrue), shape(regtrue)
+    regtrue=globaltrue(dx:dx+nx,dy:dy+ny,1:days)
+    ! print*, regtrue
+    ! call cut_domain(globaltrue,nx0,ny0,days,nx,ny,dx,dy,regtrue)
+    ! call nccheck( nf90_put_var(ncid,varid,globaltrue(dx:dx+nx,dy:dy+ny,1:days),start=start,count=count) )
+    call nccheck( nf90_put_var(ncid,varid,regtrue(1:nx,1:ny,1:days),start=start,count=count) )
     !do j=1,days
     !    start(3)=j+i
     !    call nccheck( nf90_put_var(ncid,varid,globaltrue(1:nx,1:ny,i+j),start=start,count=count) )
     !    !print*,"L165", trim(varname),j
     !end do
-    deallocate(globaltrue)
+    deallocate(globaltrue,regtrue)
     i=i+days
     !print*,"L169",trim(varname)
 end do
@@ -262,4 +271,19 @@ end if
 
 return
 end function longname
+!*********************************
+subroutine cut_domain(org,nx,ny,nt,mx,my,dx,dy,reg)
+implicit none
+integer                  :: nx,ny,nt,mx,my,dx,dy
+real                     :: org(nx,ny,nt), reg(mx,my,nt)
+integer                  :: ix,iy,jx,jy
+do iy=1, my
+    do ix=1, mx
+        jx=ix+dx
+        jy=iy+dy
+        reg(ix,iy,1:nt)=org(jx,jy,1:nt)
+    end do
+end do
+return
+end subroutine cut_domain
 !*********************************

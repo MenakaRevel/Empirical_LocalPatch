@@ -21,7 +21,8 @@ source activate pydef
 
 which python
 #========
-cd $PBS_O_WORKDIR
+# cd $PBS_O_WORKDIR
+cd "/cluster/data6/menaka/Empirical_LocalPatch"
 #================================================
 # OpenMP Thread number
 export OMP_NUM_THREADS=20
@@ -39,15 +40,15 @@ outdir=`python -c "import params; print (params.out_dir())"`
 cpunums=`python -c "import params; print (params.cpu_nums())"`
 mapname=`python -c "import params; print (params.map_name())"`
 inputname=`python -c "import params; print (params.input_name())"`
-# N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
+N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 
 #=================================================
 # make directories for semivar
-# `python src/make_semivari.py $CAMADIR $mapname $inputname $outdir`
+`python src/make_semivari.py $CAMADIR $mapname $inputname $outdir`
 
 #=================================================
 varname="standardized"
-# time ./src/semivariance $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
+time ./src/semivariance $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
 
 wait
 

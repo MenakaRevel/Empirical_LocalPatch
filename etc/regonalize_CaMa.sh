@@ -1,8 +1,9 @@
 #!/bin/sh
 #====================
 # Use externally simulated CaMa-Flood results to create Emperical Local Patches
-# Convert global data to regional netCDF
+# Convert global data to regional netCDF in same map resolution
 # Better for high resoultion CaMa maps [e.g., 06min]
+# From here one can start s03-remove_trend.sh
 # Menaka@IIS
 # 2023/01/18
 #====================
@@ -62,8 +63,8 @@ mkdir -p "../CaMa_out/${mapname}_${inputname}"
 # water surface elevation
 varname="sfcelv"
 #=================================================
-echo ./src/bin2nc_reg $N $syear $eyear $varname $mapname $glbmapname $inputname $CAMADIR $outdir &
-time ./src/bin2nc_reg $N $syear $eyear $varname $mapname $glbmapname $inputname $CAMADIR $outdir &
+# echo ./src/bin2nc_reg $N $syear $eyear $varname $mapname $glbmapname $inputname $CAMADIR $outdir &
+# time ./src/bin2nc_reg $N $syear $eyear $varname $mapname $glbmapname $inputname $CAMADIR $outdir &
 
 # discharge
 varname="outflw"

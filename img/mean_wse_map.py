@@ -110,9 +110,9 @@ catmxy = pm.CaMa_dir()+"/map/"+pm.map_name()+"/1min/1min.catmxy.bin"
 catmxy = np.fromfile(catmxy,np.int16).reshape(2,2100,4200)
 #--read outflow netCDF4--
 tag="%04d-%04d"%(syear,eyear)
-prename="mean_dis"
+prename="mean_wse"
 # sfcelv
-fname=outdir+"CaMa_out/"+inputname+"/outflw"+tag+".nc"
+fname=outdir+"CaMa_out/"+inputname+"/sfcelv"+tag+".nc"
 # fname=outdir+"CaMa_out/"+inputname+"/standardized"+tag+".nc"
 nc=xr.open_dataset(fname)
 
@@ -123,7 +123,7 @@ nc=xr.open_dataset(fname)
 
 # # nc.outflw.mean(dim='time').plot(x="lon",y="lat",ax=ax,transform=ccrs.PlateCarree(), cbar_kwargs=dict(shrink=0.7))
 # nc.outflw.mean(dim='time').plot.imshow(ax=ax,rgb='band',transform=ccrs.PlateCarree(), cbar_kwargs=dict(shrink=0.7))
-data=nc.outflw.mean(dim='time').values
+data=nc.sfcelv.mean(dim='time').values
 # data=nc.standardize.mean(dim='time').values
 data=data*rivermap
 data=np.ma.masked_less(data,0.01)
@@ -141,10 +141,13 @@ epix=(180+east)*4
 
 # cmap=cm.get_cmap('RdYlBu')
 # cmap=mbar.colormap("H01")
-cmap=cm.get_cmap("Blues")
-vmin=1.0
-vmax=2.0e5
-norm=LogNorm(vmin=vmin,vmax=vmax)
+# cmap=cm.get_cmap("Blues")
+cmap=cm.get_cmap("terrain")
+vmin=0.0
+vmax=3000.0
+norm=Normalize(vmin=vmin,vmax=vmax)
+
+# norm=LogNorm(vmin=vmin,vmax=vmax)
 
 # vmin=-1.0
 # vmax=1.0
@@ -180,9 +183,9 @@ l,b,w,h=ax.get_position().bounds
 cax=fig.add_axes([l,b-0.01*h,0.8*w,0.01])
 cbar=plt.colorbar(im,extend='max',orientation="horizontal",cax=cax)
 cbar.ax.tick_params(labelsize=6)
-cbar.set_label("Mean Discharge $(m^3/s)$",fontsize=8)
+cbar.set_label("Mean Water Surface Elevation $(m^3/s)$",fontsize=8)
 
-print (outdir+"CaMa_out/"+inputname+"/mean_discharge.jpg")
+print (outdir+"CaMa_out/"+inputname+"/mean_wse.jpg")
 # plt.show()
-plt.savefig(outdir+"CaMa_out/"+inputname+"/mean_discharge.jpg")
+plt.savefig(outdir+"CaMa_out/"+inputname+"/mean_wse.jpg")
 os.system("rm -r "+prename+"*.txt")
