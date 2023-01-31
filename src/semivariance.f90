@@ -33,6 +33,7 @@ integer                               :: seqnum,patch_nums,countnum
 integer,allocatable                   :: ux(:),uy(:),xt(:),yt(:),xlist(:),ylist(:)
 integer                               :: un,k
 character(len=8)                      :: lon,lat,u
+integer                               :: num_threads
 !====================================================
 call getarg(1,buf)
 read(buf,*) N ! length of time series
@@ -59,6 +60,9 @@ write(*,*) camadir
 call getarg(8,buf)
 read(buf,"(A)") outdir
 write(*,*) outdir
+
+call getarg(9,buf)
+read(buf,*) num_threads
 !-
 varname=outname
 !==
@@ -182,9 +186,11 @@ call nccheck( nf90_get_var(ncidin,varidin,globalarray,start=start,count=count) )
 !====close netcdf=====
 call nccheck( nf90_close(ncidin ) )
 ! parallel calculation
-
-!$omp parallel default(private) shared(ocean,rivwth,globalarray,nextX,nextY,outdir,patch_nums,nextdst,N,ix)
+print*, "define open mp threads", num_threads
+!$ call omp_set_num_threads(num_threads)
+!$omp parallel default(private) shared(ocean,globalarray,nextX,nextY,outdir,patch_nums,nextdst,N,ix)
 !!!default(shared) private(lat_cent,xt,xf,i,j,i_m,j_m,rlen,pixel, cov,corr,countnum)
+!$omp critical
 !$omp do
 do ix = 1,nx !
     do iy = 1,ny
@@ -281,9 +287,10 @@ do ix = 1,nx !
      end do
 end do
 !$omp end do
+!$omp end critical
 !$omp end parallel
 !====close netcdf=====
-!call nccheck( nf90_close(ncidin ) )
+call nccheck( nf90_close(ncidin ) )
 
 !---
 deallocate(nextX,nextY,ocean,rivseq,nextdst)

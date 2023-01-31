@@ -22,7 +22,7 @@ real                                  :: gsize,west, north, east, south ! map bo
 integer                               :: latpx,lonpx,nflp    ! pixel size, calculated
 real,allocatable                      :: globaltrue(:),rmdtrnd(:)
 integer,allocatable                   :: nextX(:,:),nextY(:,:),ocean(:,:)
-integer                               :: i,ios,N
+integer                               :: i,ios,N,slice,chunk,Noff
 real                                  :: a,b
 integer                               :: timeid,varid,latid,lonid 
 integer                               :: ncidin,ncidout,varidin,varidout
@@ -31,6 +31,7 @@ integer,allocatable                   :: dt(:)
 real,allocatable                      :: d1lat(:), d1lon(:)
 integer,dimension(3)                  :: start,count
 real,parameter                        :: rmis=1.0e20
+integer                               :: num_threads
 !====================================================
 call getarg(1,buf)
 read(buf,*) N ! length of time series
@@ -57,6 +58,9 @@ write(*,*) camadir
 call getarg(8,buf)
 read(buf,"(A)") outdir
 write(*,*) outdir
+
+call getarg(9,buf)
+read(buf,*) num_threads
 !-
 varname=outname
 !==
@@ -146,6 +150,11 @@ print*, "put attribute"
 call nccheck( nf90_put_att(ncidout, varidout, 'long_name', "trend, sesonality removed and standardized water suface elevation") )
 call nccheck( nf90_put_att(ncidout, varidout, 'units',     "none") )
 call nccheck( nf90_put_att(ncidout, varidout, '_fillvalue',rmis) )
+print*, "chunking : Write"
+chunk=100
+slice=100
+Noff=int((real(N)/real(slice)))*slice
+call nccheck( nf90_def_var_chunking(ncidout, varidout, 0, (/ chunk /)))
 
 !===set collective I/O globally===
 !call nccheck( nf90_var_par_access(ncidout, nf90_global, nf90_collective) )
@@ -193,35 +202,67 @@ call nccheck( nf90_open(fname, nf90_nowrite, ncidin) )
 call nccheck( nf90_inq_varid(ncidin, trim(varname),varidin) )
 !===set collective I/O globally===
 !call nccheck( nf90_var_par_access(ncidin, nf90_global, nf90_collective) )
+!===define chnuking ====
+! print*, "chunking : Read"
+! call nccheck( nf90_def_var_chunking(ncidin, varidin, 0, (/ ix,iy,1 /)))
 !------------
 allocate(globaltrue(N))
 
 print*,N
 ! parallel calculation
-
-!$omp parallel default(private) shared(ocean,N,iy,ncidin,varidin,ncidout,varidout)
-!$omp do
-!$write(*,*) omp_get_num_threads()
+print*, "define open mp threads", num_threads
+!$ call omp_set_num_threads(num_threads)
+!$ print*, omp_get_num_threads()
+! print*, "open loop"
+! !$omp parallel default(private) shared(ocean,N,iy,ncidin,varidin,ncidout,varidout)
+! !$omp critical
+! !$omp do
 do ix = 1,nx ! pixels along longtitude direction
     do iy = 1,ny ! pixel along latitude direction
         start=(/ix,iy,1/)
         count=(/1,1,N/)
         !remove ocean
         if (ocean(ix,iy) == 0) then
+            print*, ix, iy
             ! get variable subset
             call nccheck( nf90_get_var(ncidin,varidin,globaltrue,start=start,count=count) )
             !globaltrue = 100
             !write(*,*) globaltrue
+            
             ! standadize
+            !$omp parallel sections
+            !$omp section
             call standadize(globaltrue,N)
+            !$omp section
+            !$omp end parallel sections
+            !$print*, omp_get_num_threads()
+            ! print*, globaltrue
             !--write variable--
-            call nccheck( nf90_put_var(ncidout,varidout,globaltrue,start=start,count=count) )
+            ! call nccheck( nf90_put_var(ncidout,varidout,globaltrue,start=start,count=count) )
+            ! write variable as chuck and slice
+            !$omp parallel sections
+            !$omp section
+            !$omp do
+            do i=1,Noff,slice
+                ! print*,i, N, Noff
+                start=(/ix,iy,i/)
+                count=(/1,1,slice/)
+                ! print*, "L241:",start, count
+                call nccheck( nf90_put_var(ncidout,varidout,globaltrue(i:i+slice),start=start,count=count) )
+            end do
+            !$omp end do
+            start=(/ix,iy,Noff+1/)
+            count=(/1,1,N-Noff/)
+            ! print*, "last",start, count
+            call nccheck( nf90_put_var(ncidout,varidout,globaltrue(Noff+1:N),start=start,count=count) )
+            !$omp section
+            !$omp end parallel sections
         end if
     end do
 end do
-!$write(*,*) omp_get_num_threads()
-!$omp end do
-!$omp end parallel
+! !$omp end do
+! !$omp end critical
+! !$omp end parallel
 !---
 !====close netcdf=====
 call nccheck( nf90_close(ncidin ) )

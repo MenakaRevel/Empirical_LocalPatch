@@ -26,9 +26,9 @@ export OMP_NUM_THREADS=$NCPUS
 # cd $PBS_O_WORKDIR
 cd "/cluster/data6/menaka/Empirical_LocalPatch/img"
 
-# python mean_dis_map.py &
+python mean_dis_map.py &
 
-python mean_wse_map.py &
+# python mean_wse_map.py &
 
 wait
 

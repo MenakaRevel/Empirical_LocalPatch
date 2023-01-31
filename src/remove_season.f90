@@ -22,7 +22,7 @@ real                                  :: gsize,west, north, east, south ! map bo
 integer                               :: latpx,lonpx,nflp    ! pixel size, calculated
 real,allocatable                      :: globaltrue(:),rmdsesn(:),data1(:)
 integer,allocatable                   :: nextX(:,:),nextY(:,:),ocean(:,:)
-integer                               :: i,ios,N,NN
+integer                               :: i,ios,N,NN,slice,chunk,Noff
 integer                               :: timeid,varid,latid,lonid
 integer                               :: ncidin,ncidout,varidin,varidout
 integer                               :: ix,iy,nx,ny
@@ -146,6 +146,11 @@ print*, "put attribute"
 call nccheck( nf90_put_att(ncidout, varidout, 'long_name', 'trend & seasonlaty removed water surface elevation') ) !trim(longname(varname))
 call nccheck( nf90_put_att(ncidout, varidout, 'units',     trim(units(varname))) )
 call nccheck( nf90_put_att(ncidout, varidout, '_fillvalue',rmis) )
+print*, "chunking : Write"
+chunk=100
+slice=100
+Noff=int((real(N)/real(slice)))*slice
+call nccheck( nf90_def_var_chunking(ncidout, varidout, 0, (/ chunk /)))
 
 !===end header===
 print*, "end def"
@@ -199,7 +204,7 @@ data1=0.0
 !data11=0.0
 
 ! parallel calculation
-!$omp parallel default(private) shared(ocean,rivwth,globaltrue,N,NN) 
+!$omp parallel default(private) shared(ocean,globaltrue,N,NN) 
 !$omp do
 !$write(*,*) omp_get_num_threads()
 do ix = 1,nx ! pixels along longtitude direction
@@ -219,19 +224,34 @@ do ix = 1,nx ! pixels along longtitude direction
         !remove frequency other than multiple of p days
         !covarite of 6
         !frequency of 90 and 180 also kept
-        write(*,*)ix,iy,NN,shape(data1)
+        print*, ix,iy,NN,shape(data1)
         call iff_p(data1,NN,P)
         call REALFT(data1,NN,-1)
         !call FOUR1(data11,NN/2,-1)
         rmdsesn(:)=globaltrue(:)-(2.0/real(NN)) *data1(1:N) 
         !--write variable--
-        call nccheck( nf90_put_var(ncidout,varidout,rmdsesn,start=start,count=count) )
+        ! call nccheck( nf90_put_var(ncidout,varidout,rmdsesn,start=start,count=count) )
+        do i=1,Noff,slice
+            ! print*,i, N, Noff
+            start=(/ix,iy,i/)
+            count=(/1,1,slice/)
+            ! print*, "L241:",start, count
+            call nccheck( nf90_put_var(ncidout,varidout,globaltrue(i:i+slice),start=start,count=count) )
+        end do
+        !$omp end do
+        start=(/ix,iy,Noff+1/)
+        count=(/1,1,N-Noff/)
+        ! print*, "last",start, count
+        call nccheck( nf90_put_var(ncidout,varidout,globaltrue(Noff+1:N),start=start,count=count) )
+        !$omp section
+        !$omp end parallel sections
     end do
 end do
 !$omp end do
 !$omp end parallel
 !----
 print*, "save netCDF"
+print*, trim(adjustl(outdir))//"/CaMa_out/"//trim(mapname)//"_"//trim(inname)//"/rmdsesn"//trim(tag)//".nc"
 !====close netcdf=====
 call nccheck( nf90_close(ncidin ) )
 call nccheck( nf90_close(ncidout) )

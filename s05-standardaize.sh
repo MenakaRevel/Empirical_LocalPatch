@@ -13,10 +13,12 @@
 #PBS -V
 #PBS -N stadz
 #========
-cd $PBS_O_WORKDIR
+# cd $PBS_O_WORKDIR
+cd "/cluster/data6/menaka/Empirical_LocalPatch"
 #================================================
 # OpenMP Thread number
-export OMP_NUM_THREADS=20
+NCPUS=20
+export OMP_NUM_THREADS=$NCPUS
 
 # input settings
 syear=`python -c "import params; print (params.starttime()[0])"`
@@ -35,4 +37,4 @@ N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 
 #=================================================
 varname="rmdsesn"
-time ./src/standardize $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir
+time ./src/standardize $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $NCPUS
