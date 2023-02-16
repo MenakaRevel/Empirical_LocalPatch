@@ -290,7 +290,7 @@ end do
 !$omp end critical
 !$omp end parallel
 !====close netcdf=====
-call nccheck( nf90_close(ncidin ) )
+! call nccheck( nf90_close(ncidin ) )
 
 !---
 deallocate(nextX,nextY,ocean,rivseq,nextdst)

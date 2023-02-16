@@ -28,6 +28,7 @@ integer(kind=4)                       :: target_pixel,fn
 character(len=8)                      :: llon,llat
 real                                  :: threshold
 character(len=2)                      :: thrname
+integer                               :: num_threads
 !====================================================
 call getarg(1,buf)
 read(buf,*) N ! length of time series
@@ -63,6 +64,9 @@ read(buf,*) patch_size
 
 call getarg(10,buf)   ! to represent dams or not
 read(buf,*) dam
+
+call getarg(11,buf)
+read(buf,*) num_threads
 !-
 ! varname=outname
 !==
@@ -160,8 +164,11 @@ nx=lonpx
 !ny=latpx-30.0/dble(gsize) ! writed only up -60S latitude
 ny=(north-south)/gsize !dble(gsize)
 !--
-! do parallel
-!$omp parallel default(none)&
+! parallel calculation
+print*, "define open mp threads", num_threads
+!$ call omp_set_num_threads(num_threads)
+!$ print*, omp_get_num_threads()
+!$omp parallel default(shared)&
 !$omp& private(iy,ix,lat,lon,llon,llat,fname,fn,lag_dist,countnum,i,j,i_m,j_m,threshold)&
 !$omp& shared(ocean,rivwth,targetp,countp,patch_size,weightage,gauss_weight)
 !$omp do

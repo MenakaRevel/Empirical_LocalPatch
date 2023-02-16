@@ -5,13 +5,13 @@
 # 2020/06/01
 #====================
 #*** PBS setting when needed
-#PBS -q F40
+#PBS -q E40
 #PBS -l select=1:ncpus=40:mem=40gb
 #PBS -j oe
 #PBS -m ea
 #PBS -M menaka@rainbow.iis.u-tokyo.ac.jp
 #PBS -V
-#PBS -N distance_weight
+#PBS -N dist_wgt
 #========
 # import virtual environment
 source ~/.bashrc
@@ -42,11 +42,11 @@ cpunums=$NCPUS #`python -c "import params; print (params.cpu_nums())"`
 mapname=`python -c "import params; print (params.map_name())"`
 inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
-threshold=`python -c "import params; print (params.threshold())"`
+threshold=1000 #km distance based local patches ###`python -c "import params; print (params.threshold())"`
 # represnt dams
 damrep=`python -c "import params; print (params.dam_rep())"`
 #=================================================
-python src/weightage.py $CAMADIR $mapname $inputname $outdir $cpunums $threshold $damrep &
+python src/weightage_distance.py $CAMADIR $mapname $inputname $outdir $cpunums $threshold $damrep &
 
 wait
 

@@ -18,6 +18,6 @@ OUTDAM="../dat/damloc_${REG}.txt"
 CaMa_dir="/cluster/data6/menaka/CaMa-Flood_v4"
 
 #
-python src/regionalze_damloc.py $GLB $REG $INDAM $OUTDAM $CaMa_dir
+python src/regionalize_damloc.py $GLB $REG $INDAM $OUTDAM $CaMa_dir
 
 wait

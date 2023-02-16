@@ -12,10 +12,10 @@
 
 #===========================
 # import virtual environment
-source ~/.bashrc
-source ~/.bash_conda
+# source ~/.bashrc
+# source ~/.bash_conda
 
-source activate pydef
+# source activate pydef
 
 which python
 
@@ -26,10 +26,12 @@ export OMP_NUM_THREADS=$NCPUS
 # cd $PBS_O_WORKDIR
 cd "/cluster/data6/menaka/Empirical_LocalPatch/img"
 
-python mean_dis_map.py &
+# python mean_dis_map.py &
 
 # python mean_wse_map.py &
 
+python map_weight.py
+
 wait
 
-conda deactivate
+# conda deactivate

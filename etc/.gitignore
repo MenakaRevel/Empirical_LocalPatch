@@ -1,6 +1,7 @@
 # fortran files
 src/bin2nc_reg
 src/get_rivinfo_glb
+src/lpara_dist
 
 # params.py
 params.py

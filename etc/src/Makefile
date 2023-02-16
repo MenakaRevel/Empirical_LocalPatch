@@ -13,7 +13,8 @@ LIB = -L/opt/intel/lib -L/opt/intel/mkl/lib -L/opt/local/lib -L/opt/local/netcdf
 
 TARGETS=\
 get_rivinfo_glb\
-bin2nc_reg
+bin2nc_reg\
+lpara_dist
 
 # Suffix
 .SUFFIXES : .f90

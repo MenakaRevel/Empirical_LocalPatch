@@ -22,11 +22,15 @@ source activate pydef
 which python
 #========
 # cd $PBS_O_WORKDIR
-cd "/cluster/data6/menaka/Empirical_LocalPatch"
+cd "/cluster/data6/menaka/Empirical_LocalPatch/etc"
 #================================================
 # OpenMP Thread number
-NCPUS=10
+NCPUS=40
 export OMP_NUM_THREADS=$NCPUS
+
+# link params.py
+# rm -r params.py
+# ln -sf ../params.py params.py
 
 # input settings
 syear=`python -c "import params; print (params.starttime()[0])"`
@@ -46,7 +50,7 @@ damrep=1 #`python -c "import params; print (params.dam_rep())"`
 # mapname="amz_06min" #
 inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
-threshold=`python -c "import params; print (params.threshold())"`
+threshold=1000 #km #`python -c "import params; print (params.threshold())"`
 # threshold=0.60
 patch=100
 distpatch=1 # distance based local patch
@@ -54,22 +58,24 @@ distpatch=1 # distance based local patch
 
 # local patch name
 if [ ${distpatch} -eq 1 ]; then
-    threshname="1000KM" # for distance based
+    threshname="${threshold}KM" # for distance based
 else
     threshname=$(echo $threshold 100 | awk '{printf "%2d\n",$1*$2}') # emperical local patch
 fi
 
 # make dir local patch
 if [ ${damrep} -eq 1 ]; then
-    mkdir -p "./local_patch/${mapname}_${inputname}_${threshname}_dam"
+    echo "mkdir ../local_patch/${mapname}_${inputname}_${threshname}_dam"
+    mkdir -p "../local_patch/${mapname}_${inputname}_${threshname}_dam"
 else
-    mkdir -p "./local_patch/${mapname}_${inputname}_${threshname}"
+    echo "mkdir../local_patch/${mapname}_${inputname}_${threshname}"
+    mkdir -p "../local_patch/${mapname}_${inputname}_${threshname}"
 fi
 
 #=================================================
 # Write local patch parameters
-echo "./src/lpara $N $syear $eyear $mapname $inputname $CAMADIR $outdir $threshold $patch ${damrep}"
-./src/lpara $N $syear $eyear $mapname $inputname $CAMADIR $outdir $threshold $patch ${damrep}
+echo "./src/lpara_dist $N $syear $eyear $mapname $inputname $CAMADIR $outdir $threshold $threshname $patch ${damrep} $NCPUS"
+time ./src/lpara_dist $N $syear $eyear $mapname $inputname $CAMADIR $outdir $threshold $threshname $patch ${damrep} $NCPUS
 
 wait
 

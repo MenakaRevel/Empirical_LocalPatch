@@ -109,14 +109,17 @@ def check_dam_loc(ix,iy,mapname="glb_15min",damrep=1):
   """
   damflag=-9999
   if damrep == 1:
-    fname="./dat/damloc_"+mapname+".txt"
-    with open(fname,"r") as f:
-      lines=f.readlines()
-    for line in lines[1::]:
-      line    = re.split(" ",line)
-      line    = list(filter(None, line))
-      damIX   = int(line[4]) - 1
-      damIY   = int(line[5]) - 1
+    # fname="./dat/damloc_"+mapname+".txt"
+    # with open(fname,"r") as f:
+    #   lines=f.readlines()
+    # for line in lines[1::]:
+    #   line    = re.split(" ",line)
+    #   line    = list(filter(None, line))
+    #   damIX   = int(line[4]) - 1
+    #   damIY   = int(line[5]) - 1
+    for i in np.arange(len(ldamX)):
+      damIX=ldamX[i]
+      damIY=ldamY[i]
       if ix == damIX and iy == damIY:
         damflag=1
   else:
@@ -158,7 +161,7 @@ def weight_allocation(out_dir,mapname,inname,lon,lat,iup,uord,threshold,baseline
       # check dam location
       damflag=check_dam_loc(ix-1,iy-1,mapname,damrep)
       if damflag == 1:
-        print ("A dam is found at: ", float(line[2]))
+        # print ("A dam is found at: ", float(line[2]))
         ldam.append(1)
       else:
         ldam.append(0)
@@ -191,7 +194,7 @@ def weight_allocation(out_dir,mapname,inname,lon,lat,iup,uord,threshold,baseline
           wgt[y,x]=max(1.0-(lgamma[i]/(c+1.0e-20)),wgt[y,x])
           # Gaussian Weight
           Gwt[y,x]=max(math.exp(-ldis[i]**2/(2.0*sigma1**2)),Gwt[y,x])
-          print ("dam: ",x, y, wgt[y,x], Gwt[y,x])
+          # print ("dam: ",x, y, wgt[y,x], Gwt[y,x])
   elif sum((lwgt>=threshold)*1)<baseline and uord=="upstream":
       a1=1.0e-20
       if len(ldis)>1:
@@ -208,14 +211,14 @@ def weight_allocation(out_dir,mapname,inname,lon,lat,iup,uord,threshold,baseline
               wgt[y,x]=max(math.exp(-ldis[i]**2/(2.0*sigma**2)),wgt[y,x])
               # Gaussian Weight
               Gwt[y,x]=max(math.exp(-ldis[i]**2/(2.0*sigma1**2)),Gwt[y,x])
-              print ("baseline: ",x, y, wgt[y,x], Gwt[y,x])
+              # print ("baseline: ",x, y, wgt[y,x], Gwt[y,x])
       else: # only that grid
               x=lix[0]-1
               y=liy[0]-1
               wgt[y,x]=1.0
               # Gaussian Weight
               Gwt[y,x]=1.0
-              print ("Only grid: ",x, y, wgt[y,x], Gwt[y,x])
+              # print ("Only grid: ",x, y, wgt[y,x], Gwt[y,x])
   else:
       if sum((lwgt>=threshold)*1) >= len(ldis):
           a1=ldis[-1]
@@ -230,7 +233,7 @@ def weight_allocation(out_dir,mapname,inname,lon,lat,iup,uord,threshold,baseline
           wgt[y,x]=max(1.0-(lgamma[i]/(c+1.0e-20)),wgt[y,x])
           # Gaussian Weight 
           Gwt[y,x]=max(math.exp(-ldis[i]**2/(2.0*sigma1**2)),Gwt[y,x])
-          print ("full semi-vari: ",x, y, wgt[y,x], Gwt[y,x])
+          # print ("full semi-vari: ",x, y, wgt[y,x], Gwt[y,x])
   return 0
 #==============================================
 # read inputs
@@ -238,7 +241,7 @@ CaMa_dir=sys.argv[1]
 mapname=sys.argv[2]
 inname=sys.argv[3]
 out_dir=sys.argv[4]
-para=int(sys.argv[5])
+ncpus=int(sys.argv[5])
 threshold=float(sys.argv[6])
 damrep=int(sys.argv[7])
 #==============================================
@@ -287,9 +290,26 @@ if damrep == 1:
 mk_dir(pathname3)
 print (pathname3)
 #==============================================
+# open semivar list
 fname=out_dir+"/semivar/"+mapname+"_"+inname+"/lonlat_list.txt"
 with open(fname,"r") as f:
   lines=f.readlines()
+#==============================================
+# open dam locations
+fname="./dat/damloc_"+mapname+".txt"
+with open(fname,"r") as f:
+  lines=f.readlines()
+ldamX=[]
+ldamY=[]
+for line in lines[1::]:
+  line    = re.split(" ",line)
+  line    = list(filter(None, line))
+  damIX   = int(line[4]) - 1
+  damIY   = int(line[5]) - 1
+  ldamX.append(damIX)
+  ldamY.append(damIY)
+ldamX=np.array(ldamX)
+ldamY=np.array(ldamY)
 #==============================================
 # threshold for defining the local patch boundries
 #threshold=0.6
@@ -320,15 +340,19 @@ def mk_wgt(line):
     # put 1 in self pixel (target pixel should be 1)
     wgt[lat-1,lon-1]=1.0
     Gwt[lat-1,lon-1]=1.0
+    # --
+    # if dam location only downstream to be considered
+    damflag=check_dam_loc(lon-1,lat-1,mapname,damrep) #check dam location
     #---
     if dn>0:
         print ("downstream")
         weight_allocation(out_dir,mapname,inname,lon,lat,0,"downstream",threshold,baseline,wgt,Gwt)
-    if up > 0:
-        print ("upstream")
-        for iup in np.arange(1,up+1):
-            #print "upstream",iup
-            weight_allocation(out_dir,mapname,inname,lon,lat,iup,"upstream",threshold,baseline,wgt,Gwt)
+    if damflag != 1:
+      if up > 0:
+          print ("upstream")
+          for iup in np.arange(1,up+1):
+              #print "upstream",iup
+              weight_allocation(out_dir,mapname,inname,lon,lat,iup,"upstream",threshold,baseline,wgt,Gwt)
     #-----
     oname=pathname1+"/%04d%04d.bin"%(lon,lat)
     wgt.tofile(oname)
@@ -340,11 +364,12 @@ def mk_wgt(line):
     return 0
 ##############################################
 # main program
-if para>0:
+if ncpus>0:
     print ("do it parallel")
-    os.system("export OMP_NUM_THREADS=%d"%(para))
-    p=Pool(para)
-    p.map(mk_wgt,lines[1::])
+    os.system("export OMP_NUM_THREADS=%d"%(ncpus))
+    p=Pool(ncpus)
+    # p.map(mk_wgt,lines[1::])
+    p.map(mk_wgt,lines[83229::])
     p.terminate()
 else:
     print ("do it linear")

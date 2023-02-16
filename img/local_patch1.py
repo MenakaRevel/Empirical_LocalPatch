@@ -200,21 +200,22 @@ nexty  = nextxy[1]#ma.masked_where(rivwth<=500.0,nextxy[1]).filled(0)
 #trueforo = np.fromfile(fname,np.float32).reshape([2,nYY,nXX])
 #dis=(trueforo[0]>500.)*1
 #dis=dis*((nextx>0)*1)
-threshold=0.60 #0.90 #pm.threshold()
+# threshold=0.60 #0.90 #pm.threshold()
+thresname="1000KM"
 damrep=1
 # damrep=0
 if damrep == 1:
-  patchname="glb_15min_S14FD_dam" #"amz_06min_S14FD"
-  patch_id="glb_15min_S14FD_60_dam" #"amz_06min_S14FD_90"
+  patchname=pm.map_name()+"_"+pm.input_name()+"_dam" #"amz_06min_S14FD"
+  patch_id=pm.map_name()+"_"+pm.input_name()+"_"+thresname+"_dam" #"amz_06min_S14FD_90"
   #---
   local_patch="local_patch"#"_%3.2f"%(pm.threshold())
-  local_patch1="local_patch_one_%02d_dam"%(threshold*100)
+  local_patch1="local_patch" #_one_%02d_dam" #%(threshold*100)
 else:
-  patchname="glb_15min_S14FD" #"amz_06min_S14FD"
-  patch_id="glb_15min_S14FD_60" #"amz_06min_S14FD_90"
+  patchname=pm.map_name()+"_"+pm.input_name() #"amz_06min_S14FD"
+  patch_id=pm.map_name()+"_"+pm.input_name()+"_"+thresname #"amz_06min_S14FD_90"
   #---
   local_patch="local_patch"#"_%3.2f"%(pm.threshold())
-  local_patch1="local_patch_one_%02d"%(threshold*100)
+  local_patch1="local_patch" #_one_%02d_dam" #%(threshold*100)
 #======================
 #--major rivers and Ids
 rivid={}
@@ -258,7 +259,8 @@ staid=[]
 # rivernames = ["MADEIRA"]
 # rivernames = ["VOLGA","YELLOW","MISSISSIPPI","MISSOURI"]
 # rivernames = ["YELLOW","MISSOURI"]
-rivernames = ["AMAZON","NIGER","CONGO","VOLGA","YELLOW","MISSISSIPPI","MISSOURI"]
+rivernames = ["MISSISSIPPI","MISSOURI"]
+# rivernames = ["AMAZON","NIGER","CONGO","VOLGA","YELLOW","MISSISSIPPI","MISSOURI"]
 for rivername in rivernames:
 #for rivername in ["AMAZONAS"]:#"LENA","NIGER","INDUS","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS"]:
 #  oname = "../assim_out/img/sfcelv/%s"%(rivername)
@@ -361,8 +363,9 @@ alpha1=1
 width=0.5
 #---
 #pathname="../img/local_patch_one_0.90"
-pathname="../figures/%s"%(local_patch1)
+pathname="../figures/%s/local_patch/"%(patch_id)
 mk_dir(pathname)
+print ("making "+pathname)
 pnum=len(pname)
 #--
 #local_patch="local_patch_0.90"
@@ -370,6 +373,8 @@ for point in np.arange(pnum):
 #def mk_fig(point):
   ix=xlist[point]+1
   iy=ylist[point]+1
+  #--
+  print ("making figure -> "+river[point]+"  "+pname[point]+"....")
   #--
   # if not riveridname(river[point]) in rivid.keys():
   #   continue
@@ -431,7 +436,7 @@ for point in np.arange(pnum):
         #----
         if c_nextx[iiy,iix] <= 0:
           continue
-        print (lon1,lat1,width)
+        # print (lon1,lat1,width)
         x1,y1=M(lon1,lat1)
         x2,y2=M(lon2,lat2)
         M.plot([x1,x2],[y1,y2],color="#C0C0C0",linewidth=width,zorder=101,alpha=alpha)
@@ -494,11 +499,11 @@ for point in np.arange(pnum):
 #  stitle= "%s)"%(string.ascii_lowercase[point])
 #  ax1.set_title(stitle,fontsize=9,loc="left")
   #--
-  pathname="../figures/"+local_patch1+"/"+rivername
+  pathname="../figures/"+patch_id+"/"+local_patch1+"/"+rivername
   #pathname=pathname+"/"+rivername
   mk_dir(pathname)
   figname=pathname+"/"+pname[point]+".png"
-  print (figname)
+  print ("saving figure "+figname+"...")
   plt.savefig(figname)
   #plt.show()
 # remove tmp
