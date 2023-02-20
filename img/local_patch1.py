@@ -66,7 +66,7 @@ def latlon_river(rivername,ix,iy,mapname="glb_06min",nYY=1800,nXX=3600):
         lllon = 90.
         urlon = 120.
     if rivername=="MISSISSIPPI":
-        lllat = 30.
+        lllat = 20.
         urlat = 50.
         lllon = -115.
         urlon = -75.
@@ -201,7 +201,8 @@ nexty  = nextxy[1]#ma.masked_where(rivwth<=500.0,nextxy[1]).filled(0)
 #dis=(trueforo[0]>500.)*1
 #dis=dis*((nextx>0)*1)
 # threshold=0.60 #0.90 #pm.threshold()
-thresname="1000KM"
+thresname="60" # for adpative empirical localization
+# thresname="1000KM" # for distance based localization
 damrep=1
 # damrep=0
 if damrep == 1:
@@ -235,7 +236,7 @@ damLat=[]
 damLon=[]
 damIX=[]
 damIY=[]
-fname="../dat/dam_glb_15min.txt"
+fname="../dat/damloc_"+pm.map_name()+".txt"
 with open(fname,"r") as f:
   lines=f.readlines()
 for line in lines[1::]:
@@ -379,7 +380,7 @@ for point in np.arange(pnum):
   # if not riveridname(river[point]) in rivid.keys():
   #   continue
   #----
-  fname=pm.out_dir()+"/weightage/%s/%04d%04d.bin"%(patchname,ix,iy)
+  fname=pm.out_dir()+"/weightage/%s/%04d%04d.bin"%(patch_id,ix,iy)
   wgt=np.fromfile(fname,np.float32).reshape([ny,nx])
   #--
   rivername=river[point]
@@ -502,7 +503,7 @@ for point in np.arange(pnum):
   pathname="../figures/"+patch_id+"/"+local_patch1+"/"+rivername
   #pathname=pathname+"/"+rivername
   mk_dir(pathname)
-  figname=pathname+"/"+pname[point]+".png"
+  figname=pathname+"/"+"".join(pname[point].split())+".png"
   print ("saving figure "+figname+"...")
   plt.savefig(figname)
   #plt.show()

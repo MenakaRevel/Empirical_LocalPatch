@@ -12,10 +12,10 @@
 
 #===========================
 # import virtual environment
-# source ~/.bashrc
-# source ~/.bash_conda
+source ~/.bashrc
+source ~/.bash_conda
 
-# source activate pydef
+source activate pydef
 
 which python
 
@@ -30,8 +30,10 @@ cd "/cluster/data6/menaka/Empirical_LocalPatch/img"
 
 # python mean_wse_map.py &
 
-python map_weight.py
+# python map_weight.py
+
+python local_patch1.py
 
 wait
 
-# conda deactivate
+conda deactivate

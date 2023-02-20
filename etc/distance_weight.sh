@@ -44,7 +44,7 @@ inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 threshold=1000 #km distance based local patches ###`python -c "import params; print (params.threshold())"`
 # represnt dams
-damrep=`python -c "import params; print (params.dam_rep())"`
+damrep=1 #`python -c "import params; print (params.dam_rep())"`
 #=================================================
 python src/weightage_distance.py $CAMADIR $mapname $inputname $outdir $cpunums $threshold $damrep &
 

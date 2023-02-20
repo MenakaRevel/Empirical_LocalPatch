@@ -273,9 +273,9 @@ print (out_dir)
 pathname0=out_dir+"/weightage"
 mk_dir(pathname0)
 print (pathname0)
-pathname1=out_dir+"/weightage/"+mapname+"_"+inname
+pathname1=out_dir+"/weightage/"+mapname+"_"+inname+"_"+thresname
 if damrep == 1:
-  pathname1=out_dir+"/weightage/"+mapname+"_"+inname+"_dam"
+  pathname1=out_dir+"/weightage/"+mapname+"_"+inname+"_"+thresname+"_dam"
 mk_dir(pathname1)
 print (pathname1)
 #==============================================
@@ -290,26 +290,26 @@ if damrep == 1:
 mk_dir(pathname3)
 print (pathname3)
 #==============================================
-# open semivar list
-fname=out_dir+"/semivar/"+mapname+"_"+inname+"/lonlat_list.txt"
-with open(fname,"r") as f:
-  lines=f.readlines()
-#==============================================
 # open dam locations
 fname="./dat/damloc_"+mapname+".txt"
 with open(fname,"r") as f:
-  lines=f.readlines()
+  linesdam=f.readlines()
 ldamX=[]
 ldamY=[]
-for line in lines[1::]:
-  line    = re.split(" ",line)
-  line    = list(filter(None, line))
-  damIX   = int(line[4]) - 1
-  damIY   = int(line[5]) - 1
+for linedam in linesdam[1::]:
+  linedam = re.split(" ",linedam)
+  linedam = list(filter(None, linedam))
+  damIX   = int(linedam[4]) - 1
+  damIY   = int(linedam[5]) - 1
   ldamX.append(damIX)
   ldamY.append(damIY)
 ldamX=np.array(ldamX)
 ldamY=np.array(ldamY)
+#==============================================
+# open semivar list
+fname=out_dir+"/semivar/"+mapname+"_"+inname+"/lonlat_list.txt"
+with open(fname,"r") as f:
+  lines=f.readlines()
 #==============================================
 # threshold for defining the local patch boundries
 #threshold=0.6
@@ -368,8 +368,8 @@ if ncpus>0:
     print ("do it parallel")
     os.system("export OMP_NUM_THREADS=%d"%(ncpus))
     p=Pool(ncpus)
-    # p.map(mk_wgt,lines[1::])
-    p.map(mk_wgt,lines[83229::])
+    p.map(mk_wgt,lines[1::])
+    # p.map(mk_wgt,lines[83229::])
     p.terminate()
 else:
     print ("do it linear")

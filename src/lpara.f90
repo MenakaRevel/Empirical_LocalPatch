@@ -186,9 +186,9 @@ do ix = 1, nx ! pixels along longtitude direction
         write(llon,'(i4.4)') ix
         write(llat,'(i4.4)') iy
         ! read weightage
-        fname=trim(adjustl(outdir))//"/weightage/"//trim(mapname)//"_"//trim(inname)//"/"//trim(llon)//trim(llat)//".bin"
+        fname=trim(adjustl(outdir))//"/weightage/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/"//trim(llon)//trim(llat)//".bin"
         if (dam==1) then
-          fname=trim(adjustl(outdir))//"/weightage/"//trim(mapname)//"_"//trim(inname)//"_dam/"//trim(llon)//trim(llat)//".bin"
+          fname=trim(adjustl(outdir))//"/weightage/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_dam/"//trim(llon)//trim(llat)//".bin"
         end if  
         !print*, "read weightage",fname
         fn = 34

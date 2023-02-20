@@ -42,22 +42,23 @@ outdir=`python -c "import params; print (params.out_dir())"`
 cpunums=`python -c "import params; print (params.cpu_nums())"`
 mapname=`python -c "import params; print (params.map_name())"`
 # represnt dams
-damrep=1 #`python -c "import params; print (params.dam_rep())"`
+damrep=`python -c "import params; print (params.dam_rep())"`
 # mapname="amz_06min" #
 inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 threshold=`python -c "import params; print (params.threshold())"`
 # threshold=0.60
 patch=100
-distpatch=1 # distance based local patch
-# distpatch=0 # distance based local patch
+# distpatch=1 # distance based local patch
+distpatch=0 # distance based local patch
+threshname=$(echo $threshold 100 | awk '{printf "%2d\n",$1*$2}') # emperical local patch
 
-# local patch name
-if [ ${distpatch} -eq 1 ]; then
-    threshname="1000KM" # for distance based
-else
-    threshname=$(echo $threshold 100 | awk '{printf "%2d\n",$1*$2}') # emperical local patch
-fi
+# # local patch name
+# if [ ${distpatch} -eq 1 ]; then
+#     threshname="1000KM" # for distance based
+# else
+#     threshname=$(echo $threshold 100 | awk '{printf "%2d\n",$1*$2}') # emperical local patch
+# fi
 
 # make dir local patch
 if [ ${damrep} -eq 1 ]; then
