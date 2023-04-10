@@ -128,7 +128,7 @@ def check_dam_loc(ix,iy,mapname="glb_15min",damrep=1):
 #==============================================
 def weight_allocation(out_dir,mapname,inname,lon,lat,iup,uord,threshold,baseline,wgt,Gwt):
   """
-  Assining weights (spatial dependency weight & observation localization weights) along each river branch
+  Assigning weights (spatial dependency weight & observation localization weights) along each river branch
   """
   lix=[]
   liy=[]
@@ -158,8 +158,15 @@ def weight_allocation(out_dir,mapname,inname,lon,lat,iup,uord,threshold,baseline
       gamma = float(line[3])
       std   = float(line[4])
       #print dis,gamma
+      #====================
       # check dam location
-      damflag=check_dam_loc(ix-1,iy-1,mapname,damrep)
+      # if dam location is in target pixel do not consider it
+      if ix == lon and iy == lat:
+        damflag=0
+      else:
+        damflag=check_dam_loc(ix-1,iy-1,mapname,damrep)
+      #===================
+      # append dam location
       if damflag == 1:
         # print ("A dam is found at: ", float(line[2]))
         ldam.append(1)
@@ -174,11 +181,11 @@ def weight_allocation(out_dir,mapname,inname,lon,lat,iup,uord,threshold,baseline
   #--
   c,a=mk_svg(lgamma,ldis)
   #print c, a
-  # cal weigtage
+  # cal weightage
   lwgt=1.0 - np.array(lgamma)/(c+1.0e-20)
   #--
   # if dam is found make the wgt zero after the dam.
-  # guassian weight calculated taking dam location as the boundry.
+  # Gaussian weight calculated taking dam location as the boundary.
   if sum(ldam) >= 1:
       # print ("dam location found")
       pnum=max(0,ldam.index(1)-1)
@@ -269,7 +276,8 @@ nexty  = nextxy[1]
 #==============================================
 print (out_dir)
 #==============================================
-# spatial dependancy weight
+# spatial dependency weight
+thresname="%02d"%(threshold*100)
 pathname0=out_dir+"/weightage"
 mk_dir(pathname0)
 print (pathname0)
@@ -333,26 +341,26 @@ def mk_wgt(line):
     #---
     if up + dn == 0:
         return 0
-    #--
+    #------------------------------
     wgt=np.zeros([ny,nx],np.float32)
     Gwt=np.zeros([ny,nx],np.float32)
-    #--
+    #------------------------------------------------
     # put 1 in self pixel (target pixel should be 1)
     wgt[lat-1,lon-1]=1.0
     Gwt[lat-1,lon-1]=1.0
-    # --
-    # if dam location only downstream to be considered
+    #-----------------------------------------------------------------
+    # if lon lat is a dam location -> only downstream to be considered
     damflag=check_dam_loc(lon-1,lat-1,mapname,damrep) #check dam location
     #---
     if dn>0:
         print ("downstream")
         weight_allocation(out_dir,mapname,inname,lon,lat,0,"downstream",threshold,baseline,wgt,Gwt)
     if damflag != 1:
-      if up > 0:
-          print ("upstream")
-          for iup in np.arange(1,up+1):
-              #print "upstream",iup
-              weight_allocation(out_dir,mapname,inname,lon,lat,iup,"upstream",threshold,baseline,wgt,Gwt)
+        if up > 0:
+            print ("upstream")
+            for iup in np.arange(1,up+1):
+                #print "upstream",iup
+                weight_allocation(out_dir,mapname,inname,lon,lat,iup,"upstream",threshold,baseline,wgt,Gwt)
     #-----
     oname=pathname1+"/%04d%04d.bin"%(lon,lat)
     wgt.tofile(oname)

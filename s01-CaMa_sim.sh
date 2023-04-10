@@ -17,8 +17,8 @@
 # (0) Basic Setting (for workstation)
 
 #*** PBS setting when needed
-#PBS -q F10
-#PBS -l select=1:ncpus=10:mem=60gb
+#PBS -q F40
+#PBS -l select=1:ncpus=40:mem=60gb
 #PBS -j oe
 #PBS -m ea
 #PBS -M menaka@rainbow.iis.u-tokyo.ac.jp
@@ -61,7 +61,7 @@ export IFORTLIB="/opt/intel/lib:/opt/intel/mkl/lib"
 export DYLD_LIBRARY_PATH="${IFORTLIB}:${DYLD_LIBRARY_PATH}"
 
 #*** 0c. OpenMP thread number
-export OMP_NUM_THREADS=10 #$cpunums       # OpenMP cpu num
+export OMP_NUM_THREADS=40 #$cpunums       # OpenMP cpu num
 
 #================================================
 # (1) Experiment setting
@@ -117,7 +117,7 @@ IFRQ_RST="0"                                # output restat frequency.
 #============================
 #*** 1e. forcing setting
 IFRQ_INP="24"                               # input forcing frequency: [1,2,3,...,24] hour
-DROFUNIT="86400000"   # [mm/day->m/s]       # runoff unit conversion
+DROFUNIT="86400"      # [mm/day->m/s]       # runoff unit conversion
 
 #----- for plain binary runoff forcing
 LINPCDF=".FALSE."                           # true for netCDF runoff
@@ -131,7 +131,7 @@ LINTERPCDF=".FALSE."                        # .TRUE. to use netCDF input matrix
 #CROFSUF=".qtr"
 CROFDIR="${INBASE}/CaMa_in/"${inputname}    # runoff directory
 CROFPRE="Roff____"                          # runoff prefix/suffix
-CROFSUF=".hlf"
+CROFSUF=".sixmin"
 
 ###** sub-surface runoff scheme (not available with plain binary runoff)
 LROSPLIT=".FALSE."                          # .TRUE. for sub-surface runoff
@@ -166,8 +166,10 @@ FMAP="${BASE}/map/"${mapname}                # map directory
 #CINPMAT=${FMAP}/inpmat_test-15min.bin     # runoff input matrix for interporlation
 #CDIMINFO="${FMAP}/diminfo_test-30min.txt" # dimention information file
 #CINPMAT=${FMAP}/inpmat_test-30min.bin     # runoff input matrix for interporlation
-CDIMINFO="${FMAP}/diminfo-30min.txt" # dimention information file
-CINPMAT=${FMAP}/inpmat-30min.bin     # runoff input matrix for interporlation
+# CDIMINFO="${FMAP}/diminfo-30min.txt" # dimention information file
+# CINPMAT=${FMAP}/inpmat-30min.bin     # runoff input matrix for interporlation
+CDIMINFO="${FMAP}/diminfo-06min.txt" # dimention information file
+CINPMAT=${FMAP}/inpmat-06min.bin     # runoff input matrix for interporlation
 
 #----- for plain binary map input
 #** basic topography

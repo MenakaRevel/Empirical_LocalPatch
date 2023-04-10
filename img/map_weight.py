@@ -15,6 +15,7 @@ import numpy as np
 # import xarray as xr
 import re
 import os
+import sys
 
 import params as pm
 import my_colorbar as mbar
@@ -39,9 +40,10 @@ def vec_par(LEVEL,ax=None):
         lon2 = float(line[3])
         lat2 = float(line[4])
 
-        #- higher resolution data
-        ixx1 = int((lon1  - west)*60.0)
-        iyy1 = int((-lat1 + north)*60.0)
+        #- higher resolution data 1min
+        # print (lon1, lat1)
+        ixx1 = int((west - lon1)*60.0)
+        iyy1 = int((north - lat1)*60.0)
 
         #----
         ix =catmxy[0,iyy1,ixx1]- 1
@@ -75,9 +77,13 @@ def plot_ax(lon1,lon2,lat1,lat2,width,colorVal,ax=None,alpha=1):
 syear=1979
 eyear=2019
 inputname="conus_06min_VIC_BC"
+mapname="conus_06min"
+# inputname="glb_15min_S14FD"
+# mapname="glb_15min"
+CaMa_dir="/cluster/data6/menaka/CaMa-Flood_v4"
 outdir="../"
 #========================
-fname=pm.CaMa_dir()+"/map/"+pm.map_name()+"/params.txt"
+fname=CaMa_dir+"/map/"+mapname+"/params.txt"
 with open(fname,"r") as f:
   lines=f.readlines()
 #-- map params --
@@ -89,13 +95,13 @@ east   = float(filter(None, re.split(" ",lines[5]))[0])
 south  = float(filter(None, re.split(" ",lines[6]))[0])
 north  = float(filter(None, re.split(" ",lines[7]))[0])
 #----
-nextxy = pm.CaMa_dir()+"/map/"+pm.map_name()+"/nextxy.bin"
-rivwth = pm.CaMa_dir()+"/map/"+pm.map_name()+"/rivwth_gwdlr.bin"
-rivhgt = pm.CaMa_dir()+"/map/"+pm.map_name()+"/rivhgt.bin"
-rivlen = pm.CaMa_dir()+"/map/"+pm.map_name()+"/rivlen.bin"
-elevtn = pm.CaMa_dir()+"/map/"+pm.map_name()+"/elevtn.bin"
-lonlat = pm.CaMa_dir()+"/map/"+pm.map_name()+"/lonlat.bin"
-uparea = pm.CaMa_dir()+"/map/"+pm.map_name()+"/uparea.bin"
+nextxy = CaMa_dir+"/map/"+mapname+"/nextxy.bin"
+rivwth = CaMa_dir+"/map/"+mapname+"/rivwth_gwdlr.bin"
+rivhgt = CaMa_dir+"/map/"+mapname+"/rivhgt.bin"
+rivlen = CaMa_dir+"/map/"+mapname+"/rivlen.bin"
+elevtn = CaMa_dir+"/map/"+mapname+"/elevtn.bin"
+lonlat = CaMa_dir+"/map/"+mapname+"/lonlat.bin"
+uparea = CaMa_dir+"/map/"+mapname+"/uparea.bin"
 nextxy = np.fromfile(nextxy,np.int32).reshape(2,ny,nx)
 # rivwth = np.fromfile(rivwth,np.float32).reshape(ny,nx)
 # rivhgt = np.fromfile(rivhgt,np.float32).reshape(ny,nx)
@@ -106,95 +112,95 @@ lonlat = np.fromfile(lonlat,np.float32).reshape(2,ny,nx)
 rivermap=((nextxy[0]>0))*1.0
 #====================================================================
 #higher resolution data
-catmxy = pm.CaMa_dir()+"/map/"+pm.map_name()+"/1min/1min.catmxy.bin"
-catmxy = np.fromfile(catmxy,np.int16).reshape(2,2100,4200)
-ix=355
-iy=229
+fname = CaMa_dir+"/map/"+mapname+"/1min/location.txt"
+with open(fname,"r") as f:
+  lines=f.readlines()
+NXX = int(filter(None, re.split(" ",lines[2]))[6])
+NYY = int(filter(None, re.split(" ",lines[2]))[7])
+#====================================================================
+catmxy = CaMa_dir+"/map/"+mapname+"/1min/1min.catmxy.bin"
+catmxy = np.fromfile(catmxy,np.int16).reshape(2,NYY,NXX)
+argv=sys.argv
+ix=int(argv[1]) #391 #208 #355
+iy=int(argv[2]) #227 #162 #229
 loc="%04d%04d"%(ix,iy)
 prename="weightage"
-# #--read outflow netCDF4--
-# tag="%04d-%04d"%(syear,eyear)
-# 
-# # sfcelv
-# fname=outdir+"CaMa_out/"+inputname+"/outflw"+tag+".nc"
-# # fname=outdir+"CaMa_out/"+inputname+"/standardized"+tag+".nc"
-# nc=xr.open_dataset(fname)
-
-# # projection = ccrs.LambertConformal(central_longitude=-95, central_latitude=40)
-# # projection = ccrs.Robinson()
-
-# # f, ax = plt.subplots(subplot_kw=dict(projection=projection))
-
-# # # nc.outflw.mean(dim='time').plot(x="lon",y="lat",ax=ax,transform=ccrs.PlateCarree(), cbar_kwargs=dict(shrink=0.7))
-# # nc.outflw.mean(dim='time').plot.imshow(ax=ax,rgb='band',transform=ccrs.PlateCarree(), cbar_kwargs=dict(shrink=0.7))
-# data=nc.outflw.mean(dim='time').values
-# # data=nc.standardize.mean(dim='time').values
-fname="../weightage/"+inputname+"_1000KM_dam/"+loc+".bin"
-data=np.fromfile(fname,np.int32).reshape(ny,nx)
+#====================================================================
+# fname="../weightage/"+inputname+"/"+loc+".bin"
+fname="../weightage/"+inputname+"_60/"+loc+".bin"
+print (fname)
+data=np.fromfile(fname,np.float32).reshape(ny,nx)
 rivermap=rivermap*(data>1e-20)
 data=data*rivermap
-# data=np.ma.masked_less(data,0.00)
-
-land="white"
-water="white"
-
-londiff=(east-west)*4
-latdiff=(north-south)*4
-
-npix=(90-north)*4
-spix=(90-south)*4
-wpix=(180+west)*4
-epix=(180+east)*4
-
-# cmap=cm.get_cmap('RdYlBu')
-cmap=mbar.colormap("H01")
-# cmap=cm.get_cmap("Blues")
-# vmin=1.0
-# vmax=2.0e5
-# norm=LogNorm(vmin=vmin,vmax=vmax)
-
-vmin=0.0
-vmax=1.0
-norm=Normalize(vmin=vmin,vmax=vmax)
-
-# river width
-sup=2
-w=0.01
-alpha=1
-width=0.5
-#------
-print (west,east,south,north)
-resol=1
-fig=plt.figure()
-G = gridspec.GridSpec(1,1)
-# ax=fig.add_subplot(G[0,0])
-# ax = fig.add_subplot(G[0,0],projection=ccrs.Robinson()) 
-ax = fig.add_subplot(G[0,0],projection=ccrs.LambertConformal())
-#-----------------------------  
-ax.set_extent([west,east,south,north],crs=ccrs.PlateCarree())
-ax.add_feature(cfeature.NaturalEarthFeature('physical', 'land', '110m', edgecolor="k", facecolor=land, linewidth=0.1),zorder=100)
-box="%f %f %f %f"%(west,east,north,south) 
-os.system("./bin/txt_vector "+box+" "+pm.CaMa_dir()+" "+pm.map_name()+" > "+prename+".txt")  
-map(vec_par,np.arange(1,10+1,1))
-# map(vec_par,np.arange(6,10+1,1))
-# map(vec_par,np.arange(1,5+1,1))
-# ix , iy
-lon=lonlat[0,iy-1,ix-1]
-lat=lonlat[1,iy-1,ix-1]
-print (lon, lat)
-ax.scatter(lon,lat,s=20,marker="o",color="green",transform=ccrs.PlateCarree(),zorder=105)
-# ax.outline_patch.set_linewidth(0.0)
-
-# ax.coastlines()
-im=plt.scatter([],[],c=[],cmap=cmap,s=0.1,vmin=vmin,vmax=vmax,norm=norm,zorder=101)
-im.set_visible(False)
-# cax=fig.add_axes([0.4,0.25,0.35,0.01])
-l,b,w,h=ax.get_position().bounds
-cax=fig.add_axes([l,b-0.01*h,0.8*w,0.01])
-cbar=plt.colorbar(im,extend='max',orientation="horizontal",cax=cax)
-cbar.ax.tick_params(labelsize=6)
-cbar.set_label("Spatial Depndancey Weight",fontsize=8)
-
+data=np.ma.masked_less(data,0.6)
+plt.imshow(data)
+plt.colorbar()
 plt.show()
-# plt.savefig(outdir+"CaMa_out/"+inputname+"/weightage_"+loc+".jpg")
-os.system("rm -r "+prename+"*.txt")
+
+# # # data=np.ma.masked_less(data,0.00)
+
+# # land="white"
+# # water="white"
+
+# # londiff=(east-west)*4
+# # latdiff=(north-south)*4
+
+# # npix=(90-north)*4
+# # spix=(90-south)*4
+# # wpix=(180+west)*4
+# # epix=(180+east)*4
+
+# # # cmap=cm.get_cmap('RdYlBu')
+# # cmap=mbar.colormap("H01")
+# # # cmap=cm.get_cmap("Blues")
+# # # vmin=1.0
+# # # vmax=2.0e5
+# # # norm=LogNorm(vmin=vmin,vmax=vmax)
+
+# # vmin=0.0
+# # vmax=1.0
+# # norm=Normalize(vmin=vmin,vmax=vmax)
+
+# # # river width
+# # sup=2
+# # w=0.01
+# # alpha=1
+# # width=0.5
+# # #------
+# # print (west,east,south,north)
+# # resol=1
+# # fig=plt.figure()
+# # G = gridspec.GridSpec(1,1)
+# # # ax=fig.add_subplot(G[0,0])
+# # ax = fig.add_subplot(G[0,0],projection=ccrs.PlateCarree(central_longitude=0.0, globe=None)) #ccrs.Robinson()) 
+# # # ax = fig.add_subplot(G[0,0],projection=ccrs.LambertConformal())
+# # #-----------------------------  
+# # ax.set_extent([west,east,south,north],crs=ccrs.PlateCarree())
+# # ax.add_feature(cfeature.NaturalEarthFeature('physical', 'land', '110m', edgecolor="k", facecolor=land, linewidth=0.1),zorder=100)
+# # box="%f %f %f %f"%(west,east,north,south) 
+# # os.system("./bin/txt_vector "+box+" "+CaMa_dir+" "+mapname+" > "+prename+".txt")  
+# # map(vec_par,np.arange(1,10+1,1))
+# # # map(vec_par,np.arange(6,10+1,1))
+# # # map(vec_par,np.arange(1,5+1,1))
+# # # ix , iy
+# # lon=lonlat[0,iy-1,ix-1]
+# # lat=lonlat[1,iy-1,ix-1]
+# # # print (lon, lat)
+# # ax.scatter(lon,lat,s=20,marker="o",color="green",transform=ccrs.PlateCarree(),zorder=105)
+# # # ax.outline_patch.set_linewidth(0.0)
+
+# # # ax.coastlines()
+# # im=plt.scatter([],[],c=[],cmap=cmap,s=0.1,vmin=vmin,vmax=vmax,norm=norm,zorder=101)
+# # im.set_visible(False)
+# # # cax=fig.add_axes([0.4,0.25,0.35,0.01])
+# # l,b,w,h=ax.get_position().bounds
+# # cax=fig.add_axes([l,b-0.01*h,0.8*w,0.01])
+# # cbar=plt.colorbar(im,extend='max',orientation="horizontal",cax=cax)
+# # cbar.ax.tick_params(labelsize=6)
+# # cbar.set_label("Spatial Depndancey Weight",fontsize=8)
+
+# # plt.show()
+# # # plt.savefig(outdir+"CaMa_out/"+inputname+"/weightage_"+loc+".jpg")
+# # os.system("rm -r "+prename+"*.txt")
+
+# find . -name "*.svg" -type f | xargs wc -l | sort -rn | grep -v ' total$' | head -1

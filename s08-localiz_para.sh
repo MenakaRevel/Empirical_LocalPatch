@@ -69,8 +69,8 @@ fi
 
 #=================================================
 # Write local patch parameters
-echo "./src/lpara $N $syear $eyear $mapname $inputname $CAMADIR $outdir $threshold $patch ${damrep}"
-./src/lpara $N $syear $eyear $mapname $inputname $CAMADIR $outdir $threshold $patch ${damrep}
+echo "./src/lpara $N $syear $eyear $mapname $inputname $CAMADIR $outdir $threshold $patch $damrep $NCPUS"
+./src/lpara $N $syear $eyear $mapname $inputname $CAMADIR $outdir $threshold $patch $damrep $NCPUS
 
 wait
 

@@ -3,7 +3,7 @@ program semivariance
 ! calculates the semivariances along the river
 ! modeifed to use rivseq
 ! Menaka@IIS
-! files read  using netCDF4 format
+! files read using netCDF4 format
 ! experimental semivarinces are strored in text files
 ! 2020/05/30
 ! Reference:

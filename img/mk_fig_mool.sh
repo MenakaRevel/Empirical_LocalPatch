@@ -1,8 +1,8 @@
 #! /bin/bash
 
 ### SET "mool PBS" @ IIS U-Tokyo
-#PBS -q E10
-#PBS -l select=1:ncpus=10:mem=10gb
+#PBS -q F20
+#PBS -l select=1:ncpus=20:mem=10gb
 #PBS -l place=scatter
 #PBS -j oe
 #PBS -m ea
@@ -19,8 +19,8 @@ source activate pydef
 
 which python
 
-NCPUS=10
-export OMP_NUM_THREADS=$NCPUS
+NCPUS0=20
+export OMP_NUM_THREADS=$NCPUS0
 
 # got to working dirctory
 # cd $PBS_O_WORKDIR
@@ -32,7 +32,25 @@ cd "/cluster/data6/menaka/Empirical_LocalPatch/img"
 
 # python map_weight.py
 
-python local_patch1.py
+thresname="1000KM" 
+damrep=1 
+NCPUS=20
+# python local_patch1.py $thresname $damrep $NCPUS
+
+thresname="1000KM" 
+damrep=0
+NCPUS=20
+# python local_patch1.py $thresname $damrep $NCPUS
+
+thresname="60" 
+damrep=1
+NCPUS=20
+python local_patch1.py $thresname $damrep $NCPUS
+
+thresname="60" 
+damrep=0
+NCPUS=20
+# python local_patch1.py $thresname $damrep $NCPUS
 
 wait
 

@@ -116,7 +116,13 @@ def weight_allocation(out_dir,mapname,inname,lon,lat,iup,uord,thr_dist,wgt,Gwt):
       #print dis,gamma
       #===================
       # check dam location
-      damflag=check_dam_loc(ix-1,iy-1,mapname,damrep)
+      # if dam location is in target pixel do not consider it
+      if ix == lon and iy == lat:
+        damflag=0
+      else:
+        damflag=check_dam_loc(ix-1,iy-1,mapname,damrep)
+      #===================
+      # append dam location
       if damflag == 1:
         # print ("A dam is found at: ", float(line[2]))
         ldam.append(1)

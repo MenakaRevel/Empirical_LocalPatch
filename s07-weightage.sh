@@ -43,7 +43,7 @@ mapname=`python -c "import params; print (params.map_name())"`
 inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 threshold=`python -c "import params; print (params.threshold())"`
-damrep=`python -c "import params; print (params.dam_rep())"` # represent dams
+damrep=0 #`python -c "import params; print (params.dam_rep())"` # represent dams
 #=================================================
 python src/weightage.py $CAMADIR $mapname $inputname $outdir $cpunums $threshold $damrep &
 

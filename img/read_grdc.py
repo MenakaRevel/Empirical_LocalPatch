@@ -195,9 +195,8 @@ def get_grdc_loc_v396(name):
   #  all locations
   #grdc = pm.CaMa_dir() + "/map/glb_15min/grdc_loc.txt"
   grdc = pm.CaMa_dir() + "/map/"+pm.map_name()+"/grdc_loc.txt"
-  f = open(grdc,"r")
-  lines = f.readlines()
-  f.close()
+  with open(grdc,"r") as f:
+    lines = f.readlines()
   #--
   id_list     = []
   station_loc = []

@@ -112,13 +112,14 @@ import read_grdc as grdc
 mk_dir(pm.out_dir()+"/figures")
 mk_dir(pm.out_dir()+"/figures/"+pm.map_name()+"_"+pm.input_name()+"/disgraph")
 #--read outflow netCDF4--
-tag="%04d-%04d"%(pm.starttime()[0],pm.endtime()[0])
+tag="%04d-%04d"%(2000,2020) #pm.starttime()[0],pm.endtime()[0])
 fname=pm.out_dir()+"/CaMa_out/"+pm.map_name()+"_"+pm.input_name()+"/outflw"+tag+".nc"
 print (fname)
 nc=xr.open_dataset(fname)
 
 print (pm.patch_start())
-syear=pm.starttime()[0]
+# syear,smonth,sdate=pm.patch_start()
+syear=2000 #pm.starttime()[0]
 smonth=pm.starttime()[1]
 sdate=pm.starttime()[2]
 start_dt=datetime.date(syear,smonth,sdate)
@@ -126,8 +127,8 @@ size=60
 
 start=0
 #last_dt=datetime.date(int(argvs[1]),int(argvs[2]),int(argvs[3]))
-eyear,emonth,edate=pm.patch_end()
-eyear=pm.endtime()[0]
+# eyear,emonth,edate=pm.patch_end()
+eyear=2020 #pm.endtime()[0]
 emonth=pm.endtime()[1]
 edate=pm.endtime()[2]
 
@@ -143,8 +144,9 @@ ylist=[]
 river=[]
 staid=[]
 #--
-rivernames  = ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZON","INDUS"]
+# rivernames  = ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZON","INDUS"]
 #rivernames = ["AMAZON"]
+rivernames = ["MISSISSIPPI","MISSOURI","COLORADO","SAINT LAWRENCE","OHIO","CONNECTICUT","CHURCHILL"]
 # rivernames = grdc.grdc_river_name()
 for rivername in rivernames:
     # path = pm.out_dir()+"/figures/"+pm.map_name()+"_"+pm.input_name()+"/disgraph/%s"%(rivername)
@@ -240,7 +242,7 @@ def NS(s,o):
 #for point in np.arange(pnum):
 def make_fig(point):
     plt.close()
-
+    print ("making figure -> "+river[point]+"  "+pname[point]+" ....")
     #print org[:,point]
     fig=plt.figure()#figsize=(8.27,11.69))
     G = gridspec.GridSpec(1,1)#4,2)
@@ -249,15 +251,15 @@ def make_fig(point):
     #org_Q=grdc.grdc_Q(pname[point],start_dt,last_dt)
     #org_Q=np.array(org_Q)
 
-    org_Q=grdc_Q(staid[point],start_dt,last_dt)
+    org_Q=grdc.grdc_dis(staid[point],syear=syear,eyear=eyear)
     #print org, org_Q
     ed=np.shape(org_Q)[0]
     #print ed , np.shape(org[:,point])
     org=nc.outflw[:,ylist[point],xlist[point]]
-    print ed , np.shape(org)
+    # print (ed , np.shape(org))
     ax.plot(np.arange(start,last),org,label="CaMa-Flood",color="blue",linewidth=0.7,zorder=102)
     if ed == 0:
-        print "no GRDC data"
+        print ("no GRDC data")
         #return 0
     else:
         ax.plot(np.arange(start,last),ma.masked_less_equal(org_Q,0.0),label="GRDC",color="black",linewidth=0.7,zorder=101)

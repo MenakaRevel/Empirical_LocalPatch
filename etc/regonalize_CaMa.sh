@@ -3,7 +3,7 @@
 # Use externally simulated CaMa-Flood results to create Emperical Local Patches
 # Convert global data to regional netCDF in same map resolution
 # Better for high resoultion CaMa maps [e.g., 06min]
-# From here one can start s03-remove_trend.sh
+# From here one can start with s03-remove_trend.sh
 # Menaka@IIS
 # 2023/01/18
 #====================
@@ -29,10 +29,10 @@ rm -r params.py
 ln -sf ../params.py params.py
 
 # input settings
-syear=`python -c "import params; print (params.starttime()[0])"`
+syear=2000 #`python -c "import params; print (params.starttime()[0])"`
 smonth=`python -c "import params; print (params.starttime()[1])"`
 sdate=`python -c "import params; print (params.starttime()[2])"`
-eyear=`python -c "import params; print (params.endtime()[0])"`
+eyear=2000 #`python -c "import params; print (params.endtime()[0])"`
 emonth=`python -c "import params; print (params.endtime()[1])"`
 edate=`python -c "import params; print (params.endtime()[2])"`
 echo $syear" to "$eyear
@@ -63,8 +63,8 @@ mkdir -p "../CaMa_out/${mapname}_${inputname}"
 # water surface elevation
 varname="sfcelv"
 #=================================================
-# echo ./src/bin2nc_reg $N $syear $eyear $varname $mapname $glbmapname $inputname $CAMADIR $outdir &
-# time ./src/bin2nc_reg $N $syear $eyear $varname $mapname $glbmapname $inputname $CAMADIR $outdir &
+echo ./src/bin2nc_reg $N $syear $eyear $varname $mapname $glbmapname $inputname $CAMADIR $outdir &
+time ./src/bin2nc_reg $N $syear $eyear $varname $mapname $glbmapname $inputname $CAMADIR $outdir &
 
 # discharge
 varname="outflw"
