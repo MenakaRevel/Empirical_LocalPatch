@@ -42,7 +42,7 @@ outdir=`python -c "import params; print (params.out_dir())"`
 cpunums=`python -c "import params; print (params.cpu_nums())"`
 mapname=`python -c "import params; print (params.map_name())"`
 # represnt dams
-damrep=`python -c "import params; print (params.dam_rep())"`
+damrep=0 #`python -c "import params; print (params.dam_rep())"`
 # mapname="amz_06min" #
 inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`

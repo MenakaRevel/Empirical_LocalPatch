@@ -267,15 +267,16 @@ ylist=[]
 river=[]
 staid=[]
 #--
-#rivernames  = ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS"]#,"INDUS"]# ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS","INDUS"] ["AMAZONAS"]#"CONGO"]#
+rivernames  = ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS"]#,"INDUS"]# ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS","INDUS"] ["AMAZONAS"]#"CONGO"]#
 #rivernames = grdc.grdc_river_name()
 # rivernames = ["AMAZON"]
 # rivernames = ["MADEIRA"]
 # rivernames = ["VOLGA","YELLOW","MISSISSIPPI","MISSOURI"]
 # rivernames = ["YELLOW","MISSOURI"]
-# rivernames = ["MISSOURI","MISSISSIPPI"]#,"COLORADO"]
-rivernames = ["MISSISSIPPI"] #["COLORADO"]
+# rivernames = ["MISSOURI","MISSISSIPPI","COLORADO"]
+# rivernames = ["MISSISSIPPI"] #["COLORADO"]
 # rivernames = ["AMAZON","NIGER","CONGO","VOLGA","YELLOW","MISSISSIPPI","MISSOURI"]
+# rivernames = ["SAINT LAWRENCE","OHIO","CONNECTICUT","MISSOURI","MISSISSIPPI","COLORADO","CHURCHILL"]
 for rivername in rivernames:
 #for rivername in ["AMAZONAS"]:#"LENA","NIGER","INDUS","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS"]:
 #  oname = "../assim_out/img/sfcelv/%s"%(rivername)
@@ -430,34 +431,34 @@ def mk_fig(point):
 #  M.imshow(ma.masked_less_equal(data_Q,0.0),interpolation="nearest",cmap=cmap1,origin="upper",zorder=100,norm=norm1)
 #  im=M.imshow(ma.masked_less_equal(data,0.6),interpolation="nearest",cmap=cmap,origin="upper",zorder=101,norm=norm)
   #-----------
-  # # #--
-  # # box="%f %f %f %f"%(lllon,urlon,urlat,lllat)
-  # # #  os.system("./bin/txt_vector "+str(lllon)+str(urlon)+str(urlat)+str(lllat)+" > tmp.txt")
-  # # os.system("./bin/txt_vector "+box+" "+pm.CaMa_dir()+" "+glbname+" > "+figname0+"tmp.txt")
-  # # for LEVEL in range(1,10+1):
-  # #   os.system("./bin/print_rivvec "+figname0+"tmp.txt 1 "+str(LEVEL)+" > "+figname0+"tmp2.txt")
-  # #   width=float(LEVEL)*w
-  # #   #print width#, lon1,lat1,lon2-lon1,lat2-lat1#x1[0],y1[0],x1[1]-x1[0],y1[1]-y1[0]
-  # #   # open tmp2.txt
-  # #   with open(figname0+"tmp2.txt","r") as f:
-  # #     lines = f.readlines()
-  # #   #----------------
-  # #   for line in lines:
-  # #       line = filter(None, re.split(" ",line))
-  # #       lon1 = float(line[0])
-  # #       lat1 = float(line[1])
-  # #       lon2 = float(line[3])
-  # #       lat2 = float(line[4])
-  # #       #----
-  # #       iix  = int((lon1 + 180.)*(1.0/gsize))
-  # #       iiy  = int((-lat1 + 90.)*(1.0/gsize))
-  # #       #----
-  # #       if c_nextx[iiy,iix] <= 0:
-  # #         continue
-  # #       # print (lon1,lat1,width)
-  # #       x1,y1=M(lon1,lat1)
-  # #       x2,y2=M(lon2,lat2)
-  # #       M.plot([x1,x2],[y1,y2],color="#C0C0C0",linewidth=width,zorder=101,alpha=alpha)
+  #--
+  box="%f %f %f %f"%(lllon,urlon,urlat,lllat)
+  #  os.system("./bin/txt_vector "+str(lllon)+str(urlon)+str(urlat)+str(lllat)+" > tmp.txt")
+  os.system("./bin/txt_vector "+box+" "+pm.CaMa_dir()+" "+glbname+" > "+figname0+"tmp.txt")
+  for LEVEL in range(1,10+1):
+    os.system("./bin/print_rivvec "+figname0+"tmp.txt 1 "+str(LEVEL)+" > "+figname0+"tmp2.txt")
+    width=float(LEVEL)*w
+    #print width#, lon1,lat1,lon2-lon1,lat2-lat1#x1[0],y1[0],x1[1]-x1[0],y1[1]-y1[0]
+    # open tmp2.txt
+    with open(figname0+"tmp2.txt","r") as f:
+      lines = f.readlines()
+    #----------------
+    for line in lines:
+        line = filter(None, re.split(" ",line))
+        lon1 = float(line[0])
+        lat1 = float(line[1])
+        lon2 = float(line[3])
+        lat2 = float(line[4])
+        #----
+        iix  = int((lon1 + 180.)*(1.0/gsize))
+        iiy  = int((-lat1 + 90.)*(1.0/gsize))
+        #----
+        if c_nextx[iiy,iix] <= 0:
+          continue
+        # print (lon1,lat1,width)
+        x1,y1=M(lon1,lat1)
+        x2,y2=M(lon2,lat2)
+        M.plot([x1,x2],[y1,y2],color="#C0C0C0",linewidth=width,zorder=101,alpha=alpha)
   #--
   fname=pm.out_dir()+"/"+local_patch+"/"+patch_id+"/patch%04d%04d.txt"%(ix,iy)
   print (fname)
@@ -514,7 +515,7 @@ def mk_fig(point):
       if c_nextx[damIY[dpoint]+offsetY,damIX[dpoint]+offsetX] <= 0:
           continue
       # print ("dam", damLon[dpoint], damLat[dpoint])
-      plt.scatter(damLon[dpoint], damLat[dpoint],s=15,marker="v",color="k",zorder=106)
+      plt.scatter(damLon[dpoint], damLat[dpoint],s=10,marker="v",color="k",zorder=106)
   #plt.annotate(annotate_string,xy=(lon,lat),xycoords="data",horizontalalignment="left",verticalalignment="top",fontsize=12,zorder=106)
   #--title--
 #  stitle= "%s)"%(string.ascii_lowercase[point])

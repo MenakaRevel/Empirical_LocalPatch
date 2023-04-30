@@ -55,13 +55,9 @@ echo "#####  allocate GRanD on CaMa map"
 echo ""
 echo "@@@ src/get_rivinfo_glb "
 echo ./src/get_rivinfo_glb ${GRANDF} ${OUT_TMP} ${MAPDIR}
-# ./src/get_rivinfo_glb ${GRANDF} ${OUT_TMP} ${MAPDIR}
-# mv ./damloc_tmp.txt ./$TAG/
+./src/get_rivinfo_glb ${GRANDF} ${OUT_TMP} ${MAPDIR}
 
-# temporal dam allocation file : $OUT_TMP
 
 echo ""
 echo "@@@ ./src/modify_damloc.py "
 python ./src/modify_damloc.py $TAG $MINUPAREA $MAPDIR $OUT_TMP $OUT_DAMLOC
-
-# modified dam allocation file : $OUT_TMP

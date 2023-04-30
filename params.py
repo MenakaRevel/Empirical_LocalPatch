@@ -39,13 +39,13 @@ def map_name():
     # return "amz_06min" #Amazon river 6 min
     # return "congo_06min" #Congo river 6min
     # return "glb_06min" # global 6 min
-    # return "glb_15min" # global 15 min
-    return "conus_06min" #Conterminous US rivers 6min
+    return "glb_15min" # global 15 min
+    # return "conus_06min" #Conterminous US rivers 6min
 
 def input_name():
-    # return "S14FD"
+    return "S14FD"
     # return "VIC_BC"
-    return "ERA5"
+    # return "ERA5"
 
 def spinup_mode():
      return 1

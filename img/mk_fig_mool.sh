@@ -50,7 +50,7 @@ python local_patch1.py $thresname $damrep $NCPUS
 thresname="60" 
 damrep=0
 NCPUS=20
-# python local_patch1.py $thresname $damrep $NCPUS
+python local_patch1.py $thresname $damrep $NCPUS
 
 wait
 
