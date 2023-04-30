@@ -9,8 +9,8 @@
 
 #### initial setting ========================================
 ## project name
-# TAG="glb_15min"
-TAG="glb_06min"
+TAG="glb_15min"
+# TAG="glb_06min"
 
 GRANDF="/home/yamadai/work/data/Dam+Lake/GRanD/inp/GRanD_v1_1_inp.csv"
 
