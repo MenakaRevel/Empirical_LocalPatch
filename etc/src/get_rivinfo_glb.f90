@@ -50,10 +50,22 @@ program main
 
   !-------------------------------------------------------------------
   !! linked input list & map
-  grandf='./inp/damlist.csv'   !! GRaND CSV damlist
-  outf  ='./damloc_tmp.txt'    !! temporal dam allocation data
-  mapdir='./inp/map/'          !! CaMa-Flood map data to allocate dam
+  ! grandf='./inp/damlist.csv'   !! GRaND CSV damlist
+  ! outf  ='./damloc_tmp.txt'    !! temporal dam allocation data
+  ! mapdir='./inp/map/'          !! CaMa-Flood map data to allocate dam
 
+  call getarg(1,buf)
+  read(buf,'(A)') grandf ! GRaND CSV damlist
+  write(*,*) 'grandf',grandf
+
+  call getarg(2,buf)
+  read(buf,'(A)') outf ! temporal dam allocation data
+  write(*,*) 'outf',outf
+
+  call getarg(3,buf)
+  read(buf,'(A)') mapdir ! mapdir = glb_06min
+  write(*,*) 'mapdir',mapdir
+  
 print *, '[1] Read Map Parameters'
   open(31, file=outf, form='formatted', action='write')
   write(31,'(a)') "damid   damname   damlon   damlat   ix   iy   upreal   uparea_cama   totalsto_mcm"
