@@ -88,6 +88,7 @@ close(11)
 patch_side=patch_size*2+1
 patch_nums=patch_side**2
 
+print*, patch_side
 print*, threshold*100
 write(thrname,'(i2.0)') int(threshold*100)
 print*, thrname
@@ -95,6 +96,8 @@ print*, thrname
 fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/lonlat.txt"
 if (dam==1) then
   fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_dam/lonlat.txt"
+elseif (dam==2) then
+  fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_CaMadam/lonlat.txt"
 end if
 print *, fname
 open(78,file=fname,status='replace')
@@ -189,6 +192,8 @@ do ix = 1, nx ! pixels along longtitude direction
         fname=trim(adjustl(outdir))//"/weightage/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/"//trim(llon)//trim(llat)//".bin"
         if (dam==1) then
           fname=trim(adjustl(outdir))//"/weightage/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_dam/"//trim(llon)//trim(llat)//".bin"
+        elseif (dam==2) then
+          fname=trim(adjustl(outdir))//"/weightage/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_CaMadam/"//trim(llon)//trim(llat)//".bin"
         end if  
         !print*, "read weightage",fname
         fn = 34
@@ -198,6 +203,8 @@ do ix = 1, nx ! pixels along longtitude direction
         fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/"//trim(llon)//trim(llat)//".bin"
         if (dam==1) then
           fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_dam/"//trim(llon)//trim(llat)//".bin"
+        elseif (dam==2) then
+          fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_CaMadam/"//trim(llon)//trim(llat)//".bin"
         end if 
         fn = 34
         call read_wgt(fname,lonpx,latpx,gauss_weight)
@@ -207,6 +214,8 @@ do ix = 1, nx ! pixels along longtitude direction
         fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/patch"//trim(llon)//trim(llat)//".txt"
         if (dam==1) then
           fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_dam/patch"//trim(llon)//trim(llat)//".txt"
+        elseif (dam==2) then
+          fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_CaMadam/patch"//trim(llon)//trim(llat)//".txt"
         end if
         print *, fname
         open(fn,file=fname,status='replace')
@@ -302,6 +311,8 @@ end do
 fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/countnum.bin"
 if (dam==1) then
   fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_dam/countnum.bin"
+elseif (dam==2) then
+  fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_CaMadam/countnum.bin"
 end if
 open(84,file=fname,form="unformatted",access="direct",recl=4*latpx*lonpx,status="replace",iostat=ios)
 if(ios==0)then

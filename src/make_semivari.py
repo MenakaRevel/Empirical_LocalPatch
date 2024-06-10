@@ -1,7 +1,7 @@
 #!/opt/local/bin/python
 # -*- coding: utf-8 -*-
 #==============================================
-# Make direcotries for semvari
+# Make directories for semvarioragms
 # Menaka@IIS
 # 2020/06/02
 import numpy as np

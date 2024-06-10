@@ -284,6 +284,8 @@ print (pathname0)
 pathname1=out_dir+"/weightage/"+mapname+"_"+inname+"_"+thresname
 if damrep == 1:
   pathname1=out_dir+"/weightage/"+mapname+"_"+inname+"_"+thresname+"_dam"
+elif damrep == 2:
+  pathname1=out_dir+"/weightage/"+mapname+"_"+inname+"_"+thresname+"_CaMadam"
 mk_dir(pathname1)
 print (pathname1)
 #==============================================
@@ -295,24 +297,30 @@ thresname="%02d"%(int(threshold*100))
 pathname3=out_dir+"/gaussian_weight/"+mapname+"_"+inname+"_"+thresname
 if damrep == 1:
   pathname3=out_dir+"/gaussian_weight/"+mapname+"_"+inname+"_"+thresname+"_dam"
+elif damrep == 2:
+  pathname3=out_dir+"/gaussian_weight/"+mapname+"_"+inname+"_"+thresname+"_CaMadam"
 mk_dir(pathname3)
 print (pathname3)
 #==============================================
-# open dam locations
-fname="./dat/damloc_"+mapname+".txt"
-with open(fname,"r") as f:
-  linesdam=f.readlines()
-ldamX=[]
-ldamY=[]
-for linedam in linesdam[1::]:
-  linedam = re.split(" ",linedam)
-  linedam = list(filter(None, linedam))
-  damIX   = int(linedam[4]) - 1
-  damIY   = int(linedam[5]) - 1
-  ldamX.append(damIX)
-  ldamY.append(damIY)
-ldamX=np.array(ldamX)
-ldamY=np.array(ldamY)
+if damrep == 1:
+  # open dam locations
+  fname="./dat/damloc_"+mapname+".txt"
+  with open(fname,"r") as f:
+    linesdam=f.readlines()
+  ldamX=[]
+  ldamY=[]
+  for linedam in linesdam[1::]:
+    linedam = re.split(" ",linedam)
+    linedam = list(filter(None, linedam))
+    damIX   = int(linedam[4]) - 1
+    damIY   = int(linedam[5]) - 1
+    ldamX.append(damIX)
+    ldamY.append(damIY)
+  ldamX=np.array(ldamX)
+  ldamY=np.array(ldamY)
+else:
+  ldamX=np.array(-9999)
+  ldamY=np.array(-9999)
 #==============================================
 # open semivar list
 fname=out_dir+"/semivar/"+mapname+"_"+inname+"/lonlat_list.txt"
