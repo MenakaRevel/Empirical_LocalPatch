@@ -192,7 +192,8 @@ do ix = 1, nx ! pixels along longtitude direction
         fname=trim(adjustl(outdir))//"/weightage/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/"//trim(llon)//trim(llat)//".bin"
         if (dam==1) then
           fname=trim(adjustl(outdir))//"/weightage/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_dam/"//trim(llon)//trim(llat)//".bin"
-        elseif (dam==2) then
+        end if
+        if (dam==2) then
           fname=trim(adjustl(outdir))//"/weightage/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_CaMadam/"//trim(llon)//trim(llat)//".bin"
         end if  
         !print*, "read weightage",fname
@@ -203,7 +204,8 @@ do ix = 1, nx ! pixels along longtitude direction
         fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/"//trim(llon)//trim(llat)//".bin"
         if (dam==1) then
           fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_dam/"//trim(llon)//trim(llat)//".bin"
-        elseif (dam==2) then
+        end if
+        if (dam==2) then
           fname=trim(adjustl(outdir))//"/gaussian_weight/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_CaMadam/"//trim(llon)//trim(llat)//".bin"
         end if 
         fn = 34
@@ -214,7 +216,8 @@ do ix = 1, nx ! pixels along longtitude direction
         fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"/patch"//trim(llon)//trim(llat)//".txt"
         if (dam==1) then
           fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_dam/patch"//trim(llon)//trim(llat)//".txt"
-        elseif (dam==2) then
+        end if
+        if (dam==2) then
           fname=trim(adjustl(outdir))//"/local_patch/"//trim(mapname)//"_"//trim(inname)//"_"//trim(thrname)//"_CaMadam/patch"//trim(llon)//trim(llat)//".txt"
         end if
         print *, fname

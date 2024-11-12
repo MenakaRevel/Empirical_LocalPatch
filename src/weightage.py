@@ -173,6 +173,7 @@ def weight_allocation(out_dir,mapname,inname,lon,lat,iup,uord,threshold,baseline
       else:
         ldam.append(0)
       #--
+      # print (ix, iy, dis, gamma, std, ldam)
       lix.append(ix)
       liy.append(iy)
       ldis.append(dis)
@@ -251,6 +252,7 @@ out_dir=sys.argv[4]
 ncpus=int(sys.argv[5])
 threshold=float(sys.argv[6])
 damrep=int(sys.argv[7])
+camaopt=sys.argv[8]
 #==============================================
 fname=CaMa_dir+"/map/"+mapname+"/params.txt"
 with open(fname,"r") as f:
@@ -302,6 +304,10 @@ elif damrep == 2:
 mk_dir(pathname3)
 print (pathname3)
 #==============================================
+inname2 = inname
+if damrep == 2:
+  inname2 = inname+"_"+camaopt
+#==============================================
 if damrep == 1:
   # open dam locations
   fname="./dat/damloc_"+mapname+".txt"
@@ -323,7 +329,7 @@ else:
   ldamY=np.array(-9999)
 #==============================================
 # open semivar list
-fname=out_dir+"/semivar/"+mapname+"_"+inname+"/lonlat_list.txt"
+fname=out_dir+"/semivar/"+mapname+"_"+inname+"_"+camaopt+"/lonlat_list.txt"
 with open(fname,"r") as f:
   lines=f.readlines()
 #==============================================
@@ -362,13 +368,13 @@ def mk_wgt(line):
     #---
     if dn>0:
         print ("downstream")
-        weight_allocation(out_dir,mapname,inname,lon,lat,0,"downstream",threshold,baseline,wgt,Gwt)
+        weight_allocation(out_dir,mapname,inname2,lon,lat,0,"downstream",threshold,baseline,wgt,Gwt)
     if damflag != 1:
         if up > 0:
             print ("upstream")
             for iup in np.arange(1,up+1):
                 #print "upstream",iup
-                weight_allocation(out_dir,mapname,inname,lon,lat,iup,"upstream",threshold,baseline,wgt,Gwt)
+                weight_allocation(out_dir,mapname,inname2,lon,lat,iup,"upstream",threshold,baseline,wgt,Gwt)
     #-----
     oname=pathname1+"/%04d%04d.bin"%(lon,lat)
     wgt.tofile(oname)

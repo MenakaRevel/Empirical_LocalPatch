@@ -28,6 +28,10 @@ cd "/cluster/data6/menaka/Empirical_LocalPatch/etc"
 NCPUS=40
 export OMP_NUM_THREADS=$NCPUS
 
+# link params
+rm -r params.py
+ln -sf ../params.py params.py
+
 # input settings
 syear=`python -c "import params; print (params.starttime()[0])"`
 smonth=`python -c "import params; print (params.starttime()[1])"`
@@ -42,7 +46,7 @@ cpunums=$NCPUS #`python -c "import params; print (params.cpu_nums())"`
 mapname=`python -c "import params; print (params.map_name())"`
 inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
-threshold=1000 #km distance based local patches ###`python -c "import params; print (params.threshold())"`
+threshold=500 #km distance based local patches ###`python -c "import params; print (params.threshold())"`
 # represnt dams
 damrep=1 #`python -c "import params; print (params.dam_rep())"`
 #=================================================

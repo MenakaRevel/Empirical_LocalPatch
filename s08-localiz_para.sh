@@ -37,20 +37,21 @@ emonth=`python -c "import params; print (params.endtime()[1])"`
 edate=`python -c "import params; print (params.endtime()[2])"`
 echo $syear" to "$eyear
 CAMADIR=`python -c "import params; print (params.CaMa_dir())"`
+CaMa_opt=`python -c "import params; print (params.CaMa_opt())"`
 # CAMADIR="/cluster/data6/menaka/CaMa-Flood_v396a_20200514"
 outdir=`python -c "import params; print (params.out_dir())"`
 cpunums=`python -c "import params; print (params.cpu_nums())"`
 mapname=`python -c "import params; print (params.map_name())"`
 # represnt dams
-damrep=0 #`python -c "import params; print (params.dam_rep())"`
+damrep=`python -c "import params; print (params.dam_rep())"`
 # mapname="amz_06min" #
 inputname=`python -c "import params; print (params.input_name())"`
 N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 threshold=`python -c "import params; print (params.threshold())"`
 # threshold=0.60
-patch=100
+patch=`python -c "import params; print (params.patch_size())"`
 # distpatch=1 # distance based local patch
-distpatch=0 # distance based local patch
+# distpatch=0 # distance based local patch ### not need here
 threshname=$(echo $threshold 100 | awk '{printf "%2d\n",$1*$2}') # emperical local patch
 
 # # local patch name
@@ -63,6 +64,8 @@ threshname=$(echo $threshold 100 | awk '{printf "%2d\n",$1*$2}') # emperical loc
 # make dir local patch
 if [ ${damrep} -eq 1 ]; then
     mkdir -p "./local_patch/${mapname}_${inputname}_${threshname}_dam"
+elif [ ${damrep} -eq 2 ]; then
+    mkdir -p "./local_patch/${mapname}_${inputname}_${threshname}_CaMadam"
 else
     mkdir -p "./local_patch/${mapname}_${inputname}_${threshname}"
 fi
@@ -70,7 +73,7 @@ fi
 #=================================================
 # Write local patch parameters
 echo "./src/lpara $N $syear $eyear $mapname $inputname $CAMADIR $outdir $threshold $patch $damrep $NCPUS"
-./src/lpara $N $syear $eyear $mapname $inputname $CAMADIR $outdir $threshold $patch $damrep $NCPUS
+time ./src/lpara $N $syear $eyear $mapname $inputname $CAMADIR $outdir $threshold $patch $damrep $NCPUS
 
 wait
 

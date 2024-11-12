@@ -39,6 +39,7 @@ emonth=`python -c "import params; print (params.endtime()[1])"`
 edate=`python -c "import params; print (params.endtime()[2])"`
 echo $syear" to "$eyear
 CAMADIR=`python -c "import params; print (params.CaMa_dir())"`
+CaMa_opt=`python -c "import params; print (params.CaMa_opt())"`
 outdir=`python -c "import params; print (params.out_dir())"`
 cpunums=`python -c "import params; print (params.cpu_nums())"`
 mapname=`python -c "import params; print (params.map_name())"`
@@ -69,7 +70,7 @@ export OMP_NUM_THREADS=40 #$cpunums       # OpenMP cpu num
 
 #============================
 #*** 1a. Experiment directory setting
-EXP=${mapname}_${inputname}                 # experiment name (output directory name)
+EXP=${mapname}_${inputname}_${CaMa_opt}     # experiment name (output directory name)
 RDIR=${OUTBASE}/CaMa_out/${EXP}             # directory to run CaMa-Flood
 EXE="MAIN_cmf"                              # Execute file name
 PROG=${BASE}/src/${EXE}                     # location of Fortran main program
@@ -85,9 +86,16 @@ LADPSTP=".TRUE."                            # .TRUE. for adaptive time step
 LFPLAIN=".TRUE."                            # .TRUE. to activate floodplain storage
 LKINE=".FALSE."                             # .TRUE. to use kinematic wave equation
 LFLDOUT=".TRUE."                            # .TRUE. to activate floodplain discharge
-LPTHOUT=".TRUE."                            #.TRUE. to activate bifurcation flow, mainly for delta simulation
+LPTHOUT=".TRUE."                            # .TRUE. to activate bifurcation flow, mainly for delta simulation
 LDAMOUT=".FALSE."                           # .TRUE. to activate reservoir operation (under development)
-
+LDAMYBY=".FALSE."                           # .TRUE. to use Year-By-Year dam activation scheme. .False. for All-reservoirs-in scheme
+LiVnorm=".FALSE."                           # .TRUE. to use Noemal Volume as initial reservoir storage. False for zero-additional storage.
+if [ $CaMa_opt = "bif" ] || [ $CaMa_opt = "all" ];then
+     LPTHOUT=".TRUE."                       # .TRUE. to activate bifurcation flow, mainly for delta simulation
+fi                          
+if [ $CaMa_opt = "dam" ] || [ $CaMa_opt = "all" ];then
+     LDAMOUT=".TRUE."                       # .TRUE. to activate reservoir operation (under development)
+fi
 
 #============================
 #*** 1c. simulation time
@@ -113,9 +121,37 @@ LRESTCDF=".FALSE."                          # .TRUE. to use netCDF restart file
 IFRQ_RST="0"                                # output restat frequency.
                                             # [0]: only at last time, [1,2,3,...,24] hourly restart, [30]: monthly restart
 
+#============================
+#*** 1e. river map & topography
+FMAP="${BASE}/map/$mapname"                # map directory
+
+# Dam Parameter File
+CDAMFILE="${FMAP}/dam_param.csv"            # dam parameter list
+
+#----- for plain binary map input
+#** basic topography
+LMAPCDF=".FALSE."                           # .TRUE. for netCDF map
+CNEXTXY="${FMAP}/nextxy.bin"                # downstream xy (river network map)
+CGRAREA="${FMAP}/ctmare.bin"                # unit-catchment area   [m2]
+CELEVTN="${FMAP}/elevtn.bin"                # channel top elevation [m]
+CNXTDST="${FMAP}/nxtdst.bin"                # downstream distance   [m]
+CRIVLEN="${FMAP}/rivlen.bin"                # channel length        [m]
+CFLDHGT="${FMAP}/fldhgt.bin"                # floodplain elevation profile (height above 'elevtn') [m]
+
+#** channel parameter
+###CRIVWTH=${FMAP}/rivwth.bin"              # channel width [m] (empirical power-low)
+CRIVWTH="${FMAP}/rivwth_gwdlr.bin"          # channel width [m] (GWD-LR + filled with empirical)
+CRIVHGT="${FMAP}/rivhgt.bin"                # channel depth [m] (empirical power-low)
+CRIVMAN="${FMAP}/rivman.bin"                # manning coefficient river (The one in flood plain is a global parameter; set $PMANFLD below.)
+
+#** bifurcation channel info
+CPTHOUT="${FMAP}/bifprm.txt"                #   bifurcation channel list
 
 #============================
-#*** 1e. forcing setting
+#*** 1f. forcing setting
+CDIMINFO="${FMAP}/diminfo-06min.txt"        # dimention information file
+CINPMAT=${FMAP}/inpmat-06min.bin            # runoff input matrix for interporlation
+
 IFRQ_INP="24"                               # input forcing frequency: [1,2,3,...,24] hour
 DROFUNIT="86400"      # [mm/day->m/s]       # runoff unit conversion
 
@@ -153,44 +189,6 @@ LROSPLIT=".FALSE."                          # .TRUE. for sub-surface runoff
 ###SDAYIN=""      # see (3) set each year
 ###SHOURIN=""     # see (3) set each year
 
-
-#============================
-#*** 1f. river map & topography
-FMAP="${BASE}/map/"${mapname}                # map directory
-#FMAP="${BASE}/map/glb_15min"                # map directory
-#CDIMINFO="${FMAP}/diminfo_test-1deg.txt"    # dimention information file
-#CINPMAT=${FMAP}/inpmat_test-1deg.bin        # runoff input matrix for interporlation
-#CDIMINFO="${FMAP}/diminfo_test-15min_nc.txt" # dimention information file
-#CINPMAT=${FMAP}/inpmat_test-15min_nc.bin     # runoff input matrix for interporlation
-#CDIMINFO="${FMAP}/diminfo_test-15min.txt" # dimention information file
-#CINPMAT=${FMAP}/inpmat_test-15min.bin     # runoff input matrix for interporlation
-#CDIMINFO="${FMAP}/diminfo_test-30min.txt" # dimention information file
-#CINPMAT=${FMAP}/inpmat_test-30min.bin     # runoff input matrix for interporlation
-# CDIMINFO="${FMAP}/diminfo-30min.txt" # dimention information file
-# CINPMAT=${FMAP}/inpmat-30min.bin     # runoff input matrix for interporlation
-CDIMINFO="${FMAP}/diminfo-06min.txt" # dimention information file
-CINPMAT=${FMAP}/inpmat-06min.bin     # runoff input matrix for interporlation
-
-#----- for plain binary map input
-#** basic topography
-LMAPCDF=".FALSE."                           # .TRUE. for netCDF map
-CNEXTXY="${FMAP}/nextxy.bin"                # downstream xy (river network map)
-CGRAREA="${FMAP}/ctmare.bin"                # unit-catchment area   [m2]
-CELEVTN="${FMAP}/elevtn.bin"                # channel top elevation [m]
-CNXTDST="${FMAP}/nxtdst.bin"                # downstream distance   [m]
-CRIVLEN="${FMAP}/rivlen.bin"                # channel length        [m]
-CFLDHGT="${FMAP}/fldhgt.bin"                # floodplain elevation profile (height above 'elevtn') [m]
-
-#** channel parameter
-###CRIVWTH=${FMAP}/rivwth.bin"              # channel width [m] (empirical power-low)
-CRIVWTH="${FMAP}/rivwth_gwdlr.bin"          # channel width [m] (GWD-LR + filled with empirical)
-CRIVHGT="${FMAP}/rivhgt.bin"                # channel depth [m] (empirical power-low)
-CRIVMAN="${FMAP}/rivman.bin"                # manning coefficient river (The one in flood plain is a global parameter; set $PMANFLD below.)
-
-
-#** bifurcation channel info
-CPTHOUT="${FMAP}/bifprm.txt"                #   bifurcation channel list
-
 ###** groundwater delay (not available in plain binary runoff/map)
 LGDWDLY=".FALSE."                           # .TRUE. to actuvate groundwater delay
 #CGDWDLY=""                                 # ground water delay map
@@ -224,14 +222,15 @@ LSEALEV=".FALSE."                           # .TRUE. to activate dynamic sea lev
 
 #============================
 #*** 1h. Output Settings 
-LOUTPUT=".TRUE."                            # .TRUE. to use CaMa-Flood standard output
 IFRQ_OUT=24                                 # output frequency: [1,2,3,...,24] hour
 
 LOUTCDF=".FALSE."                           # .TRUE. netCDF output, .FALSE. plain binary output
 COUTDIR="./"                                # output directory 
 #CVARSOUT="outflw,storge,fldfrc,maxdph,flddph" # list output variable (comma separated)
 #CVARSOUT="rivout,rivsto,rivdph,rivvel,fldout,fldsto,flddph,fldfrc,fldare,sfcelv,outflw,storge,pthflw,pthout,maxsto,maxflw,maxdph" # list output variable (comma separated)
-CVARSOUT="rivout,fldout,sfcelv,outflw" # list output variable (comma separated)
+# CVARSOUT="rivout,fldout,sfcelv,outflw" # list output variable (comma separated)
+CVARSOUT="sfcelv,outflw" # list output variable (comma separated)
+
 COUTTAG=""  # see (3) set each year         #   output tag $(COUTDIR)/$(VARNAME)$(OUTTAG).bin
 
 ##### Model Parameters ################
@@ -239,8 +238,6 @@ PMANRIV="0.03D0"                            # manning coefficient river
 PMANFLD="0.10D0"                            # manning coefficient floodplain
 PCADP="0.7"                                 # satety coefficient for CFL condition
 PDSTMTH="10000.D0"                          # downstream distance at river mouth [m]
-
-
 
 #================================================
 # (2) Initial setting
@@ -320,23 +317,9 @@ rm -f ${NMLIST}
 cat >> ${NMLIST} << EOF
 &NRUNVER
 LADPSTP  = ${LADPSTP}                  ! true: use adaptive time step
-LFPLAIN  = ${LFPLAIN}                  ! true: consider floodplain (false: only river channel)
-LKINE    = ${LKINE}                    ! true: use kinematic wave
-LFLDOUT  = ${LFLDOUT}                  ! true: floodplain flow (high-water channel flow) active
 LPTHOUT  = ${LPTHOUT}                  ! true: activate bifurcation scheme
 LDAMOUT  = ${LDAMOUT}                  ! true: activate dam operation (under development)
-LROSPLIT = ${LROSPLIT}                 ! true: input if surface (Qs) and sub-surface (Qsb) runoff
-LGDWDLY  = ${LGDWDLY}                  ! true: Activate ground water reservoir and delay
-LSLPMIX  = .FALSE.                     ! true: activate mixed kinematic and local inertia based on slope
-LMEANSL  = ${LMEANSL}                  ! true: boundary condition for mean sea level
-LSEALEV  = ${LSEALEV}                  ! true: boundary condition for variable sea level
 LRESTART = ${LRESTART}                 ! true: initial condition from restart file
-LSTOONLY = ${LSTOONLY}                 ! true: storage only restart (mainly for data assimilation)
-LOUTPUT  = ${LOUTPUT}                  ! true: use standard output (to file)
-LGRIDMAP = .TRUE.                      ! true: for standard XY gridded 2D map
-LLEAPYR  = .TRUE.                      ! true: neglect leap year (Feb29 skipped)
-LMAPEND  = .FALSE.                     ! true: for map data endian conversion
-LBITSAFE = .FALSE.                     ! true: for Bit Identical simulation (avoid OSM ATOMIC)
 /
 &NDIMTIME
 CDIMINFO = "${CDIMINFO}"               ! text file for dimention information
@@ -346,17 +329,8 @@ IFRQ_INP = ${IFRQ_INP}                 ! input forcing update frequency (hour)
 &NPARAM
 PMANRIV  = ${PMANRIV}                  ! manning coefficient river
 PMANFLD  = ${PMANFLD}                  ! manning coefficient floodplain
-PGRV     = 9.8D0                       ! gravity accerelation
 PDSTMTH  = ${PDSTMTH}                  ! downstream distance at river mouth [m]
 PCADP    = ${PCADP}                    ! CFL coefficient
-PMINSLP  = 1.D-5                       ! minimum slope (kinematic wave)
-IMIS     = -9999                       ! missing value for integer
-RMIS     = 1.E20                       ! missing value for real*4
-DMIS     = 1.E20                       ! missing value for real*8
-CSUFBIN  = '.bin'                      ! file suffix for plain binary 2D map
-CSUFVEC  = '.vec'                      ! file suffix for plain binary 1D vector
-CSUFPTH  = '.pth'                      ! file suffix for plain binary bifurcation channel
-CSUFCDF  = '.nc'                       ! file suffix for netCDF
 /
 EOF
 
@@ -388,11 +362,6 @@ CRIVWTH    = "${CRIVWTH}"              ! channel width
 CRIVHGT    = "${CRIVHGT}"              ! channel depth
 CRIVMAN    = "${CRIVMAN}"              ! river manning coefficient
 CPTHOUT    = "${CPTHOUT}"              ! bifurcation channel table
-CGDWDLY    = "${CGDWDLY}"              ! Groundwater Delay Parameter
-CMEANSL    = "${CMEANSL}"              ! mean sea level
-CRIVCLINC  = "${CRIVCLINC}"            ! * river map netcdf
-CRIVPARNC  = "${CRIVPARNC}"            ! * river parameter netcdf (width, height, manning, ground water delay)
-CMEANSLNC  = "${CMEANSLNC}"            ! * mean sea level netCDF
 /
 EOF
 
@@ -402,49 +371,23 @@ cat >> ${NMLIST} << EOF
 CRESTSTO = "${CRESTSTO}"               ! restart file
 CRESTDIR = "${CRESTDIR}"               ! restart directory
 CVNREST  = "${CVNREST}"                ! restart variable name
-LRESTCDF = ${LRESTCDF}                 ! * true for netCDF restart file
+LRESTCDF = ${LRESTCDF}                 ! * true for netCDF restart file (double precision)
 IFRQ_RST = ${IFRQ_RST}                 ! restart write frequency (1-24: hour, 0:end of run)
 /
 EOF
 
 #*** 4. forcing
-if [ ${LINPCDF} = ".FALSE." ]; then
 cat >> ${NMLIST} << EOF
 &NFORCE
 LINPCDF  = ${LINPCDF}                  ! true for netCDF runoff
 LINTERP  = ${LINTERP}                  ! true for runoff interpolation using input matrix
-LINPEND  = .FALSE.                     ! true for runoff endian conversion
 CINPMAT  = "${CINPMAT}"                ! input matrix file name
 DROFUNIT = ${DROFUNIT}                 ! runoff unit conversion
 CROFDIR  = "${CROFDIR}"                ! runoff             input directory
 CROFPRE  = "${CROFPRE}"                ! runoff             input prefix
 CROFSUF  = "${CROFSUF}"                ! runoff             input suffix
-CSUBDIR  = "${CSUBDIR}"                ! sub-surface runoff input directory
-CSUBPRE  = "${CSUBPRE}"                ! sub-surface runoff input prefix
-CSUBSUF  = "${CSUBSUF}"                ! sub-surface runoff input suffix
 /
 EOF
-
-elif [ ${LINPCDF} = ".TRUE." ]; then
-cat >> ${NMLIST} << EOF
-&NFORCE
-LINPCDF  = ${LINPCDF}                  ! true for netCDF runoff
-LINTERP  = ${LINTERP}                  ! true for runoff interpolation using input matrix
-LINPEND  = .FALSE.                     ! true for runoff endian conversion
-LITRPCDF = ${LINTERPCDF}               ! * true for netCDF input matrix
-CINPMAT  = "${CINPMAT}"                ! input matrix file name
-DROFUNIT = ${DROFUNIT}                 ! runoff unit conversion
-CROFCDF  = "${CROFCDF}"                ! * netCDF input runoff file name
-CVNROF   = "${CVNROF}"                 ! * netCDF input runoff variable name
-CVNSUB   = "${CVNSUB}"                 ! * netCDF input runoff variable name
-SYEARIN  = ${SYEARIN}                  ! * netCDF input start year
-SMONIN   = ${SMONIN}                   ! * netCDF input start year
-SDAYIN   = ${SDAYIN}                   ! * netCDF input start year
-SHOURIN  = ${SHOURIN}                  ! * netCDF input start year
-/
-EOF
-
-fi # (if LINPCDF)
 
 #*** 5. outputs
 cat >> ${NMLIST} << EOF
@@ -452,31 +395,23 @@ cat >> ${NMLIST} << EOF
 COUTDIR  = "${COUTDIR}"                ! OUTPUT DIRECTORY
 CVARSOUT = "${CVARSOUT}"               ! Comma-separated list of output variables to save 
 COUTTAG  = "${COUTTAG}"                ! Output Tag Name for each experiment
-LOUTVEC  = .FALSE                      ! TRUE FOR VECTORIAL OUTPUT, FALSE FOR NX,NY OUTPUT
+LOUTVEC  = .FALSE.                     ! TRUE FOR VECTORIAL OUTPUT, FALSE FOR NX,NY OUTPUT
 LOUTCDF  = ${LOUTCDF}                  ! * true for netcdf outptu false for binary
 NDLEVEL  = 0                           ! * NETCDF DEFLATION LEVEL 
 IFRQ_OUT = ${IFRQ_OUT}                 ! output data write frequency (hour)
 /
 EOF
 
-#### 6. sea level (optional) 
-#cat >> ${NMLIST} << EOF
-#&NBOUND
-#LSEALEVCDF =  ${LSEALEVCDF}            ! * true : netCDF sea level boundary
-#CSEALEVDIR = "${CSEALEVDIR}"           ! Sea level boundary DIRECTORY
-#CSEALEVPRE = "${CSEALEVPRE}"           ! Sea level boundary PREFIX
-#CSEALEVSUF = "${CSEALEVSUF}"           ! Sea level boundary SUFFIX
-#CSEALEVCDF = "${CSEALEVCDF}"           ! * Sea level netCDF file name
-#CVNSEALEV  = "${CVNSEALEV}"            ! * Sea Level netCDF variable name
-#SYEARSL    = ${SYEARSL}                ! * netCDF sea level start year
-#SMONSL     = ${SMONSL}                 ! * netCDF sea level start year
-#SDAYSL     = ${SDAYSL}                 ! * netCDF sea level start year
-#SHOURSL    = ${SHOURSL}                ! * netCDF sea level start year
-#NSTATIONS  = ${NSTATIONS}              ! sea level data points
-#CSLMAP     = "${CSLMAP}                ! station to XY conversion table
-#IFRQ_SL    = ${IFRQ_SL}                ! sea level boundary update frequency (min)
-#/
-#EOF
+#*** Opt. Reservoir Operation
+cat >> ${NMLIST} << EOF
+&NDAMOUT
+CDAMFILE = "${CDAMFILE}"               ! Reservoir Parameter File
+LDAMTXT  = .TRUE.                      ! True for text-based reservoir data output
+LDAMH22  = .FALSE.                     ! True to use Hanazaki 2022 dam scheme. (False for Yamazaki&Funato scheme)
+LDAMYBY  = ${LDAMYBY}                  ! .TRUE. to use Year-By-Year dam activation scheme. .False. for All-reservoirs-in scheme
+LiVnorm  = ${LiVnorm}                  ! .TRUE. to use Normal Volume as initial reservoir storage. False for zero-additional storage.
+/
+EOF
 
 #================================================
 # (5) Execute main program

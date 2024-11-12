@@ -26,9 +26,17 @@ def CaMa_dir():
     #return "/cluster/data6/menaka/CaMa-Flood_v395b_20191030"
     #return "/cluster/data6/menaka/CaMa-Flood_v396_20191225"
     # return "/cluster/data6/menaka/CaMa-Flood_v396a_20200514"
-    return "/cluster/data6/menaka/CaMa-Flood_v4"
+    # return "/cluster/data6/menaka/CaMa-Flood_v4"
+    return "/cluster/data6/menaka/CaMa-Flood_v420"
     # directory of CaMa-Flood
     # indicate the directory of ./map or ./src and other folders
+
+def CaMa_opt():
+    # return "all" # for bifurcation and dam on
+    return "bif" # for bifurcation on  
+    # return "dam" # for dam on ** run dam and bif together [needed for dir names]
+    # return "levee" # for levee on ** under development
+    # for CaMa-Flood options  *** make [dam_rep == 2]
 
 def out_dir():
     return "/cluster/data6/menaka/Empirical_LocalPatch"
@@ -39,13 +47,14 @@ def map_name():
     # return "amz_06min" #Amazon river 6 min
     # return "congo_06min" #Congo river 6min
     # return "glb_06min" # global 6 min
-    return "glb_15min" # global 15 min
-    # return "conus_06min" #Conterminous US rivers 6min
+    # return "glb_15min" # global 15 min
+    # return "conus_06min" # Conterminous US rivers 6min
+    return "Mackenzie_06min" # Mackenzie river 6min
 
 def input_name():
-    return "S14FD"
+    # return "S14FD"
     # return "VIC_BC"
-    # return "ERA5"
+    return "ERA5"
 
 def spinup_mode():
      return 1
@@ -69,16 +78,22 @@ def patch_end():
     return 2020,12,31
 
 def threshold():
+    # return 0.8000000
     return 0.6000000
     # return 0.4000000
     # return 0.2000000
 
+def patch_size():
+    return 1000 # for lpara.f90 # 6min
+    # return 100 # 15min
+
 def dam_rep():
-    return 1 # represent dams in local patch
+    # return 1 # represent dams in local patch
     # return 0 # not represent dams in local patch
+    return 2 # reservoirs simulated by CaMa-Flood
 
 def para_nums():
-    return 6
+    return 1
     # setting number of parallels to run CaMa-Flood Model
     # default is 6, but may change depending on your system
 
@@ -105,6 +120,6 @@ def cpu_nums():
 
 def version():
     # return "v3.0.0 (updated 2020-05-25): CaMa-Flood v396"
-    return "v3.0.1 (updated 2022-11-23): CaMa-Flood v4, dams included"
+    return "v3.1.0 (updated 2024-06-08): CaMa-Flood v420, dams included"
     # version  396 merit DEM
     # different maps [glb_15min,glb_06min, etc]

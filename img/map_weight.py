@@ -76,7 +76,7 @@ def plot_ax(lon1,lon2,lat1,lat2,width,colorVal,ax=None,alpha=1):
 #========================
 syear=1979
 eyear=2019
-inputname="conus_06min_VIC_BC"
+inputname="conus_06min_ERA5"#"conus_06min_VIC_BC"
 mapname="conus_06min"
 # inputname="glb_15min_S14FD"
 # mapname="glb_15min"
@@ -127,7 +127,7 @@ loc="%04d%04d"%(ix,iy)
 prename="weightage"
 #====================================================================
 # fname="../weightage/"+inputname+"/"+loc+".bin"
-fname="../weightage/"+inputname+"_60/"+loc+".bin"
+fname="../weightage/"+inputname+"_60_CaMadam/"+loc+".bin"
 print (fname)
 data=np.fromfile(fname,np.float32).reshape(ny,nx)
 rivermap=rivermap*(data>1e-20)

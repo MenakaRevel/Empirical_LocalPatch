@@ -37,6 +37,7 @@ emonth=`python -c "import params; print (params.endtime()[1])"`
 edate=`python -c "import params; print (params.endtime()[2])"`
 echo $syear" to "$eyear
 CAMADIR=`python -c "import params; print (params.CaMa_dir())"`
+CaMa_opt=`python -c "import params; print (params.CaMa_opt())"`
 outdir=`python -c "import params; print (params.out_dir())"`
 cpunums=`python -c "import params; print (params.cpu_nums())"`
 mapname=`python -c "import params; print (params.map_name())"`
@@ -45,11 +46,11 @@ N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 
 #=================================================
 # make directories for semivar
-`python src/make_semivari.py $CAMADIR $mapname $inputname $outdir`
+`python src/make_semivari.py $CAMADIR $mapname ${inputname}_${CaMa_opt} $outdir`
 
 #=================================================
 varname="standardized"
-time ./src/semivariance $N $syear $eyear $varname $mapname $inputname $CAMADIR $outdir $NCPUS
+time ./src/semivariance $N $syear $eyear $varname $mapname ${inputname}_${CaMa_opt} $CAMADIR $outdir $NCPUS
 
 wait
 

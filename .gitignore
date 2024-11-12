@@ -68,3 +68,8 @@ EmpLP.o*
 
 # fortran files
 fort.*
+
+# vscode
+.vscode/
+
+*STDIN.*

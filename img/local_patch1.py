@@ -224,6 +224,12 @@ if damrep == 1:
   #---
   local_patch="local_patch"#"_%3.2f"%(pm.threshold())
   local_patch1="local_patch" #_one_%02d_dam" #%(threshold*100)
+elif damrep == 1:
+  patchname=pm.map_name()+"_"+pm.input_name()+"_CaMadam" #"amz_06min_S14FD"
+  patch_id=pm.map_name()+"_"+pm.input_name()+"_"+thresname+"_CaMadam" #"amz_06min_S14FD_90"
+  #---
+  local_patch="local_patch"#"_%3.2f"%(pm.threshold())
+  local_patch1="local_patch" #_one_%02d_dam" #%(threshold*100)
 else:
   patchname=pm.map_name()+"_"+pm.input_name() #"amz_06min_S14FD"
   patch_id=pm.map_name()+"_"+pm.input_name()+"_"+thresname #"amz_06min_S14FD_90"
@@ -267,14 +273,14 @@ ylist=[]
 river=[]
 staid=[]
 #--
-rivernames  = ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS"]#,"INDUS"]# ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS","INDUS"] ["AMAZONAS"]#"CONGO"]#
+# rivernames  = ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS"]#,"INDUS"]# ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZONAS","INDUS"] ["AMAZONAS"]#"CONGO"]#
 #rivernames = grdc.grdc_river_name()
 # rivernames = ["AMAZON"]
 # rivernames = ["MADEIRA"]
 # rivernames = ["VOLGA","YELLOW","MISSISSIPPI","MISSOURI"]
 # rivernames = ["YELLOW","MISSOURI"]
 # rivernames = ["MISSOURI","MISSISSIPPI","COLORADO"]
-# rivernames = ["MISSISSIPPI"] #["COLORADO"]
+rivernames = ["MISSISSIPPI"] #["COLORADO"]
 # rivernames = ["AMAZON","NIGER","CONGO","VOLGA","YELLOW","MISSISSIPPI","MISSOURI"]
 # rivernames = ["SAINT LAWRENCE","OHIO","CONNECTICUT","MISSOURI","MISSISSIPPI","COLORADO","CHURCHILL"]
 for rivername in rivernames:
@@ -388,10 +394,14 @@ pnum=len(pname)
 # for point in np.arange(pnum):
 def mk_fig(point):
   figname0="".join(pname[point].split())
+  # figname0="".join(figname0.split())
+  # figname0="".join(figname0.split())
+  figname0="".join(e for e in figname0 if e.isalnum())
   ix=xlist[point]+1
   iy=ylist[point]+1
   #--
-  print ("making figure -> "+river[point]+"  "+pname[point],ix,iy," ....")
+  print ("\tmaking figure >>>>>>>> "+river[point]+"  "+pname[point],ix,iy," ....")
+  print ("\t\t >>>>>>> "+figname0)
   #--
   # if not riveridname(river[point]) in rivid.keys():
   #   continue

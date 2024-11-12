@@ -109,11 +109,17 @@ slink("../params.py","params.py")
 import params as pm
 import read_grdc as grdc
 #--
+# if pm.CaMa_opt()=="dam":
+#   inputname=pm.map_name()+"_"+pm.input_name()#+"_"+pm.CaMa_opt()
+# else:
+#   inputname=pm.map_name()+"_"+pm.input_name()
+inputname=pm.map_name()+"_"+pm.input_name()+"_"+pm.CaMa_opt()
 mk_dir(pm.out_dir()+"/figures")
-mk_dir(pm.out_dir()+"/figures/"+pm.map_name()+"_"+pm.input_name()+"/disgraph")
+mk_dir(pm.out_dir()+"/figures/"+inputname+"/disgraph")
 #--read outflow netCDF4--
 tag="%04d-%04d"%(2000,2020) #pm.starttime()[0],pm.endtime()[0])
-fname=pm.out_dir()+"/CaMa_out/"+pm.map_name()+"_"+pm.input_name()+"/outflw"+tag+".nc"
+# fname=pm.out_dir()+"/CaMa_out/"+pm.map_name()+"_"+pm.input_name()+"_"+pm.CaMa_opt()+"/outflw"+tag+".nc"
+fname=pm.out_dir()+"/CaMa_out/"+inputname+"/outflw"+tag+".nc"
 print (fname)
 nc=xr.open_dataset(fname)
 
@@ -146,8 +152,9 @@ staid=[]
 #--
 # rivernames  = ["LENA","NIGER","CONGO","OB","MISSISSIPPI","MEKONG","AMAZON","INDUS"]
 #rivernames = ["AMAZON"]
-rivernames = ["MISSISSIPPI","MISSOURI","COLORADO","SAINT LAWRENCE","OHIO","CONNECTICUT","CHURCHILL"]
+# rivernames = ["MISSISSIPPI","MISSOURI","COLORADO","SAINT LAWRENCE","OHIO","CONNECTICUT","CHURCHILL"]
 # rivernames = grdc.grdc_river_name()
+rivernames = ["MACKENZIE"]
 for rivername in rivernames:
     # path = pm.out_dir()+"/figures/"+pm.map_name()+"_"+pm.input_name()+"/disgraph/%s"%(rivername)
     # print path
@@ -284,7 +291,9 @@ def make_fig(point):
     ax.ticklabel_format(style="sci",axis="y",scilimits=(0,0))
 
     plt.tight_layout(pad=0.2,w_pad=0.05,h_pad=0.05)
-    plt.savefig(pm.out_dir()+"/figures/"+pm.map_name()+"_"+pm.input_name()+"/disgraph/"+river[point]+"-"+pname[point]+"_disgraph_GRDC.png",dpi=500)
+    # plt.savefig(pm.out_dir()+"/figures/"+pm.map_name()+"_"+pm.input_name()+"_"+pm.CaMa_opt()+"/disgraph/"+river[point]+"-"+pname[point]+"_disgraph_GRDC.png",dpi=500)
+    plt.savefig(pm.out_dir()+"/figures/"+inputname+"/disgraph/"+river[point]+"-"+pname[point]+"_disgraph_GRDC.png",dpi=500)
+    
     #plt.show()
     return 0
 

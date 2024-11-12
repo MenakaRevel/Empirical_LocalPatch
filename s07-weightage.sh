@@ -5,7 +5,7 @@
 # 2020/06/01
 #====================
 #*** PBS setting when needed
-#PBS -q E40
+#PBS -q F40
 #PBS -l select=1:ncpus=40:mem=40gb
 #PBS -j oe
 #PBS -m ea
@@ -15,7 +15,7 @@
 #========
 # import virtual environment
 source ~/.bashrc
-source ~/.bash_conda
+# source ~/.bash_conda
 
 source activate pydef
 
@@ -25,7 +25,7 @@ which python
 cd "/cluster/data6/menaka/Empirical_LocalPatch"
 #================================================
 # OpenMP Thread number
-NCPUS=40
+NCPUS=20
 export OMP_NUM_THREADS=$NCPUS
 
 # input settings
@@ -37,6 +37,7 @@ emonth=`python -c "import params; print (params.endtime()[1])"`
 edate=`python -c "import params; print (params.endtime()[2])"`
 echo $syear" to "$eyear
 CAMADIR=`python -c "import params; print (params.CaMa_dir())"`
+CaMa_opt=`python -c "import params; print (params.CaMa_opt())"`
 outdir=`python -c "import params; print (params.out_dir())"`
 cpunums=$NCPUS #`python -c "import params; print (params.cpu_nums())"`
 mapname=`python -c "import params; print (params.map_name())"`
@@ -45,7 +46,7 @@ N=`python src/calc_days.py $syear $smonth $sdate $eyear $emonth $edate`
 threshold=`python -c "import params; print (params.threshold())"`
 damrep=`python -c "import params; print (params.dam_rep())"` # represent dams
 #=================================================
-python src/weightage.py $CAMADIR $mapname $inputname $outdir $cpunums $threshold $damrep &
+python src/weightage.py $CAMADIR $mapname ${inputname} $outdir $cpunums $threshold $damrep ${CaMa_opt} &
 
 wait
 
