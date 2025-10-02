@@ -14,10 +14,10 @@
 #PBS -N weight
 #========
 # import virtual environment
-source ~/.bashrc
+# source ~/.bashrc
 # source ~/.bash_conda
 
-source activate pydef
+# source activate pydef
 
 which python
 #========
@@ -25,7 +25,7 @@ which python
 cd "/cluster/data6/menaka/Empirical_LocalPatch"
 #================================================
 # OpenMP Thread number
-NCPUS=20
+NCPUS=40
 export OMP_NUM_THREADS=$NCPUS
 
 # input settings
@@ -50,4 +50,4 @@ python src/weightage.py $CAMADIR $mapname ${inputname} $outdir $cpunums $thresho
 
 wait
 
-conda deactivate
+# conda deactivate
